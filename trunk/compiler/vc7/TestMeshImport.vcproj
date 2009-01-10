@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="Windows-1252"?>
+<VisualStudioProject
+ProjectType="Visual C++"
+Version="7.00"
+Name="TestMeshImport"
+>
+<Platforms>
+<Platform Name="Win32"/>
+</Platforms>
+<Configurations>
+  <Configuration
+    Name="debug|Win32"
+    OutputDirectory="../../bin/win32"
+    IntermediateDirectory="build/Win32/$(SolutionName)/$(ProjectName)/debug"
+    ConfigurationType="1"
+    CharacterSet="2"
+    >
+    <Tool
+      Name="VCCLCompilerTool"
+      AdditionalIncludeDirectories="&quot;../../include&quot;;"
+      PreprocessorDefinitions="WIN32;_WINDOWS;UNICODE=1;_CRT_SECURE_NO_DEPRECATE;OPEN_SOURCE=1;_DEBUG;"
+      WarningLevel="3"
+      Optimization="4"
+      AdditionalOptions="/fp:fast /W4 /WX /MDd /Zi "
+      ExceptionHandling="1"
+      />
+    <Tool Name="VCCustomBuildTool"/>
+    <Tool 
+      Name="VCLinkerTool" 
+      OutputFile="$(OutDir)/TestMeshImportDEBUG.exe" 
+      ProgramDatabaseFile="$(OutDir)/TestMeshImportDEBUG.exe.pdb" 
+      AdditionalOptions="/DEBUG "
+      AdditionalDependencies=""
+      AdditionalLibraryDirectories=""
+      GenerateMapFile="TRUE"
+      MapFileName="$(OutDir)/TestMeshImportDEBUG.exe.map"
+      SubSystem="1"
+      />
+    <Tool Name="VCMIDLTool"/>
+    <Tool Name="VCPreBuildEventTool"/>
+    <Tool Name="VCPostBuildEventTool"/>
+    <Tool Name="VCPreLinkEventTool"/>
+    <Tool Name="VCResourceCompilerTool"/>
+    <Tool Name="VCWebServiceProxyGeneratorTool"/>
+    <Tool Name="VCXMLDataGeneratorTool"/>
+    <Tool Name="VCWebDeploymentTool"/>
+    <Tool Name="VCManagedWrapperGeneratorTool"/>
+    <Tool Name="VCAuxiliaryManagedWrapperGeneratorTool"/>
+  </Configuration>
+  <Configuration
+    Name="release|Win32"
+    OutputDirectory="../../bin/win32"
+    IntermediateDirectory="build/Win32/$(SolutionName)/$(ProjectName)/release"
+    ConfigurationType="1"
+    CharacterSet="2"
+    >
+    <Tool
+      Name="VCCLCompilerTool"
+      AdditionalIncludeDirectories="&quot;../../include&quot;;"
+      PreprocessorDefinitions="WIN32;_WINDOWS;UNICODE=1;_CRT_SECURE_NO_DEPRECATE;OPEN_SOURCE=1;NDEBUG;"
+      WarningLevel="3"
+      Optimization="4"
+      AdditionalOptions="/fp:fast /WX /W4 /MD /Zi /O2 "
+      ExceptionHandling="1"
+      />
+    <Tool Name="VCCustomBuildTool"/>
+    <Tool 
+      Name="VCLinkerTool" 
+      OutputFile="$(OutDir)/TestMeshImport.exe" 
+      ProgramDatabaseFile="$(OutDir)/TestMeshImport.exe.pdb" 
+      AdditionalOptions="/DEBUG "
+      AdditionalDependencies=""
+      AdditionalLibraryDirectories=""
+      GenerateMapFile="TRUE"
+      MapFileName="$(OutDir)/TestMeshImport.exe.map"
+      SubSystem="1"
+      />
+    <Tool Name="VCMIDLTool"/>
+    <Tool Name="VCPreBuildEventTool"/>
+    <Tool Name="VCPostBuildEventTool"/>
+    <Tool Name="VCPreLinkEventTool"/>
+    <Tool Name="VCResourceCompilerTool"/>
+    <Tool Name="VCWebServiceProxyGeneratorTool"/>
+    <Tool Name="VCXMLDataGeneratorTool"/>
+    <Tool Name="VCWebDeploymentTool"/>
+    <Tool Name="VCManagedWrapperGeneratorTool"/>
+    <Tool Name="VCAuxiliaryManagedWrapperGeneratorTool"/>
+  </Configuration>
+</Configurations>
+<References></References>
+<Files>
+  <Filter Name="Common Binding Files" Filter="">
+    <Filter Name="binding" Filter="">
+      <File RelativePath="..\..\include\common\binding\binding.cpp"/>
+      <File RelativePath="..\..\include\common\binding\binding.h"/>
+    </Filter>
+    <Filter Name="MemoryServices" Filter="">
+      <File RelativePath="..\..\include\common\MemoryServices\MemoryContainer.cpp"/>
+      <File RelativePath="..\..\include\common\MemoryServices\MemoryContainer.h"/>
+    </Filter>
+  </Filter>
+  <Filter Name="TestMeshImport" Filter="">
+    <File RelativePath="..\..\app\TestMeshImport\TestMeshImport.cpp"/>
+  </Filter>
+</Files>
+<Globals></Globals>
+</VisualStudioProject>
