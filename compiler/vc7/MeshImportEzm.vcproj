@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="Windows-1252"?>
+<VisualStudioProject
+ProjectType="Visual C++"
+Version="7.00"
+Name="MeshImportEzm"
+>
+<Platforms>
+<Platform Name="Win32"/>
+</Platforms>
+<Configurations>
+  <Configuration
+    Name="debug|Win32"
+    OutputDirectory="../../bin/win32"
+    IntermediateDirectory="build/Win32/$(SolutionName)/$(ProjectName)/debug"
+    ConfigurationType="2"
+    CharacterSet="2"
+    >
+    <Tool
+      Name="VCCLCompilerTool"
+      AdditionalIncludeDirectories="&quot;../../include&quot;;"
+      PreprocessorDefinitions="WIN32;_WINDOWS;UNICODE=1;_UNICODE=1;MESHIMPORTEZM_EXPORTS;_DEBUG;"
+      WarningLevel="3"
+      Optimization="4"
+      AdditionalOptions="/WX /W4 /fp:fast /MDd /Zi "
+      ExceptionHandling="1"
+      />
+    <Tool Name="VCCustomBuildTool"/>
+    <Tool 
+      Name="VCLinkerTool" 
+      OutputFile="$(OutDir)/MeshImportEzm.dll" 
+      ProgramDatabaseFile="$(OutDir)/MeshImportEzm.dll.pdb" 
+      AdditionalOptions="/DEBUG "
+      AdditionalDependencies=""
+      AdditionalLibraryDirectories="&quot;../../lib/win32&quot;;"
+      ImportLibrary="../../lib/win32/$(TargetName).lib"
+      GenerateMapFile="TRUE"
+      MapFileName="$(OutDir)/MeshImportEzm.dll.map"
+      SubSystem="1"
+      />
+    <Tool Name="VCMIDLTool"/>
+    <Tool Name="VCPreBuildEventTool"/>
+    <Tool Name="VCPostBuildEventTool"/>
+    <Tool Name="VCPreLinkEventTool"/>
+    <Tool Name="VCResourceCompilerTool"/>
+    <Tool Name="VCWebServiceProxyGeneratorTool"/>
+    <Tool Name="VCXMLDataGeneratorTool"/>
+    <Tool Name="VCWebDeploymentTool"/>
+    <Tool Name="VCManagedWrapperGeneratorTool"/>
+    <Tool Name="VCAuxiliaryManagedWrapperGeneratorTool"/>
+  </Configuration>
+  <Configuration
+    Name="release|Win32"
+    OutputDirectory="../../bin/win32"
+    IntermediateDirectory="build/Win32/$(SolutionName)/$(ProjectName)/release"
+    ConfigurationType="2"
+    CharacterSet="2"
+    >
+    <Tool
+      Name="VCCLCompilerTool"
+      AdditionalIncludeDirectories="&quot;../../include&quot;;"
+      PreprocessorDefinitions="WIN32;_WINDOWS;UNICODE=1;_UNICODE=1;MESHIMPORTEZM_EXPORTS;NDEBUG;"
+      WarningLevel="3"
+      Optimization="4"
+      AdditionalOptions="/WX /W4 /fp:fast /O2 /MD /Zi "
+      ExceptionHandling="1"
+      />
+    <Tool Name="VCCustomBuildTool"/>
+    <Tool 
+      Name="VCLinkerTool" 
+      OutputFile="$(OutDir)/MeshImportEzm.dll" 
+      ProgramDatabaseFile="$(OutDir)/MeshImportEzm.dll.pdb" 
+      AdditionalOptions="/DEBUG "
+      AdditionalDependencies=""
+      AdditionalLibraryDirectories="&quot;../../lib/win32&quot;;"
+      ImportLibrary="../../lib/win32/$(TargetName).lib"
+      GenerateMapFile="TRUE"
+      MapFileName="$(OutDir)/MeshImportEzm.dll.map"
+      SubSystem="1"
+      />
+    <Tool Name="VCMIDLTool"/>
+    <Tool Name="VCPreBuildEventTool"/>
+    <Tool Name="VCPostBuildEventTool"/>
+    <Tool Name="VCPreLinkEventTool"/>
+    <Tool Name="VCResourceCompilerTool"/>
+    <Tool Name="VCWebServiceProxyGeneratorTool"/>
+    <Tool Name="VCXMLDataGeneratorTool"/>
+    <Tool Name="VCWebDeploymentTool"/>
+    <Tool Name="VCManagedWrapperGeneratorTool"/>
+    <Tool Name="VCAuxiliaryManagedWrapperGeneratorTool"/>
+  </Configuration>
+</Configurations>
+<References></References>
+<Files>
+  <Filter Name="Source Files" Filter="">
+    <File RelativePath="..\..\src\MeshImportEzm\ImportEzm.cpp"/>
+    <File RelativePath="..\..\src\MeshImportEzm\MeshImportEzm.cpp"/>
+  </Filter>
+  <Filter Name="Header Files" Filter="">
+    <File RelativePath="..\..\src\MeshImportEzm\ImportEzm.h"/>
+  </Filter>
+  <Filter Name="Public Header Files" Filter="">
+    <File RelativePath="..\..\include\MeshImportEzm\MeshImportEzm.h"/>
+  </Filter>
+  <Filter Name="Plugin Header Files" Filter="">
+    <Filter Name="MeshImport" Filter="">
+      <File RelativePath="..\..\include\MeshImport\MeshImport.h"/>
+      <File RelativePath="..\..\include\MeshImport\MeshSystem.h"/>
+    </Filter>
+  </Filter>
+  <Filter Name="Common Include-Binding Files" Filter="">
+    <Filter Name="snippets" Filter="">
+      <File RelativePath="..\..\include\common\snippets\asc2bin.cpp"/>
+      <File RelativePath="..\..\include\common\snippets\asc2bin.h"/>
+      <File RelativePath="..\..\include\common\snippets\stable.h"/>
+    </Filter>
+    <Filter Name="MemoryServices" Filter="">
+      <File RelativePath="..\..\include\common\MemoryServices\MemoryContainer.cpp"/>
+      <File RelativePath="..\..\include\common\MemoryServices\MemoryContainer.h"/>
+    </Filter>
+    <Filter Name="TinyXML" Filter="">
+      <File RelativePath="..\..\include\common\TinyXML\tinystr.cpp"/>
+      <File RelativePath="..\..\include\common\TinyXML\tinystr.h"/>
+      <File RelativePath="..\..\include\common\TinyXML\tinyxml.cpp"/>
+      <File RelativePath="..\..\include\common\TinyXML\tinyxml.h"/>
+      <File RelativePath="..\..\include\common\TinyXML\tinyxmlerror.cpp"/>
+      <File RelativePath="..\..\include\common\TinyXML\tinyxmlparser.cpp"/>
+    </Filter>
+    <Filter Name="FileInterface" Filter="">
+      <File RelativePath="..\..\include\common\FileInterface\FileInterface.cpp"/>
+      <File RelativePath="..\..\include\common\FileInterface\FileInterface.h"/>
+    </Filter>
+  </Filter>
+</Files>
+<Globals></Globals>
+</VisualStudioProject>

@@ -1,0 +1,85 @@
+<XPJ version="4">
+
+	<Project name="MeshImport" version="1">
+		<Export platform="win32" tool="vc8">../vc8</Export>
+		<Export platform="win32" tool="vc7">../vc7</Export>
+
+
+		<Target name="MeshImport">
+			<Export platform="win32" tool="vc8">../vc8</Export>
+			<Export platform="win32" tool="vc7">../vc7</Export>
+
+			<Configuration name="default" platform="Win32" type="dll">
+				<OutFile>MeshImport.dll</OutFile>
+				<Preprocessor type="define">
+					WIN32
+					_WINDOWS
+					UNICODE=1
+					_UNICODE=1
+          MESHIMPORT_EXPORTS
+				</Preprocessor>
+				<Files name="Source Files" root="../../src/MeshImport" type="source">
+					*.cpp
+					*.c
+				</Files>
+				<Files name="Header Files" root="../../src/MeshImport" type="header">
+					*.h
+				</Files>
+				<Files name="Public Header Files" root="../../include/MeshImport" type="header">
+					*.h
+				</Files>
+				<Files name="External SDK Header Files" root="../../ext" type="header">
+				</Files>
+				<Files name="Plugin Header Files" root="../../include" type="header">
+				</Files>
+				<Files name="Common Include-Binding Files" root="../../include/common" type="header">
+         MemoryServices/*.cpp
+         MemoryServices/*.h
+         snippets/StringDict.cpp
+         snippets/StringDict.h
+         snippets/UserMemAlloc.h
+         snippets/stable.h
+         snippets/HtmlTable.cpp
+         snippets/HtmlTable.h
+				</Files>
+				<OutDir>../../bin/win32</OutDir>
+				<ImpDir>../../lib/win32</ImpDir>
+				<SearchPaths type="header">
+          ../../include
+          ../../include/common/snippets
+          ../../include/common/MemoryServices
+				</SearchPaths>
+				<SearchPaths type="library">
+       ../../lib/win32
+				</SearchPaths>
+				<Dependencies>
+				</Dependencies>
+				<Libraries>
+				</Libraries>
+ 				<LFlags tool="vc8">/NODEFAULTLIB:libcp.lib</LFlags>
+			</Configuration>
+
+			<Configuration name="debug">
+				<CFlags>/WX /W4 /fp:fast /MDd /Zi</CFlags>
+				<LFlags>/DEBUG</LFlags>
+				<Preprocessor type="define">
+					_DEBUG
+				</Preprocessor>
+				<Libraries>
+				</Libraries>
+			</Configuration>
+
+			<Configuration name="release">
+				<CFlags>/WX /W4 /fp:fast /O2 /MD /Zi</CFlags>
+				<LFlags>/DEBUG</LFlags>
+				<Preprocessor type="define">
+					NDEBUG
+				</Preprocessor>
+				<Libraries>
+				</Libraries>
+			</Configuration>
+
+		</Target>
+	</Project>
+
+</XPJ>

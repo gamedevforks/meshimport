@@ -1,0 +1,78 @@
+<XPJ version="4">
+	<Project name="TestMeshImport" version="1">
+		<Export platform="win32" tool="vc8">../vc8</Export>
+		<Export platform="win32" tool="vc7">../vc7</Export>
+		<Import root=".\" file="MeshImport.xpj"/>
+		<Import root=".\" file="MeshImportEzm.xpj"/>
+		<Import root=".\" file="MeshImportFbx.xpj"/>
+		<Import root=".\" file="MeshImportLeveller.xpj"/>
+		<Import root=".\" file="MeshImportObj.xpj"/>
+		<Import root=".\" file="MeshImportPsk.xpj"/>
+		<Import root=".\" file="MeshImportAssimp.xpj"/>
+		<Import root=".\" file="MeshImportOgre.xpj"/>
+
+		<Target name="TestMeshImport">
+			<Export platform="win32" tool="vc8">../vc8</Export>
+			<Export platform="win32" tool="vc7">../vc7</Export>
+
+			<Configuration name="default" platform="Win32" type="console">
+				<Preprocessor type="define">
+					WIN32
+					_WINDOWS
+					UNICODE=1
+					_CRT_SECURE_NO_DEPRECATE
+          OPEN_SOURCE=1
+				</Preprocessor>
+				<CFlags tool="vc8">/wd4996</CFlags>
+ 				<LFlags tool="vc8">/NODEFAULTLIB:libcp.lib</LFlags>
+				<OutDir>../../bin/win32</OutDir>
+				<SearchPaths type="header">
+          ../../include
+				</SearchPaths>
+				<Files name="Common Binding Files" root="../../include/common" type="header">
+          binding/*.cpp
+          binding/*.h
+          MemoryServices/*.cpp
+          MemoryServices/*.h
+				</Files>
+			<Files name="TestMeshImport" root="../../app/TestMeshImport" type="header">
+				*.h
+				*.cpp
+				*.c
+			</Files>
+				<SearchPaths type="library">
+				</SearchPaths>
+				<Libraries>
+				</Libraries>
+			</Configuration>
+
+			<Configuration name="debug">
+				<OutFile>TestMeshImportDEBUG.exe</OutFile>
+				<CFlags>/fp:fast /W4 /WX /MDd /Zi</CFlags>
+				<LFlags>/DEBUG</LFlags>
+				<Preprocessor type="define">
+					_DEBUG
+				</Preprocessor>
+			</Configuration>
+
+			<Configuration name="release">
+				<OutFile>TestMeshImport.exe</OutFile>
+				<CFlags>/fp:fast /WX /W4 /MD /Zi /O2</CFlags>
+				<LFlags>/DEBUG</LFlags>
+				<Preprocessor type="define">NDEBUG</Preprocessor>
+			</Configuration>
+			<Libraries>
+			</Libraries>
+			<Dependencies type="link">
+     		MeshImport
+    		MeshImportEzm
+    		MeshImportFbx
+    		MeshImportLeveller
+    		MeshImportObj
+    		MeshImportPsk
+        MeshImportAssimp
+        MeshImportOgre
+			</Dependencies>
+		</Target>
+	</Project>
+</XPJ>

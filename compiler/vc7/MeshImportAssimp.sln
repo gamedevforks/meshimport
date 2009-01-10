@@ -1,0 +1,21 @@
+Microsoft Visual Studio Solution File, Format Version 8.00
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MeshImportAssimp", "MeshImportAssimp.vcproj", "{757D17B6-103C-9414-9113-D8122C7B8A33}"
+	ProjectSection(ProjectDependencies) = postProject
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfiguration) = preSolution
+		debug = debug
+		release = release
+	EndGlobalSection
+	GlobalSection(ProjectConfiguration) = postSolution
+		{757D17B6-103C-9414-9113-D8122C7B8A33}.debug.ActiveCfg = debug|Win32
+		{757D17B6-103C-9414-9113-D8122C7B8A33}.debug.Build.0 = debug|Win32
+		{757D17B6-103C-9414-9113-D8122C7B8A33}.release.ActiveCfg = release|Win32
+		{757D17B6-103C-9414-9113-D8122C7B8A33}.release.Build.0 = release|Win32
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+	EndGlobalSection
+	GlobalSection(ExtensibilityAddins) = postSolution
+	EndGlobalSection
+EndGlobal

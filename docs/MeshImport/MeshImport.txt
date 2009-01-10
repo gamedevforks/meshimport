@@ -1,0 +1,5 @@
+
+# The MeshImport project is an open source suite of DLL's that import a wide variety of graphics mesh formats.
+# MeshImport is similar to the OpenAssetImport library and, in fact, one of the MeshImport plugins provides
+# support for the OpenAssetImport DLL.
+#

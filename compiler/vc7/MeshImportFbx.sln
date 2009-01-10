@@ -1,0 +1,21 @@
+Microsoft Visual Studio Solution File, Format Version 8.00
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MeshImportFbx", "MeshImportFbx.vcproj", "{285507B1-ED5C-5646-8C30-665A8583D9F8}"
+	ProjectSection(ProjectDependencies) = postProject
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfiguration) = preSolution
+		debug = debug
+		release = release
+	EndGlobalSection
+	GlobalSection(ProjectConfiguration) = postSolution
+		{285507B1-ED5C-5646-8C30-665A8583D9F8}.debug.ActiveCfg = debug|Win32
+		{285507B1-ED5C-5646-8C30-665A8583D9F8}.debug.Build.0 = debug|Win32
+		{285507B1-ED5C-5646-8C30-665A8583D9F8}.release.ActiveCfg = release|Win32
+		{285507B1-ED5C-5646-8C30-665A8583D9F8}.release.Build.0 = release|Win32
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+	EndGlobalSection
+	GlobalSection(ExtensibilityAddins) = postSolution
+	EndGlobalSection
+EndGlobal
