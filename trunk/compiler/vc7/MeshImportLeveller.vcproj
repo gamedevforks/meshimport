@@ -3,6 +3,9 @@
 ProjectType="Visual C++"
 Version="7.00"
 Name="MeshImportLeveller"
+SccProjectName="Perforce Project"
+SccLocalPath="."
+SccProvider="MSCCI:Perforce SCM"
 >
 <Platforms>
 <Platform Name="Win32"/>

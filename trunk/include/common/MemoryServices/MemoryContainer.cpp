@@ -102,7 +102,11 @@ void* MemoryPool_Private::OperatorNewArray(POOL_NUMBER pool, size_t s,const char
 
 void  MemoryPool_Private::OperatorDeleteArray(POOL_NUMBER pool, void* ptr)
 {
+#if HE_USE_MEMORY_TRACKING
+  MEMALLOC::free(MEMALLOC::gMemAlloc,ptr,MEMALLOC::MAT_NEW_ARRAY);
+#else
   MEMALLOC_FREE(ptr);
+#endif
 }
 
 

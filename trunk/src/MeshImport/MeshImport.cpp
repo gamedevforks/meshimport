@@ -5,6 +5,7 @@
 #include "./MeshImport/MeshImport.h"
 #include "MeshImportBuilder.h"
 #include "common/snippets/UserMemAlloc.h"
+#include "common/FileInterface/FileInterface.h"
 
 #pragma warning(disable:4996)
 
@@ -95,7 +96,7 @@ public:
     MeshImporter *mi = locateMeshImporter(meshName);
     if ( mi )
     {
-      MeshImportBuilder *b = createMeshImportBuilder(meshName,data,dlen,mi,options);
+      MeshBuilder *b = createMeshBuilder(meshName,data,dlen,mi,options);
       if ( b )
       {
         ret = static_cast< MeshSystem * >(b);
@@ -107,10 +108,134 @@ public:
 
   virtual void             releaseMeshSystem(MeshSystem *mesh)
   {
-    MeshImportBuilder *b = static_cast< MeshImportBuilder *>(mesh);
-    releaseMeshImportBuilder(b);
+    MeshBuilder *b = static_cast< MeshBuilder *>(mesh);
+    releaseMeshBuilder(b);
   }
 
+
+  virtual int              getImporterCount(void)
+  {
+    return mImporters.size();
+  }
+
+  virtual MeshImporter    *getImporter(int index)
+  {
+    MeshImporter *ret = 0;
+    assert( index >=0 && index < (int)mImporters.size() );
+    if ( index >= 0 && index < (int)mImporters.size() )
+    {
+      ret = mImporters[index];
+    }
+    return ret;
+  }
+
+  const char *getStr(const char *str)
+  {
+    if ( str == 0 ) str = "";
+    return str;
+  }
+
+  void printAABB(FILE_INTERFACE *fph,const MeshAABB &a)
+  {
+    fi_fprintf(fph,"       <MeshAABB min=\"%0.9f,%0.9f,%0.9f\" max=\"%0.9f,%0.9f,%0.9f\"/>\r\n", a.mMin[0], a.mMin[1], a.mMin[2], a.mMax[0], a.mMax[1], a.mMax[2] );
+  }
+
+  void print(FILE_INTERFACE *fph,MeshRawTexture *t)
+  {
+    assert(0); // not yet implemented
+  }
+
+  void print(FILE_INTERFACE *fph,MeshTetra *t)
+  {
+    assert(0); // not yet implemented
+  }
+
+  void print(FILE_INTERFACE *fph,MeshSkeleton *s)
+  {
+    assert(0);
+  }
+
+  void print(FILE_INTERFACE *fph,MeshAnimation *a)
+  {
+    assert(0);
+  }
+
+  void print(FILE_INTERFACE *fph,const MeshMaterial &m)
+  {
+    fi_fprintf(fph,"      <Material name=%s meta_data=%s/>\r\n", m.mName, m.mMetaData );
+  }
+
+  virtual void            *serializeMeshSystem(MeshSystem *mesh,unsigned int &len,MeshSerializeFormat format)
+  {
+    void * ret = 0;
+    len = 0;
+
+    FILE_INTERFACE *fph = fi_fopen("foo", "wmem", 0, 0);
+
+    if ( fph )
+    {
+      fi_fprintf(fph,"<?xml version=\"1.0f\"?>\r\n");
+      fi_fprintf(fph,"  <MeshSystem asset_name=\"%s\" asset_info=\"%s\" mesh_system_version=%d mesh_system_asset_version=%d>\r\n", getStr(mesh->mAssetName), getStr(mesh->mAssetInfo), mesh->mMeshSystemVersion, mesh->mAssetVersion );
+      printAABB(fph,mesh->mAABB);
+
+      fi_fprintf(fph,"    <Textures count=%d>\r\n", mesh->mTextureCount );
+      for (unsigned int i=0; i<mesh->mTextureCount; i++)
+      {
+        print(fph,mesh->mTextures[i]);
+      }
+      fi_fprintf(fph,"    </Textures>\r\n");
+
+      fi_fprintf(fph,"   <TetraMeshes count=%d>\r\n", mesh->mTetraMeshCount );
+      for (unsigned int i=0; i<mesh->mTetraMeshCount; i++)
+      {
+        print(fph,mesh->mTetraMeshes[i]);
+      }
+      fi_fprintf(fph,"   </TetraMeshes>\r\n");
+
+      fi_fprintf(fph,"    <Skeletons count=%d>\r\n");
+
+      for (unsigned int i=0; i<mesh->mSkeletonCount; i++)
+      {
+        print(fph,mesh->mSkeletons[i]);
+      }
+
+      fi_fprintf(fph,"    </Skeletons>\r\n");
+
+      fi_fprintf(fph,"    <Animations count=%d>\r\n", mesh->mAnimationCount );
+      for (unsigned int i=0; i<mesh->mAnimationCount; i++)
+      {
+        print(fph,mesh->mAnimations[i]);
+      }
+      fi_fprintf(fph,"    </Animations>\r\n");
+
+      fi_fprintf(fph,"    <Materials count=%d>\r\n", mesh->mMaterialCount );
+      for (unsigned int i=0; i<mesh->mMaterialCount; i++)
+      {
+        print(fph,mesh->mMaterials[i]);
+      }
+
+
+
+      fi_fprintf(fph,"  </MeshSystem>\r\n");
+
+      size_t olen;
+      void *temp = fi_getMemBuffer(fph,&olen);
+      if ( temp )
+      {
+        ret = MEMALLOC_MALLOC(olen);
+        memcpy(ret,temp,olen);
+        len = olen;
+      }
+      fi_fclose(fph);
+    }
+
+    return ret;
+  }
+
+  virtual  void             releaseSerializeMemory(void *data)
+  {
+    MEMALLOC_FREE(data);
+  }
 
 private:
   MeshImporterVector  mImporters;

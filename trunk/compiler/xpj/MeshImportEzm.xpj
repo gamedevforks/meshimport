@@ -37,6 +37,8 @@
           snippets/asc2bin.cpp
           snippets/asc2bin.h
           snippets/stable.h
+          snippets/stringdict.cpp
+          snippets/stringdict.h
           MemoryServices/*.cpp
           MemoryServices/*.h
           TinyXML/*.cpp

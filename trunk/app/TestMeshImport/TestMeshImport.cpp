@@ -145,6 +145,24 @@ void main(int argc,const char **argv)
         if ( ms )
         {
           printf("Success!\r\n");
+
+          unsigned int olen;
+          void *data = gMeshImport->serializeMeshSystem(ms,olen,MESHIMPORT::MSF_EZMESH);
+          if ( data )
+          {
+            printf("Saving serialized data as temp.ezm\r\n");
+            FILE *fph = fopen("temp.ezm", "wb");
+            if ( fph )
+            {
+              fwrite(data,olen,1,fph);
+              fclose(fph);
+            }
+            else
+            {
+              printf("Failed to open file for write access.\r\n");
+            }
+            gMeshImport->releaseSerializeMemory(data);
+          }
           gMeshImport->releaseMeshSystem(ms);
         }
         else

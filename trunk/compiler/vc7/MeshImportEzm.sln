@@ -4,6 +4,14 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MeshImportEzm", "MeshImport
 	EndProjectSection
 EndProject
 Global
+GlobalSection(SourceCodeControl) = preSolution
+  SccNumberOfProjects = 2
+  SccLocalPath0 = .
+  SccProjectUniqueName0 = debug.vcproj
+  SccLocalPath1 = .
+  SccProjectUniqueName1 = release.vcproj
+  SccLocalPath2 = .
+  EndGlobalSection
 	GlobalSection(SolutionConfiguration) = preSolution
 		debug = debug
 		release = release
@@ -18,4 +26,7 @@ Global
 	EndGlobalSection
 	GlobalSection(ExtensibilityAddins) = postSolution
 	EndGlobalSection
+GlobalSection(SolutionProperties) = preSolution
+  HideSolutionNode = FALSE
+  EndGlobalSection
 EndGlobal

@@ -155,10 +155,8 @@ namespace MemoryContainer {
 #include <hash_set>
 #include <hash_map>
 #else
-#ifndef ORA_PROC
 #include <ext/hash_set>
 #include <ext/hash_map>
-#endif
 #endif
 #include <deque>
 #include <stack>

@@ -38,9 +38,14 @@ public:
     return doShutdown();
   }
 
-  virtual const char * getExtension(void)  // report the default file name extension for this mesh type.
+  virtual const char * getExtension(int index)  // report the default file name extension for this mesh type.
   {
-    return ".hms";
+    return ".psk";
+  }
+
+  virtual const char * getDescription(int index)
+  {
+    return "Unreal Character Files";
   }
 
   virtual bool importMesh(const char *meshName,const void *data,unsigned int dlen,MESHIMPORT::MeshImportInterface *callback,const char *options)
