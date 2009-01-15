@@ -20,7 +20,7 @@
 namespace MESHIMPORT
 {
 
-enum MeshImportVertexFlag
+enum MeshVertexFlag
 {
   MIVF_POSITION       = (1<<0),
   MIVF_NORMAL         = (1<<1),
@@ -35,10 +35,10 @@ enum MeshImportVertexFlag
 	MIVF_ALL = (MIVF_POSITION | MIVF_NORMAL | MIVF_COLOR | MIVF_TEXEL1 | MIVF_TEXEL2 | MIVF_TEXEL3 | MIVF_TEXEL4 | MIVF_TANGENT | MIVF_BINORMAL | MIVF_BONE_WEIGHTING)
 };
 
-class MeshImportVertex
+class MeshVertex
 {
 public:
-  MeshImportVertex(void)
+  MeshVertex(void)
   {
     mPos[0] = mPos[1] = mPos[2] = 0;
     mNormal[0] = 0; mNormal[1] = 1; mNormal[2] = 0;
@@ -65,10 +65,10 @@ public:
   unsigned short mBone[4];
 };
 
-class MeshImportBone
+class MeshBone
 {
 public:
-	MeshImportBone(void)
+	MeshBone(void)
 	{
 		mParentIndex = -1;
 		strcpy(mName,"");
@@ -114,12 +114,12 @@ public:
 
 	void SetName(const char *name)
 	{
-		strncpy(mName,name,MAXSTRLEN);
+    strncpy(mName,name,MAXSTRLEN);
 	}
 
 	void Set(const char *name,int parent,const float *transform)
 	{
-		strncpy(mName,name,MAXSTRLEN);
+    strncpy(mName,name,MAXSTRLEN);
 		mParentIndex = parent;
 		memcpy(mElement,transform,sizeof(float)*16);
 
@@ -133,8 +133,7 @@ public:
 
 	void Set(const char *name,int parent,const float *pos,const float *rot)
 	{
-		strncpy(mName,name,MAXSTRLEN);
-
+    strncpy(mName,name,MAXSTRLEN);
 		mParentIndex = parent;
 
 		mPosition[0] = pos[0];
@@ -257,46 +256,51 @@ public:
 	float         mElement[4][4];
 };
 
-class MeshImportEntry
+class MeshEntry
 {
 public:
+  MeshEntry(void)
+  {
+    strcpy(mName,"");
+    mBone = 0;
+  }
 private:
-	char      mName[MAXSTRLEN];
+  char     mName[MAXSTRLEN];
 	int     mBone;         // bone this mesh is associcated
 };
 
-class MeshImportSkeleton
+class MeshSkeleton
 {
 public:
-	MeshImportSkeleton(const char *name)
+	MeshSkeleton(const char *name)
 	{
 		strncpy(mName,name,MAXSTRLEN);
 		mBoneCount = 0;
 		mBones = 0;
 	}
 
-	MeshImportSkeleton(const char *name,int bonecount)
+	MeshSkeleton(const char *name,int bonecount)
 	{
 		strncpy(mName,name,MAXSTRLEN);
 		mBoneCount = bonecount;
-    mBones = MEMALLOC_NEW_ARRAY(MeshImportBone,bonecount)[bonecount];
+    mBones = MEMALLOC_NEW_ARRAY(MeshBone,bonecount)[bonecount];
 	}
 
-	MeshImportSkeleton(const MeshImportSkeleton &sk)
+	MeshSkeleton(const MeshSkeleton &sk)
 	{
 		strncpy(mName, sk.mName, MAXSTRLEN );
 		mBoneCount = sk.mBoneCount;
 		mBones = 0;
 		if ( mBoneCount )
 		{
-			mBones = MEMALLOC_NEW_ARRAY(MeshImportBone,mBoneCount)[mBoneCount];
-			memcpy(mBones,sk.mBones,sizeof(MeshImportBone)*mBoneCount);
+			mBones = MEMALLOC_NEW_ARRAY(MeshBone,mBoneCount)[mBoneCount];
+			memcpy(mBones,sk.mBones,sizeof(MeshBone)*mBoneCount);
 		}
 	}
 
-	~MeshImportSkeleton(void)
+	~MeshSkeleton(void)
 	{
-		MEMALLOC_DELETE_ARRAY(MeshImportBone,mBones);
+		MEMALLOC_DELETE_ARRAY(MeshBone,mBones);
 	}
 
 	void SetName(const char *name)
@@ -304,7 +308,7 @@ public:
 		strncpy(mName,name,MAXSTRLEN);
 	}
 
-	void SetBones(int bcount,MeshImportBone *bones) // memory ownership changes hands here!!!!!!!!!!
+	void SetBones(int bcount,MeshBone *bones) // memory ownership changes hands here!!!!!!!!!!
 	{
 		mBoneCount = bcount;
 		mBones     = bones;
@@ -357,7 +361,7 @@ public:
   	bones[2]   = 0;
   	bones[3]   = 0;
 
-  	MeshImportBone *b = mBones;
+  	MeshBone *b = mBones;
   	for (int i=0; i<mBoneCount; i++,b++)
   	{
   		float bpos[3];
@@ -425,22 +429,22 @@ public:
 
 	int GetBoneCount(void) const { return mBoneCount; };
 
-	const MeshImportBone& GetBone(int index) const { return mBones[index]; };
+	const MeshBone& GetBone(int index) const { return mBones[index]; };
 
-	MeshImportBone * GetBonePtr(int index) const { return &mBones[index]; };
+	MeshBone * GetBonePtr(int index) const { return &mBones[index]; };
 
-	void SetBone(int index,const MeshImportBone &b) { mBones[index] = b; };
+	void SetBone(int index,const MeshBone &b) { mBones[index] = b; };
 
 	const char * GetName(void) const { return mName; };
 
 private:
 	char            mName[MAXSTRLEN];
 	int             mBoneCount;
-	MeshImportBone *mBones;
+	MeshBone *mBones;
 };
 
 
-class MeshImportAnimPose
+class MeshAnimPose
 {
 public:
 
@@ -470,37 +474,37 @@ public:
 	float mQuat[4];
 };
 
-class MeshImportAnimTrack
+class MeshAnimTrack
 {
 public:
 
-	MeshImportAnimTrack(int framecount,
+	MeshAnimTrack(int framecount,
 						float duration,
 						float dtime)
 	{
 		mName[0] = 0;
 		mFrameCount = framecount;
-		mPose = MEMALLOC_NEW_ARRAY(MeshImportAnimPose,mFrameCount)[mFrameCount];
+		mPose = MEMALLOC_NEW_ARRAY(MeshAnimPose,mFrameCount)[mFrameCount];
 		mDuration   = duration;
 		mDtime      = dtime;
 	}
 
-	MeshImportAnimTrack(const MeshImportAnimTrack &c)
+	MeshAnimTrack(const MeshAnimTrack &c)
 	{
 		strcpy(mName, c.mName );
 		mFrameCount = c.mFrameCount;
 		mDuration   = c.mDuration;
 		mDtime      = c.mDtime;
-		mPose = MEMALLOC_NEW_ARRAY(MeshImportAnimPose,mFrameCount)[mFrameCount];
+		mPose = MEMALLOC_NEW_ARRAY(MeshAnimPose,mFrameCount)[mFrameCount];
 		for (int i=0; i<mFrameCount; i++)
 		{
 			mPose[i] = c.mPose[i];
 		}
 	}
 
-	~MeshImportAnimTrack(void)
+	~MeshAnimTrack(void)
 	{
-		MEMALLOC_DELETE_ARRAY(MeshImportAnimPose,mPose);
+		MEMALLOC_DELETE_ARRAY(MeshAnimPose,mPose);
 	}
 
 	void SetName(const char *name)
@@ -526,53 +530,53 @@ public:
 
 	int GetFrameCount(void) const { return mFrameCount; };
 
-	MeshImportAnimPose * GetPose(int index) { return &mPose[index]; };
+	MeshAnimPose * GetPose(int index) { return &mPose[index]; };
 
 private:
 	char      mName[MAXSTRLEN]; // name of the track.
 	int       mFrameCount;
 	float     mDuration;
 	float     mDtime;
-	MeshImportAnimPose *mPose;
+	MeshAnimPose *mPose;
 };
 
-class MeshImportAnimation
+class MeshAnimation
 {
 public:
-	MeshImportAnimation(const char *name,int trackcount,int framecount,float duration,float dtime)
+	MeshAnimation(const char *name,int trackcount,int framecount,float duration,float dtime)
 	{
 		strncpy(mName,name,MAXSTRLEN);
 		mTrackCount = trackcount;
 		mFrameCount = framecount;
-		mTracks = (MeshImportAnimTrack **)MEMALLOC_MALLOC(sizeof(MeshImportAnimTrack*)*mTrackCount);
+		mTracks = (MeshAnimTrack **)MEMALLOC_MALLOC(sizeof(MeshAnimTrack*)*mTrackCount);
 		mDuration  = duration;
 		mDtime     = dtime;
 		for (int i=0; i<trackcount; i++)
 		{
-			mTracks[i] = MEMALLOC_NEW(MeshImportAnimTrack)(framecount,duration,dtime);
+			mTracks[i] = MEMALLOC_NEW(MeshAnimTrack)(framecount,duration,dtime);
 		}
 	}
 
-	MeshImportAnimation(const MeshImportAnimation &c) // construct animation by copying an existing one
+	MeshAnimation(const MeshAnimation &c) // construct animation by copying an existing one
 	{
 		strcpy(mName, c.mName );
 		mTrackCount = c.mTrackCount;
 		mFrameCount = c.mFrameCount;
 		mDuration   = c.mDuration;
 		mDtime      = c.mDtime;
-		mTracks     = (MeshImportAnimTrack **)MEMALLOC_MALLOC(sizeof(MeshImportAnimTrack*)*mTrackCount);
+		mTracks     = (MeshAnimTrack **)MEMALLOC_MALLOC(sizeof(MeshAnimTrack*)*mTrackCount);
 		for (int i=0; i<mTrackCount; i++)
 		{
-			mTracks[i] = MEMALLOC_NEW(MeshImportAnimTrack)( *c.mTracks[i] );
+			mTracks[i] = MEMALLOC_NEW(MeshAnimTrack)( *c.mTracks[i] );
 		}
 	}
 
-	~MeshImportAnimation(void)
+	~MeshAnimation(void)
 	{
 		for (int i=0; i<mTrackCount; i++)
 		{
-			MeshImportAnimTrack *at = mTracks[i];
-			MEMALLOC_DELETE(MeshImportAnimTrack,at);
+			MeshAnimTrack *at = mTracks[i];
+			MEMALLOC_DELETE(MeshAnimTrack,at);
 		}
 		MEMALLOC_FREE(mTracks);
 	}
@@ -594,12 +598,12 @@ public:
 
 	const char * GetName(void) const { return mName; };
 
-	const MeshImportAnimTrack * LocateTrack(const char *name) const
+	const MeshAnimTrack * LocateTrack(const char *name) const
 	{
-		const MeshImportAnimTrack *ret = 0;
+		const MeshAnimTrack *ret = 0;
 		for (int i=0; i<mTrackCount; i++)
 		{
-			const MeshImportAnimTrack *t = mTracks[i];
+			const MeshAnimTrack *t = mTracks[i];
 			if ( stricmp(t->GetName(),name) == 0 )
 			{
 				ret = t;
@@ -619,9 +623,9 @@ public:
 	int GetTrackCount(void) const { return mTrackCount; };
 	float GetDuration(void) const { return mDuration; };
 
-	MeshImportAnimTrack * GetTrack(int index)
+	MeshAnimTrack * GetTrack(int index)
 	{
-		MeshImportAnimTrack *ret = 0;
+		MeshAnimTrack *ret = 0;
 		if ( index >= 0 && index < mTrackCount )
 		{
 			ret = mTracks[index];
@@ -638,14 +642,19 @@ private:
 	int         mFrameCount;
 	float       mDuration;
 	float       mDtime;
-	MeshImportAnimTrack **mTracks;
+	MeshAnimTrack **mTracks;
 };
 
 
 
-class MeshImportMaterial
+class MeshMaterial
 {
 public:
+  MeshMaterial(void)
+  {
+    mName = 0;
+    mMetaData = 0;
+  }
   const char *mName;
   const char *mMetaData;
 };
@@ -653,18 +662,49 @@ public:
 class MeshAABB
 {
 public:
-  float mBmin[3];
-  float mBmax[3];
+  MeshAABB(void)
+  {
+    mMin[0] = FLT_MAX;
+    mMin[1] = FLT_MAX;
+    mMin[2] = FLT_MAX;
+    mMax[0] = FLT_MIN;
+    mMax[1] = FLT_MIN;
+    mMax[2] = FLT_MIN;
+  }
+
+  void include(const float pos[3])
+  {
+    if ( pos[0] < mMin[0] ) mMin[0] = pos[0];
+    if ( pos[1] < mMin[1] ) mMin[1] = pos[1];
+    if ( pos[2] < mMin[2] ) mMin[2] = pos[2];
+    if ( pos[0] > mMax[0] ) mMax[0] = pos[0];
+    if ( pos[1] > mMax[1] ) mMax[1] = pos[1];
+    if ( pos[2] > mMax[2] ) mMax[2] = pos[2];
+  }
+  float mMin[3];
+  float mMax[3];
 };
 
 class SubMesh
 {
 public:
-  MeshImportMaterial  *mMaterial;
+  SubMesh(void)
+  {
+    mMaterialName = 0;
+    mMaterial     = 0;
+    mVertexFlags  = (MESHIMPORT::MeshVertexFlag)0;
+    mVertexCount  = 0;
+    mVertices     = 0;
+    mTriCount     = 0;
+    mIndices      = 0;
+  }
+
+  const char          *mMaterialName;
+  MeshMaterial        *mMaterial;
   MeshAABB             mAABB;
-  MeshImportVertexFlag mVertexFlags; // defines which vertex components are active.
+  MeshVertexFlag       mVertexFlags; // defines which vertex components are active.
   unsigned int         mVertexCount; // number of vertices
-  MeshImportVertex    *mVertices;
+  MeshVertex          *mVertices;
   unsigned int         mTriCount;    // number of triangles.
   unsigned int        *mIndices;     // indexed triange list
 };
@@ -672,16 +712,33 @@ public:
 class Mesh
 {
 public:
-  MeshImportSkeleton *mSkeleton; // the skeleton used by this mesh system.
+  Mesh(void)
+  {
+    mMeshName     = 0;
+    mSkeletonName = 0;
+    mSkeleton     = 0;
+    mSubMeshCount = 0;
+    mSubMeshes    = 0;
+  }
+  const char         *mMeshName;
+  const char         *mSkeletonName;
+  MeshSkeleton       *mSkeleton; // the skeleton used by this mesh system.
   MeshAABB            mAABB;
   unsigned int        mSubMeshCount;
-  SubMesh            *mSubMeshes;
+  SubMesh           **mSubMeshes;
 };
 
 class MeshRawTexture
 {
 public:
-  const char *mName;
+  MeshRawTexture(void)
+  {
+    mName = 0;
+    mData = 0;
+    mWidth = 0;
+    mHeight = 0;
+  }
+  const char    *mName;
   unsigned char *mData;
   unsigned int   mWidth;
   unsigned int   mHeight;
@@ -690,79 +747,130 @@ public:
 class MeshInstance
 {
 public:
-  Mesh   *mMesh;     
-  float   mPosition[3];
-  float   mRotation[4]; //quaternion
-  float   mScale[3];
+  MeshInstance(void)
+  {
+    mMeshName = 0;
+    mMesh     = 0;
+    mPosition[0] = mPosition[1] = mPosition[2] = 0;
+    mRotation[0] = mRotation[1] = mRotation[2] = mRotation[3] = 0;
+    mScale[0] = mScale[1] = mScale[2] = 0;
+  }
+  const char  *mMeshName;
+  Mesh        *mMesh;
+  float        mPosition[3];
+  float        mRotation[4]; //quaternion XYZW
+  float        mScale[3];
 };
+
+class MeshUserData
+{
+public:
+  MeshUserData(void)
+  {
+    mUserKey = 0;
+    mUserValue = 0;
+  }
+  const char *mUserKey;
+  const char *mUserValue;
+};
+
+class MeshUserBinaryData
+{
+public:
+  MeshUserBinaryData(void)
+  {
+    mName     = 0;
+    mUserData = 0;
+    mUserLen  = 0;
+  }
+  const char    *mName;
+  unsigned int   mUserLen;
+  unsigned char *mUserData;
+};
+
+class MeshTetra
+{
+public:
+  MeshTetra(void)
+  {
+    mTetraName  = 0;
+    mMeshName   = 0;  // mesh the tetraheadral mesh is associated with.
+    mMesh       = 0;
+    mTetraCount = 0;
+    mTetraData  = 0;
+  }
+
+  const char  *mTetraName;
+  const char  *mMeshName;
+  MeshAABB     mAABB;
+  Mesh        *mMesh;
+  unsigned int mTetraCount; // number of tetrahedrons
+  float       *mTetraData;
+};
+
+#define MESH_SYSTEM_VERSION 1 // version number of this data structure, used for binary serialization
 
 class MeshSystem
 {
 public:
   MeshSystem(void)
   {
-    mTextureCount = 0;
-    mTextures     = 0;
-    mSkeletonCount = 0;
-    mSkeletons    = 0;
-    mAnimationCount = 0;
-    mAnimations = 0;
-    mMaterialCount = 0;
-    mMaterials = 0;
-    mMeshCount = 0;
-    mMeshes = 0;
-    mMeshInstanceCount = 0;
-    mMeshInstances = 0;
+    mAssetName           = 0;
+    mAssetInfo           = 0;
+    mTextureCount        = 0;
+    mTextures            = 0;
+    mSkeletonCount       = 0;
+    mSkeletons           = 0;
+    mAnimationCount      = 0;
+    mAnimations          = 0;
+    mMaterialCount       = 0;
+    mMaterials           = 0;
+    mMeshCount           = 0;
+    mMeshes              = 0;
+    mMeshInstanceCount   = 0;
+    mMeshInstances       = 0;
+    mUserDataCount       = 0;
+    mUserData            = 0;
+    mUserBinaryDataCount = 0;
+    mUserBinaryData      = 0;
+    mTetraMeshCount      = 0;
+    mTetraMeshes         = 0;
+    mMeshSystemVersion   = MESH_SYSTEM_VERSION;
+    mAssetVersion        = 0;
   }
 
-  unsigned int          mTextureCount;          // Are textures necessary? [rgd]. 
-  MeshRawTexture       *mTextures;              // Texture storage in mesh data is rare, and the name is simply an attribute of the material
+
+  const char           *mAssetName;
+  const char           *mAssetInfo;
+  int                   mMeshSystemVersion;
+  int                   mAssetVersion;
+  MeshAABB              mAABB;
+  unsigned int          mTextureCount;          // Are textures necessary? [rgd].
+  MeshRawTexture      **mTextures;              // Texture storage in mesh data is rare, and the name is simply an attribute of the material
+
+  unsigned int          mTetraMeshCount;        // number of tetrahedral meshes
+  MeshTetra           **mTetraMeshes;           // tetraheadral meshes
 
   unsigned int          mSkeletonCount;         // number of skeletons
-  MeshImportSkeleton   *mSkeletons;             // the skeletons.
+  MeshSkeleton        **mSkeletons;             // the skeletons.
 
   unsigned int          mAnimationCount;
-  MeshImportAnimation  *mAnimations;
+  MeshAnimation       **mAnimations;
 
   unsigned int          mMaterialCount;         // Materials are owned by this list, merely referenced later.
-  MeshImportMaterial   *mMaterials;
+  MeshMaterial         *mMaterials;
+
+  unsigned int          mUserDataCount;
+  MeshUserData        **mUserData;
+
+  unsigned int          mUserBinaryDataCount;
+  MeshUserBinaryData  **mUserBinaryData;
 
   unsigned int          mMeshCount;
-  Mesh                 *mMeshes;
+  Mesh                **mMeshes;
 
   unsigned int          mMeshInstanceCount;
-  MeshInstance         *mMeshInstances; 
-};
-
-typedef int MaterialRef;
-typedef int MeshRef;
-
-class MeshImportInterface
-{
-public:
-  // Material refs are used to by import triangle functions to triangles to have
-  // assigned materials regardless of the order that materials are imported by the importer.
-  virtual MaterialRef createMaterialRef(const char *matName) = 0; 
-  
-  // Creates a slot for a mesh. Each vertex import function fills a specific mesh.
-  virtual MeshRef     createMeshRef(const char *meshName) = 0;
-
-  virtual void        importAssetName(const char *assetName,const char *info) = 0;
-  virtual MaterialRef importMaterial(const char *matName,const char *metaData) = 0;
-  virtual void        importTriangle(MeshRef meshref, MaterialRef matref, unsigned int vertexFlags,const MeshImportVertex verts[3]) = 0;
-  virtual void        importTriangle(unsigned int vertexFlags,const MeshImportVertex verts[3]) = 0;
-  virtual void        importAnimation(const MeshImportAnimation &animation) = 0;
-  virtual void        importSkeleton(const MeshImportSkeleton &skeleton) = 0;
-  virtual void        importRawTexture(const char *textureName,const unsigned char *pixels,unsigned int wid,unsigned int hit) = 0;
-  virtual void        importMeshInstance(const char *meshName,const float pos[3],const float rotation[4],const float scale[3])= 0;
-
-};
-
-class MeshImporter
-{
-public:
-  virtual const char *     getExtension(void) = 0; // report the default file name extension for this mesh type.
-  virtual bool             importMesh(const char *meshName,const void *data,unsigned int dlen,MeshImportInterface *callback,const char *options) = 0;
+  MeshInstance         *mMeshInstances;
 };
 
 

@@ -4,6 +4,9 @@
 	Version="8.00"
 	Name="MeshImportLeveller"
 	ProjectGUID="{439FE316-A384-B433-12BF-A4CA1BF47F37}"
+	SccProjectName="Perforce Project"
+	SccLocalPath="."
+	SccProvider="MSCCI:Perforce SCM"
 	>
 	<Platforms>
 		<Platform

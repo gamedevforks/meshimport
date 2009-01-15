@@ -7,6 +7,7 @@
 #pragma warning(disable:4702) // disabling a warning that only shows up when building VC7
 
 #include "ImportOgre.h"
+#include "MeshImport/MeshImport.h"
 #include "MeshImport/MeshSystem.h"
 #include "common/TinyXML/tinyxml.h"
 
@@ -178,10 +179,16 @@ public:
     mCallback = 0;
   }
 
-  virtual const char * getExtension(void)  // report the default file name extension for this mesh type.
+  virtual const char * getExtension(int index)  // report the default file name extension for this mesh type.
   {
     return ".xml";
   }
+
+  virtual const char * getDescription(int index)  // report the default file name extension for this mesh type.
+  {
+    return "Ogre3d XML Mesh Files";
+  }
+
 
   virtual bool importMesh(const char *fname,const void *data,unsigned int dlen,MeshImportInterface *callback,const char *options)
   {

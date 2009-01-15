@@ -62,8 +62,10 @@
 #include <stdarg.h>
 
 #include "MeshImport/MeshSystem.h"
+#include "MeshImport/MeshImport.h"
 #include "ImportEZM.h"
-
+#include "common/snippets/SendTextMessage.h"
+#include "common/snippets/StringDict.h"
 #include "common/snippets/stable.h"
 #include "common/snippets/asc2bin.h"
 #include "common/TinyXML/tinyxml.h"
@@ -136,7 +138,7 @@ public:
 	float         mBinormal[3];
 };
 
-static void getVertex(const float *buffer,MeshImportVertex &vtx)
+static void getVertex(const float *buffer,MeshVertex &vtx)
 {
 	vtx.mPos[0] = buffer[0];
 	vtx.mPos[1] = buffer[1];
@@ -160,7 +162,7 @@ struct tempVertex
   unsigned short b[4];
 };
 
-static void getVertex(const tempVertex &s,MeshImportVertex &d)
+static void getVertex(const tempVertex &s,MeshVertex &d)
 {
   d.mPos[0] = s.pos[0];
   d.mPos[1] = s.pos[1];
@@ -254,9 +256,14 @@ public:
 	}
 
 
-  virtual const char * getExtension(void)  // report the default file name extension for this mesh type.
+  virtual const char * getExtension(int index)  // report the default file name extension for this mesh type.
   {
     return ".ezm";
+  }
+
+  virtual const char * getDescription(int index)
+  {
+    return "PhysX Rocket EZ-Mesh format";
   }
 
   virtual bool  importMesh(const char *meshName,const void *data,unsigned int dlen,MeshImportInterface *callback,const char *options)
@@ -279,7 +286,7 @@ public:
   		if ( mAnimation )
   		{
   			mCallback->importAnimation(*mAnimation);
-        MEMALLOC_DELETE(MeshImportAnimation,mAnimation);
+        MEMALLOC_DELETE(MeshAnimation,mAnimation);
   			mAnimation = 0;
   		}
 
@@ -363,7 +370,7 @@ public:
 								if ( mAnimation )
 								{
 									mCallback->importAnimation(*mAnimation);
-									MEMALLOC_DELETE(MeshImportAnimation,mAnimation);
+									MEMALLOC_DELETE(MeshAnimation,mAnimation);
 									mAnimation = 0;
 								}
 								mName       = 0;
@@ -384,7 +391,7 @@ public:
 										float dtime = (float) atof(mDtime);
 										if ( trackcount >= 1 && framecount >= 1 )
 										{
-											mAnimation = MEMALLOC_NEW(MeshImportAnimation)(mName, trackcount, framecount, duration, dtime );
+											mAnimation = MEMALLOC_NEW(MeshAnimation)(mName, trackcount, framecount, duration, dtime );
 										}
 									}
 								}
@@ -396,8 +403,8 @@ public:
 								break;
 							case NT_SKELETON:
 								{
-									MEMALLOC_DELETE(MeshImportSkeleton,mSkeleton);
-									mSkeleton = MEMALLOC_NEW(MeshImportSkeleton)("bip01");
+									MEMALLOC_DELETE(MeshSkeleton,mSkeleton);
+									mSkeleton = MEMALLOC_NEW(MeshSkeleton)("bip01");
 								}
 							case NT_BONE:
 								if ( mSkeleton )
@@ -421,11 +428,11 @@ public:
 							int count = atoi( mCount );
 							if ( count == mAnimTrack->GetFrameCount() )
 							{
-								float *buff = (float *) ::malloc(sizeof(float)*7*count);
+								float *buff = (float *) MEMALLOC_MALLOC(sizeof(float)*7*count);
 								Asc2Bin(svalue, count, "fff ffff", buff );
 								for (int i=0; i<count; i++)
 								{
-									MeshImportAnimPose *p = mAnimTrack->GetPose(i);
+									MeshAnimPose *p = mAnimTrack->GetPose(i);
 									const float *src = &buff[i*7];
 									p->mPos[0]  = src[0];
 									p->mPos[1]  = src[1];
@@ -444,7 +451,7 @@ public:
 						{
 							float transform[4*4];
 							Asc2Bin(svalue, 4, "ffff", transform );
-              MeshImportBone b;
+              MeshBone b;
               b.SetTransform(transform);
               float pos[3];
               float quat[3];
@@ -461,7 +468,7 @@ public:
 							if ( stricmp(mSemantic,"position normal texcoord texcoord blendweights blendindices") == 0 )
 							{
                 tempVertex tvtx[3];
-								MeshImportVertex vtx[3];
+								MeshVertex vtx[3];
 
 								Asc2Bin(svalue, 3, mCtype, tvtx );
 
@@ -469,19 +476,19 @@ public:
                 getVertex(tvtx[1],vtx[1]);
                 getVertex(tvtx[2],vtx[2]);
 
-                mCallback->importTriangle(MIVF_POSITION | MIVF_NORMAL | MIVF_TEXEL1 | MIVF_TEXEL2 | MIVF_BONE_WEIGHTING,vtx);
+                mCallback->importTriangle(mCurrentMesh.Get(),mCurrentMaterial.Get(),MIVF_POSITION | MIVF_NORMAL | MIVF_TEXEL1 | MIVF_TEXEL2 | MIVF_BONE_WEIGHTING,vtx);
 
 							}
 							else if ( stricmp(mSemantic,"position normal texcoord texcoord") == 0 )
 							{
-								MeshImportVertex vtx[3];
+								MeshVertex vtx[3];
 								float buffer[10*3];
 								Asc2Bin(svalue, 3, mCtype, buffer );
 								getVertex(buffer,vtx[0]);
 								getVertex(&buffer[10],vtx[1]);
 								getVertex(&buffer[20],vtx[2]);
 
-                mCallback->importTriangle(MIVF_POSITION | MIVF_NORMAL | MIVF_TEXEL1 | MIVF_TEXEL2,vtx);
+                mCallback->importTriangle(mCurrentMesh.Get(),mCurrentMaterial.Get(),MIVF_POSITION | MIVF_NORMAL | MIVF_TEXEL1 | MIVF_TEXEL2,vtx);
 							}
 							mCtype = 0;
 							mSemantic = 0;
@@ -514,9 +521,9 @@ public:
 						{
 							if ( stricmp(mSemantic,"position normal texcoord texcoord blendweights blendindices") == 0 )
 							{
-								MeshImportVertex *vtx = MEMALLOC_NEW_ARRAY(MeshImportVertex,mVertexCount)[mVertexCount];
+								MeshVertex *vtx = MEMALLOC_NEW_ARRAY(MeshVertex,mVertexCount)[mVertexCount];
 								GeometryDeformVertex            *source = (GeometryDeformVertex *) mVertexBuffer;
-								MeshImportVertex *dest = vtx;
+								MeshVertex *dest = vtx;
 
 								for (int i=0; i<mVertexCount; i++)
 								{
@@ -550,24 +557,15 @@ public:
 
 								}
 
-								unsigned int *idx = (unsigned int *) mIndexBuffer;
+                mCallback->importIndexedTriangleList(mCurrentMesh.Get(),mCurrentMaterial.Get(),MIVF_POSITION | MIVF_NORMAL | MIVF_TEXEL1 | MIVF_TEXEL2 | MIVF_BONE_WEIGHTING,mVertexCount,vtx,mIndexCount,(const unsigned int *)mIndexBuffer );
 
-								for (int i=0; i<mIndexCount; i++)
-								{
-                  MeshImportVertex v[3];
-                  v[0] = vtx[*idx++];
-                  v[1] = vtx[*idx++];
-                  v[2] = vtx[*idx++];
-									mCallback->importTriangle(MIVF_POSITION | MIVF_NORMAL | MIVF_TEXEL1 | MIVF_TEXEL2 | MIVF_BONE_WEIGHTING,v);
-
-								}
-                MEMALLOC_DELETE_ARRAY(MeshImportVertex,vtx);
+                MEMALLOC_DELETE_ARRAY(MeshVertex,vtx);
 							}
 							else if ( stricmp(mSemantic,"position blendweights blendindices normal texcoord tangent binormal") == 0 )
 							{
-								MeshImportVertex *vtx = MEMALLOC_NEW_ARRAY(MeshImportVertex,mVertexCount)[mVertexCount];
+								MeshVertex *vtx = MEMALLOC_NEW_ARRAY(MeshVertex,mVertexCount)[mVertexCount];
 								MaxVertex            *source = (MaxVertex *) mVertexBuffer;
-								MeshImportVertex *dest = vtx;
+								MeshVertex *dest = vtx;
 
 								for (int i=0; i<mVertexCount; i++)
 								{
@@ -591,9 +589,6 @@ public:
 									dest->mTexel1[0]  = source->mTexel[0];
 									dest->mTexel1[1]  = source->mTexel[1];
 
-									dest->mTexel2[0]  = source->mTexel[0];
-									dest->mTexel2[1]  = source->mTexel[1];
-
 									dest->mWeight[0] = source->mWeight[0];
 									dest->mWeight[1] = source->mWeight[1];
 									dest->mWeight[2] = source->mWeight[2];
@@ -609,24 +604,16 @@ public:
 
 								}
 
-								unsigned int *idx = (unsigned int *) mIndexBuffer;
 
-								for (int i=0; i<mIndexCount; i++)
-								{
-                  MeshImportVertex v[3];
-                  v[0] = vtx[*idx++];
-                  v[1] = vtx[*idx++];
-                  v[2] = vtx[*idx++];
-									mCallback->importTriangle(MIVF_ALL,v);
+                mCallback->importIndexedTriangleList(mCurrentMesh.Get(),mCurrentMaterial.Get(),MIVF_POSITION | MIVF_NORMAL | MIVF_TEXEL1 | MIVF_TANGENT | MIVF_BINORMAL | MIVF_BONE_WEIGHTING,mVertexCount,vtx,mIndexCount,(const unsigned int *)mIndexBuffer );
 
-								}
-                MEMALLOC_DELETE_ARRAY(MeshImportVertex,vtx);
+                MEMALLOC_DELETE_ARRAY(MeshVertex,vtx);
 							}
 							else if ( stricmp(mSemantic,"position normal texcoord texcoord") == 0 )
 							{
-								MeshImportVertex *vtx = MEMALLOC_NEW_ARRAY(MeshImportVertex,mVertexCount)[mVertexCount];
+								MeshVertex *vtx = MEMALLOC_NEW_ARRAY(MeshVertex,mVertexCount)[mVertexCount];
 								GeometryVertex            *source = (GeometryVertex *) mVertexBuffer;
-								MeshImportVertex *dest = vtx;
+								MeshVertex *dest = vtx;
 
 								for (int i=0; i<mVertexCount; i++)
 								{
@@ -652,22 +639,14 @@ public:
 
 								}
 
-								unsigned int *idx = (unsigned int *) mIndexBuffer;
+                mCallback->importIndexedTriangleList(mCurrentMesh.Get(),mCurrentMaterial.Get(),MIVF_POSITION | MIVF_NORMAL | MIVF_TEXEL1 | MIVF_TEXEL2,mVertexCount,vtx,mIndexCount,(const unsigned int *)mIndexBuffer );
 
-								for (int i=0; i<mIndexCount; i++)
-								{
-									MeshImportVertex v[3];
-                  v[0] = vtx[*idx++];
-									v[1] = vtx[*idx++];
-									v[2] = vtx[*idx++];
-									mCallback->importTriangle(MIVF_POSITION | MIVF_NORMAL | MIVF_TEXEL1 | MIVF_TEXEL2,v);
-								}
-                MEMALLOC_DELETE_ARRAY(MeshImportVertex,vtx);
+                MEMALLOC_DELETE_ARRAY(MeshVertex,vtx);
 							}
 						}
 
-						::free( mIndexBuffer);
-			      ::free( mVertexBuffer);
+						MEMALLOC_FREE( mIndexBuffer);
+			      MEMALLOC_FREE( mVertexBuffer);
 
 						mIndexBuffer = 0;
 						mVertexBuffer = 0;
@@ -720,7 +699,7 @@ public:
 					if ( mBoneIndex == mSkeleton->GetBoneCount() )
 					{
 						mCallback->importSkeleton(*mSkeleton);
-						MEMALLOC_DELETE(MeshImportSkeleton,mSkeleton);
+						MEMALLOC_DELETE(MeshSkeleton,mSkeleton);
 						mSkeleton = 0;
 						mBoneIndex = 0;
 					}
@@ -756,7 +735,8 @@ public:
 				switch ( mType )
 				{
 					case NT_MESH:
-						mCallback->createMeshRef(savalue);
+            mCurrentMesh = mStrings.Get(savalue);
+            mCallback->importMesh(savalue,0);
 						break;
 					case NT_SKELETON:
 						if ( mSkeleton )
@@ -781,8 +761,8 @@ public:
 						int count = atoi( savalue );
 						if ( count > 0 )
 						{
-							MeshImportBone *bones;
-							bones = MEMALLOC_NEW_ARRAY(MeshImportBone,count)[count];
+							MeshBone *bones;
+							bones = MEMALLOC_NEW_ARRAY(MeshBone,count)[count];
 							mSkeleton->SetBones(count,bones);
 							mBoneIndex = 0;
 						}
@@ -795,7 +775,7 @@ public:
 				{
 					for (int i=0; i<mBoneIndex; i++)
 					{
-						const MeshImportBone &b = mSkeleton->GetBone(i);
+						const MeshBone &b = mSkeleton->GetBone(i);
 						if ( strcmp(mParent,b.mName) == 0 )
 						{
 							mBone->mParentIndex = i;
@@ -808,6 +788,7 @@ public:
 				if ( mType == NT_MESH_SECTION )
 				{
 					mCallback->importMaterial(savalue,0);
+          mCurrentMaterial = mStrings.Get(savalue);
 				}
 				break;
 			case AT_CTYPE:
@@ -825,11 +806,11 @@ public:
 #if DEBUG_LOG
 		for (int i=0; i<depth; i++)
 		{
-			printf("  ");
+			SEND_TEXT_MESSAGE(0,"  ");
 		}
 		char wbuff[8192];
 		vsnprintf(wbuff, 8191, fmt, (char *)(&fmt+1));
-		printf("%s", wbuff);
+		SEND_TEXT_MESSAGE(0,"%s", wbuff);
 #endif
 	}
 
@@ -857,15 +838,19 @@ private:
 
 	int          mTrackIndex;
 	int          mBoneIndex;
-	MeshImportBone       * mBone;
+	MeshBone       * mBone;
 
-	MeshImportAnimation  * mAnimation;
-	MeshImportAnimTrack  * mAnimTrack;
-	MeshImportSkeleton   * mSkeleton;
+	MeshAnimation  * mAnimation;
+	MeshAnimTrack  * mAnimTrack;
+	MeshSkeleton   * mSkeleton;
 	int          mVertexCount;
 	int          mIndexCount;
 	void       * mVertexBuffer;
 	void       * mIndexBuffer;
+
+  StringRef    mCurrentMesh;
+  StringRef    mCurrentMaterial;
+  StringDict   mStrings;
 
 
 };

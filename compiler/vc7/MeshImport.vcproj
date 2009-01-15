@@ -3,6 +3,9 @@
 ProjectType="Visual C++"
 Version="7.00"
 Name="MeshImport"
+SccProjectName="Perforce Project"
+SccLocalPath="."
+SccProvider="MSCCI:Perforce SCM"
 >
 <Platforms>
 <Platform Name="Win32"/>
@@ -112,6 +115,10 @@ Name="MeshImport"
       <File RelativePath="..\..\include\common\snippets\stringdict.cpp"/>
       <File RelativePath="..\..\include\common\snippets\stringdict.h"/>
       <File RelativePath="..\..\include\common\snippets\UserMemAlloc.h"/>
+    </Filter>
+    <Filter Name="FileInterface" Filter="">
+      <File RelativePath="..\..\include\common\FileInterface\FileInterface.cpp"/>
+      <File RelativePath="..\..\include\common\FileInterface\FileInterface.h"/>
     </Filter>
   </Filter>
 </Files>

@@ -9,14 +9,14 @@
 namespace MESHIMPORT
 {
 
-class MeshImportBuilder : public MeshSystem
+class MeshBuilder : public MeshSystem
 {
 public:
 };
 
 
-MeshImportBuilder * createMeshImportBuilder(const char *meshName,const void *data,unsigned int dlen,MeshImporter *mi,const char *options);
-void          releaseMeshImportBuilder(MeshImportBuilder *m);
+MeshBuilder * createMeshBuilder(const char *meshName,const void *data,unsigned int dlen,MeshImporter *mi,const char *options);
+void          releaseMeshBuilder(MeshBuilder *m);
 
 };
 

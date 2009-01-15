@@ -41,6 +41,8 @@
          snippets/stable.h
          snippets/HtmlTable.cpp
          snippets/HtmlTable.h
+         FileInterface/*.h
+         FileInterface/*.cpp
 				</Files>
 				<OutDir>../../bin/win32</OutDir>
 				<ImpDir>../../lib/win32</ImpDir>
