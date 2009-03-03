@@ -7,8 +7,8 @@ XPStyle on
 
 !define ShortName      "MeshImport"
 !define LongName       "MeshImport - MeshImport plugin system by John W. Ratcliff"
-!define ShortVersion   "1.1"
-!define LongVersion    "v1.1"
+!define ShortVersion   "1.0"
+!define LongVersion    "v1.0"
 Icon                   "Rocket.ico"
 UninstallIcon          "Rocket.ico"
 !define RootDir        "..\.."
@@ -69,6 +69,7 @@ Section "MeshImport Executable and Data" sec1
   File "${RootDir}\bin\win32\MSVCR80.dll"
 
   SetOutPath "$INSTDIR\ext\assimp"
+  File "${RootDir}\ext\assimp\*.inl"
   File "${RootDir}\ext\assimp\*.h"
   File "${RootDir}\ext\assimp\*.lib"
 
@@ -88,21 +89,25 @@ Section "MeshImport Executable and Data" sec1
 
   SetOutPath "$INSTDIR\src\MeshImportEzm"
   File "${RootDir}\src\MeshImportEzm\*.cpp"
+  File "${RootDir}\src\MeshImportEzm\*.h"
 
   SetOutPath "$INSTDIR\src\MeshImportLeveller"
   File "${RootDir}\src\MeshImportLeveller\*.cpp"
 
   SetOutPath "$INSTDIR\src\MeshImportObj"
   File "${RootDir}\src\MeshImportObj\*.cpp"
+  File "${RootDir}\src\MeshImportObj\*.h"
 
   SetOutPath "$INSTDIR\src\MeshImportOgre"
   File "${RootDir}\src\MeshImportOgre\*.cpp"
+  File "${RootDir}\src\MeshImportOgre\*.h"
 
 
 ## Install the header files.
 
   SetOutPath "$INSTDIR\include\MeshImport"
   File "${RootDir}\include\MeshImport\*.h"
+  File "${RootDir}\include\MeshImport\*.cpp"
 
   SetOutPath "$INSTDIR\include\MeshImportAssimp"
   File "${RootDir}\include\MeshImportAssimp\*.h"
@@ -123,9 +128,14 @@ Section "MeshImport Executable and Data" sec1
   File "${RootDir}\include\common\binding\*.h"
   File "${RootDir}\include\common\binding\*.cpp"
 
+  SetOutPath "$INSTDIR\include\common\FileInterface"
+  File "${RootDir}\include\common\FileInterface\*.h"
+  File "${RootDir}\include\common\FileInterface\*.cpp"
+
   SetOutPath "$INSTDIR\include\common\snippets"
   File "${RootDir}\include\common\snippets\*.h"
   File "${RootDir}\include\common\snippets\*.cpp"
+  File "${RootDir}\include\common\snippets\*.inl"
 
   SetOutPath "$INSTDIR\include\common\MemoryServices"
   File "${RootDir}\include\common\MemoryServices\*.h"
