@@ -38,7 +38,9 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ---------------------------------------------------------------------------
 */
-/** @file 4x4 matrix structure, including operators when compiling in C++ */
+/** @file aiMatrix4x4.h
+ *  @brief 4x4 matrix structure, including operators when compiling in C++
+ */
 #ifndef AI_MATRIX4X4_H_INC
 #define AI_MATRIX4X4_H_INC
 
@@ -49,19 +51,11 @@ extern "C" {
 struct aiMatrix3x3;
 struct aiQuaternion;
 
-// Set packing to 4
-#if defined(_MSC_VER) ||  defined(__BORLANDC__) ||	defined (__BCPLUSPLUS__)
-	#pragma pack(push,4)
-	#define PACK_STRUCT
-#elif defined( __GNUC__ )
-	#define PACK_STRUCT	__attribute__((packed))
-#else
-	#error Compiler not supported
-#endif
+#include "./Compiler/pushpack1.h"
 
 // ---------------------------------------------------------------------------
 /** Represents a row-major 4x4 matrix, 
-*  use this for homogenious coordinates 
+*  use this for homogeneous coordinates 
 */
 // ---------------------------------------------------------------------------
 struct aiMatrix4x4
@@ -126,7 +120,8 @@ struct aiMatrix4x4
 	 *  \param y Rotation angle for the y-axis, in radians
 	 *  \param z Rotation angle for the z-axis, in radians
 	 */
-	inline void FromEulerAngles(float x, float y, float z);
+	inline void FromEulerAnglesXYZ(float x, float y, float z);
+	inline void FromEulerAnglesXYZ(const aiVector3D& blubb);
 
 
 	/** \brief Returns a rotation matrix for a rotation around the x axis
@@ -136,14 +131,12 @@ struct aiMatrix4x4
 	 */
 	static aiMatrix4x4& RotationX(float a, aiMatrix4x4& out);
 
-
 	/** \brief Returns a rotation matrix for a rotation around the y axis
 	 *  \param a Rotation angle, in radians
 	 *  \param out Receives the output matrix
 	 *  \return Reference to the output matrix
 	 */
 	static aiMatrix4x4& RotationY(float a, aiMatrix4x4& out);
-
 
 	/** \brief Returns a rotation matrix for a rotation around the z axis
 	 *  \param a Rotation angle, in radians
@@ -152,13 +145,32 @@ struct aiMatrix4x4
 	 */
 	static aiMatrix4x4& RotationZ(float a, aiMatrix4x4& out);
 
+	/** Returns a rotation matrix for a rotation around an arbitrary axis.
+	 *  @param a Rotation angle, in radians
+	 *  @param axis Rotation axis, should be a normalized vector.
+	 *  @param out Receives the output matrix
+	 *  \return Reference to the output matrix
+	 */
+	static aiMatrix4x4& Rotation(float a, const aiVector3D& axis, aiMatrix4x4& out);
 
 	/** \brief Returns a translation matrix 
 	 *  \param v Translation vector
 	 *  \param out Receives the output matrix
 	 *  \return Reference to the output matrix
 	 */
-	static aiMatrix4x4& Translation(aiVector3D v, aiMatrix4x4& out);
+	static aiMatrix4x4& Translation( const aiVector3D& v, aiMatrix4x4& out);
+
+
+	/** A function for creating a rotation matrix that rotates a vector called
+	* "from" into another vector called "to".
+	* Input : from[3], to[3] which both must be *normalized* non-zero vectors
+	* Output: mtx[3][3] -- a 3x3 matrix in colum-major form
+	* Authors: Tomas Möller, John Hughes
+	*          "Efficiently Building a Matrix to Rotate One Vector to Another"
+	*          Journal of Graphics Tools, 4(4):1-4, 1999
+	*/
+	static aiMatrix4x4& FromToMatrix(const aiVector3D& from, 
+		const aiVector3D& to, aiMatrix4x4& out);
 
 #endif // __cplusplus
 
@@ -170,11 +182,7 @@ struct aiMatrix4x4
 } PACK_STRUCT;
 
 
-// Reset packing
-#if defined(_MSC_VER) ||  defined(__BORLANDC__) || defined (__BCPLUSPLUS__)
-#pragma pack( pop )
-#endif
-#undef PACK_STRUCT
+#include "./Compiler/poppack1.h"
 
 #ifdef __cplusplus
 } // end extern "C"

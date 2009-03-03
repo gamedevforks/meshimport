@@ -64,7 +64,7 @@ SccProvider="MSCCI:Perforce SCM"
       PreprocessorDefinitions="WIN32;_WINDOWS;UNICODE=1;_UNICODE=1;MESHIMPORTOBJ_EXPORTS;NDEBUG;"
       WarningLevel="3"
       Optimization="4"
-      AdditionalOptions="/WX /W4 /fp:fast /O2 /MD /Zi "
+      AdditionalOptions="/Zi /WX /W4 /fp:fast /WX /MD /O2 "
       ExceptionHandling="1"
       />
     <Tool Name="VCCustomBuildTool"/>
@@ -95,12 +95,27 @@ SccProvider="MSCCI:Perforce SCM"
 <References></References>
 <Files>
   <Filter Name="Source Files" Filter="">
+    <File RelativePath="..\..\src\MeshImportObj\ImportObj.cpp"/>
     <File RelativePath="..\..\src\MeshImportObj\MeshImportObj.cpp"/>
+  </Filter>
+  <Filter Name="Header Files" Filter="">
+    <File RelativePath="..\..\src\MeshImportObj\ImportObj.h"/>
   </Filter>
   <Filter Name="Public Header Files" Filter="">
     <File RelativePath="..\..\include\MeshImportObj\MeshImportObj.h"/>
   </Filter>
   <Filter Name="Common Include-Binding Files" Filter="">
+    <Filter Name="snippets" Filter="">
+      <File RelativePath="..\..\include\common\snippets\inparser.cpp"/>
+      <File RelativePath="..\..\include\common\snippets\inparser.h"/>
+      <File RelativePath="..\..\include\common\snippets\stable.h"/>
+      <File RelativePath="..\..\include\common\snippets\stringdict.cpp"/>
+      <File RelativePath="..\..\include\common\snippets\stringdict.h"/>
+      <File RelativePath="..\..\include\common\snippets\sutil.cpp"/>
+      <File RelativePath="..\..\include\common\snippets\sutil.h"/>
+      <File RelativePath="..\..\include\common\snippets\SystemServices.cpp"/>
+      <File RelativePath="..\..\include\common\snippets\SystemServices.h"/>
+    </Filter>
     <Filter Name="MemoryServices" Filter="">
       <File RelativePath="..\..\include\common\MemoryServices\MemoryContainer.cpp"/>
       <File RelativePath="..\..\include\common\MemoryServices\MemoryContainer.h"/>

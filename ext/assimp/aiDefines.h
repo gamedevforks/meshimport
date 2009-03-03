@@ -39,42 +39,92 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ---------------------------------------------------------------------------
 */
 
-#ifndef AI_DEFINES_H_INC
-#define AI_DEFINES_H_INC
+/** @file aiDefines.h
+ *  @brief Assimp build configuration setup. See the notes in the comment
+ *  blocks to find out how you can customize your Assimp build.
+ */
 
-// compiler specific includes and definitions
+#ifndef INCLUDED_AI_DEFINES_H
+#define INCLUDED_AI_DEFINES_H
+
+	//////////////////////////////////////////////////////////////////////////
+	// Define ASSIMP_BUILD_NO_XX_IMPORTER to disable a specific
+	// file format loader. The loader is be excluded from the
+	// build in this case. 'XX' stands for the most common file
+	// extension of the file format. E.g.: 
+    // ASSIMP_BUILD_NO_X_IMPORTER disables the X loader.
+	//
+	// Other configuration switches:
+	//    ASSIMP_BUILD_NO_COMPRESSED_X 
+	//      - Disable support for compressed X files, removes the
+	//        dependency from the zlib inflate algorithm.
+	//
+#ifndef ASSIMP_BUILD_NO_COMPRESSED_X
+#	define ASSIMP_BUILD_NEED_Z_INFLATE
+#endif
+
+	//////////////////////////////////////////////////////////////////////////
+	// Define ASSIMP_BUILD_NO_XX_PROCESS to disable a specific
+	// post-processing step. The spe will be excluded from the
+	// build in this case. 'XX' stands for the name of the loader.
+	// List of defines:
+	// CALCTANGENTS
+	// JOINVERTICES
+	// CONVERTTOLH
+	// TRIANGULATE
+	// GENFACENORMALS
+	// GENVERTEXNORMALS
+	// REMOVEVC
+	// SPLITLARGEMESHES
+	// PRETRANSFORMVERTICES
+	// LIMITBONEWEIGHTS
+	// VALIDATEDS
+	// IMPROVECACHELOCALITY
+	// FIXINFACINGNORMALS
+	// REMOVE_REDUNDANTMATERIALS
+	// OPTIMIZEGRAPH
+	// SORTBYPTYPE
+	// FINDINVALIDDATA
+	// TRANSFORMTEXCOORDS
+	// GENUVCOORDS
+
+// Compiler specific includes and definitions
 #if (defined _MSC_VER)
-
-	// include stdint.h from the C98 standard
-#	include "Compiler/MSVC/stdint.h"
-
 #	undef ASSIMP_API
 
-	// ************************************************************
+	// Include our workaround stdint.h - VC doesn't have one
+#	include "Compiler/pstdint.h"
+
+	//////////////////////////////////////////////////////////////////////////
 	// Define ASSIMP_BUILD_DLL_EXPORT to build a DLL of the library
-	// ************************************************************
 #	if (defined ASSIMP_BUILD_DLL_EXPORT)
 #		define ASSIMP_API __declspec(dllexport)
 #		pragma warning (disable : 4251)
 
-	// ************************************************************
+	//////////////////////////////////////////////////////////////////////////
 	// Define ASSIMP_DLL before including Assimp to use ASSIMP in
 	// an external DLL (otherwise a static library is used)
-	// ************************************************************
 #	elif (defined ASSIMP_DLL)
 #		define ASSIMP_API __declspec(dllimport)
 #	else
 #		define ASSIMP_API 
 #	endif
 
+	// Force the compiler to inline a function, if supported
+#	define AI_FORCE_INLINE __forceinline
+
 #else
 #	define ASSIMP_API
+#	define AI_FORCE_INLINE inline
 #endif // (defined _MSC_VER)
 
 #ifdef __cplusplus
+	// No explicit 'struct' and 'enum' tags for C++, we don't want to 
+	// confuse the AI (:-)) of our IDE.
 #	define C_STRUCT
+#	define C_ENUM
 #else
-	// ************************************************************
+	//////////////////////////////////////////////////////////////////////////
 	// To build the documentation, make sure ASSIMP_DOXYGEN_BUILD
 	// is defined by Doxygen's preprocessor. The corresponding
 	// entries in the DoxyFile look like this:
@@ -86,30 +136,75 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 	INCLUDE_PATH           = 
 	INCLUDE_FILE_PATTERNS  = 
 	PREDEFINED             = ASSIMP_DOXYGEN_BUILD=1
-	EXPAND_AS_DEFINED      = C_STRUCT
+	EXPAND_AS_DEFINED      = C_STRUCT C_ENUM
 	SKIP_FUNCTION_MACROS   = YES
 #endif
-	// ************************************************************
+	//////////////////////////////////////////////////////////////////////////
+	// Doxygen gets confused if we use c-struct typedefs to avoid
+	// the explicit 'struct' notation. This trick here has the same
+	// effect as the TYPEDEF_HIDES_STRUCT option, but we don't need
+	// to typedef all structs/enums.
 #	if (defined ASSIMP_DOXYGEN_BUILD)
-#		define C_STRUCT
+#		define C_STRUCT 
+#		define C_ENUM   
 #	else
 #		define C_STRUCT struct
+#		define C_ENUM   enum
 #	endif
 #endif
 
-// helper macro that sets a pointer to NULL in debug builds
-#if (!defined AI_DEBUG_INVALIDATE_PTR)
-#	if (defined _DEBUG)
-#		define AI_DEBUG_INVALIDATE_PTR(x) x = NULL;
-#	else
-#		define AI_DEBUG_INVALIDATE_PTR(x)
-#	endif
-#endif 
+#if (defined(__BORLANDC__) || defined (__BCPLUSPLUS__))
 
+#error Currently Borland is unsupported. Feel free to port Assimp.
+
+// "W8059 Packgröße der Struktur geändert"
+
+#endif
+	//////////////////////////////////////////////////////////////////////////
+	// Define ASSIMP_BUILD_BOOST_WORKAROUND to compile assimp
+	// without boost. This is done by using a few workaround
+	// classes. However, some assimp features are not available
+	// in this case. This implies the ASSIMP_BUILD_SINGLETHREADED option.
+#ifdef ASSIMP_BUILD_BOOST_WORKAROUND
+
+	// threading support requires boost
+#ifndef ASSIMP_BUILD_SINGLETHREADED
+#	define ASSIMP_BUILD_SINGLETHREADED
+#endif
+
+#endif
+
+	//////////////////////////////////////////////////////////////////////////
+	// Define ASSIMP_BUILD_SINGLETHREADED to compile assimp
+	// without threading support. The library doesn't utilize
+	// threads then, and is itself not threadsafe.
+	// If this flag is specified, boost::threads is *not* required.
+
+	// TODO
+#ifndef ASSIMP_BUILD_SINGLETHREADED
+#	define ASSIMP_BUILD_SINGLETHREADED
+#endif
+
+#ifndef ASSIMP_BUILD_SINGLETHREADED
+#	define AI_C_THREADSAFE
+#endif // !! ASSIMP_BUILD_SINGLETHREADED
+
+#if (defined _DEBUG || defined DEBUG) // one of the two should be defined ..
+#	define ASSIMP_BUILD_DEBUG
+#endif
+
+// Make sure NULL is defined
+#ifndef NULL
+#	define NULL 0
+#endif
+
+// Use our own definition of PI here
 #define AI_MATH_PI		(3.1415926538)
 #define AI_MATH_TWO_PI	(AI_MATH_PI * 2.0)
+#define AI_MATH_HALF_PI	(AI_MATH_PI * 0.5)
 
+// Tiny macro to convert from radians to degrees and the reverse
 #define AI_DEG_TO_RAD(x) (x*0.0174532925f)
 #define AI_RAD_TO_DEG(x) (x*57.2957795f)
 
-#endif // !! AI_DEFINES_H_INC
+#endif // !! INCLUDED_AI_DEFINES_H

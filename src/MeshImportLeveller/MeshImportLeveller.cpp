@@ -1,5 +1,6 @@
 #include <assert.h>
-#include "./MeshImportLeveller/MeshImportLeveller.h"
+#include "common/snippets/UserMemAlloc.h"
+#include "MeshImport/MeshImport.h"
 
 #ifdef WIN32
 #ifdef MESHIMPORTLEVELLER_EXPORTS
@@ -17,12 +18,12 @@ bool doShutdown(void);
 
 extern "C"
 {
-MESHIMPORTLEVELLER_API MESHIMPORTLEVELLER::MeshImportLeveller * getInterface(int version_number);
+MESHIMPORTLEVELLER_API MESHIMPORT::MeshImporter * getInterface(int version_number,SYSTEM_SERVICES::SystemServices *services);
 };
 
-namespace MESHIMPORTLEVELLER
+namespace MESHIMPORT
 {
-class MyMeshImportLeveller : public MeshImportLeveller
+class MyMeshImportLeveller : public MeshImporter
 {
 public:
   MyMeshImportLeveller(void)
@@ -48,7 +49,7 @@ public:
     return "Leveller Files";
   }
 
-  virtual bool importMesh(const char *meshName,const void *data,unsigned int dlen,MESHIMPORT::MeshImportInterface *callback,const char *options)
+  virtual bool importMesh(const char *meshName,const void *data,unsigned int dlen,MESHIMPORT::MeshImportInterface *callback,const char *options,MeshImportApplicationResource *appResource)
   {
     bool ret = false;
 
@@ -68,7 +69,7 @@ enum MeshImportLevellerAPI
 };  // End of Namespace
 
 
-using namespace MESHIMPORTLEVELLER;
+using namespace MESHIMPORT;
 
 
 static MyMeshImportLeveller *gInterface=0;
@@ -76,24 +77,28 @@ static MyMeshImportLeveller *gInterface=0;
 extern "C"
 {
 #ifdef PLUGINS_EMBEDDED
-  MeshImportLeveller * getInterfaceMeshImportLeveller(int version_number)
+  MeshImporter * getInterfaceMeshImportLeveller(int version_number,SYSTEM_SERVICES::SystemServices *services)
 #else
-MESHIMPORTLEVELLER_API MeshImportLeveller * getInterface(int version_number)
+MESHIMPORTLEVELLER_API MeshImporter * getInterface(int version_number,SYSTEM_SERVICES::SystemServices *services)
 #endif
 {
+  if ( services )
+  {
+    SYSTEM_SERVICES::gSystemServices = services;
+  }
   assert( gInterface == 0 );
-  if ( gInterface == 0 && version_number == MESHIMPORTLEVELLER_VERSION )
+  if ( gInterface == 0 && version_number == MESHIMPORT_VERSION )
   {
     gInterface = MEMALLOC_NEW(MyMeshImportLeveller);
   }
-  return static_cast<MeshImportLeveller *>(gInterface);
+  return static_cast<MeshImporter *>(gInterface);
 };
 
 };  // End of namespace PATHPLANNING
 
 #ifndef PLUGINS_EMBEDDED
 
-using namespace MESHIMPORTLEVELLER;
+using namespace MESHIMPORT;
 
 bool doShutdown(void)
 {
@@ -107,7 +112,7 @@ bool doShutdown(void)
   return ret;
 }
 
-using namespace MESHIMPORTLEVELLER;
+using namespace MESHIMPORT;
 
 #ifdef WIN32
 

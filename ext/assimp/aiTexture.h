@@ -39,9 +39,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ---------------------------------------------------------------------------
 */
 
-/** @file Defines texture helper structures for the library
+/** @file aiTexture.h
+ *  @brief Defines texture helper structures for the library
  *
- * Used for file formats which embedd their textures into the model file.
+ * Used for file formats which embed their textures into the model file.
  * Supported are both normal textures, which are stored as uncompressed
  * pixels, and "compressed" textures, which are stored in a file format
  * such as PNG or TGA.
@@ -57,70 +58,65 @@ extern "C" {
 #endif
 
 
-// ---------------------------------------------------------------------------
-/** \def AI_MAKE_EMBEDDED_TEXNAME
+// --------------------------------------------------------------------------------
+/** @def AI_MAKE_EMBEDDED_TEXNAME
  *  Used to build the reserved path name used by the material system to 
  *  reference textures that are embedded into their corresponding
  *  model files. The parameter specifies the index of the texture
  *  (zero-based, in the aiScene::mTextures array)
  */
-// ---------------------------------------------------------------------------
 #if (!defined AI_MAKE_EMBEDDED_TEXNAME)
 #	define AI_MAKE_EMBEDDED_TEXNAME(_n_) "*" # _n_
 #endif
 
-// ugly compiler dependent packing stuff
-#if defined(_MSC_VER) ||  defined(__BORLANDC__) ||	defined (__BCPLUSPLUS__)
-#	pragma pack(push,1)
-#	define PACK_STRUCT
-#elif defined( __GNUC__ )
-#	define PACK_STRUCT	__attribute__((packed))
-#else
-#	error Compiler not supported. Never do this again.
-#endif
 
-// ---------------------------------------------------------------------------
-/** Helper structure to represent a texel in ARGB8888 format
+#include "./Compiler/pushpack1.h"
+
+// --------------------------------------------------------------------------------
+/** @brief Helper structure to represent a texel in a ARGB8888 format
 * 
-* Used by aiTexture
+*  Used by aiTexture.
 */
-// ---------------------------------------------------------------------------
 struct aiTexel
 {
-	unsigned char b;
-	unsigned char g;
-	unsigned char r;
-	unsigned char a;
+	unsigned char b,g,r,a;
 
+#ifdef __cplusplus
 	//! Comparison operator
 	bool operator== (const aiTexel& other) const
 	{
 		return b == other.b && r == other.r &&
-			g == other.g && a == other.a;
+			   g == other.g && a == other.a;
 	}
 
-	//! Negative comparison operator
+	//! Inverse comparison operator
 	bool operator!= (const aiTexel& other) const
 	{
 		return b != other.b || r != other.r ||
-			g != other.g || a != other.a;
+			   g != other.g || a != other.a;
 	}
+
+	//! Conversion to a floating-point 4d color
+	operator aiColor4D() const
+	{
+		return aiColor4D(r/255.f,g/255.f,b/255.f,a/255.f);
+	}
+#endif // __cplusplus
 
 } PACK_STRUCT;
 
-// reset packing to the original value
-#if defined(_MSC_VER) ||  defined(__BORLANDC__) || defined (__BCPLUSPLUS__)
-#	pragma pack( pop )
-#endif
-#undef PACK_STRUCT
+#include "./Compiler/poppack1.h"
 
-// ---------------------------------------------------------------------------
+// --------------------------------------------------------------------------------
 /** Helper structure to describe an embedded texture
 * 
 * Normally textures are contained in external files but some file formats
-* do embedd them. Embedded
+* embed them directly in the model file. There are two types of embedded
+* textures: 1. Uncompressed textures. The color data is directly given.
+* 2. Compressed textures stored in a file format like png or jpg. The raw
+* file is given, the application must utilize an image decoder (e.g. DevIL)
+* to get access to the color data.
 */
-// ---------------------------------------------------------------------------
 struct aiTexture
 {
 	/** Width of the texture, in pixels
@@ -134,7 +130,7 @@ struct aiTexture
 	/** Height of the texture, in pixels
 	 *
 	 * If this value is zero, pcData points to an compressed texture
-	 * in an unknown format (e.g. JPEG).
+	 * in any format (e.g. JPEG).
 	 */
 	unsigned int mHeight;
 
@@ -142,10 +138,12 @@ struct aiTexture
 	 *  to determine the type of embedded compressed textures.
 	 *
 	 * If mHeight != 0 this member is undefined. Otherwise it
-	 * will be set to '\0\0\0\0' if the loader has no additional
+	 * is set set to '\\0\\0\\0\\0' if the loader has no additional
 	 * information about the texture file format used OR the
-	 * file extension of the format without a leading dot.
-	 * E.g. 'dds\0', 'pcx\0'.  All characters are lower-case.
+	 * file extension of the format without a trailing dot. If there 
+	 * are multiple file extensions for a format, the shortest 
+	 * extension is chosen (JPEG maps to 'jpg', not to 'jpeg').
+	 * E.g. 'dds\\0', 'pcx\\0', 'jpg'.  All characters are lower-case.
 	 */
 	char achFormatHint[4];
 
@@ -158,18 +156,29 @@ struct aiTexture
 	 * buffer of size mWidth containing the compressed texture
 	 * data. Good luck, have fun!
 	 */
-	aiTexel* pcData;
+	C_STRUCT aiTexel* pcData;
 
 #ifdef __cplusplus
 
+	//! For compressed textures (mHeight == 0): compare the
+	//! format hint against a given string.
+	//! @param s Input string. 4 characters are maximally processed.
+	//!        Example values: "jpg", "png"
+	//! @return true if the given string matches the format hint
+	bool CheckFormat(const char* s) const
+	{
+		ai_assert(s && !mHeight);
+		return (0 == ::strncmp(achFormatHint,s,4));
+	}
+
 	// Construction
 	aiTexture ()
-		: mWidth(0), mHeight(0), pcData(NULL)
+		: mWidth  (0)
+		, mHeight (0)
+		, pcData  (NULL)
 	{
-		achFormatHint[0] = '\0';
-		achFormatHint[1] = '\0';
-		achFormatHint[2] = '\0';
-		achFormatHint[3] = '\0';
+		achFormatHint[0] = achFormatHint[1] = 0;
+		achFormatHint[2] = achFormatHint[3] = 0;
 	}
 
 	// Destruction

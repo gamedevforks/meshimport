@@ -38,7 +38,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ----------------------------------------------------------------------
 */
 
-/** @file Quaternion structure, including operators when compiling in C++ */
+/** @file aiQuaternion.h
+ *  @brief Quaternion structure, including operators when compiling in C++
+ */
 #ifndef AI_QUATERNION_H_INC
 #define AI_QUATERNION_H_INC
 
@@ -72,6 +74,27 @@ struct aiQuaternion
 	/** Returns a matrix representation of the quaternion */
 	aiMatrix3x3 GetMatrix() const;
 
+
+	bool operator== (const aiQuaternion& o) const
+		{return x == o.x && y == o.y && z == o.z && w == o.w;}
+
+	bool operator!= (const aiQuaternion& o) const
+		{return !(*this == o);}
+
+	/** Normalize the quaternion */
+	aiQuaternion& Normalize();
+
+	/** Multiply two quaternions */
+	aiQuaternion operator* (const aiQuaternion& two) const;
+
+	/** Performs a spherical interpolation between two quaternions and writes the result into the third.
+	 * @param pOut Target object to received the interpolated rotation.
+	 * @param pStart Start rotation of the interpolation at factor == 0.
+	 * @param pEnd End rotation, factor == 1.
+	 * @param pFactor Interpolation factor between 0 and 1. Values outside of this range yield undefined results.
+	 */
+	static void Interpolate( aiQuaternion& pOut, const aiQuaternion& pStart, const aiQuaternion& pEnd, float pFactor);
+
 #endif // __cplusplus
 
 	//! w,x,y,z components of the quaternion
@@ -88,7 +111,7 @@ inline aiQuaternion::aiQuaternion( const aiMatrix3x3 &pRotMatrix)
 	float t = 1 + pRotMatrix.a1 + pRotMatrix.b2 + pRotMatrix.c3;
 
 	// large enough
-	if( t > 0.00001f)
+	if( t > 0.001f)
 	{
 		float s = sqrt( t) * 2.0f;
 		x = (pRotMatrix.b3 - pRotMatrix.c2) / s;
@@ -98,29 +121,29 @@ inline aiQuaternion::aiQuaternion( const aiMatrix3x3 &pRotMatrix)
 	} // else we have to check several cases
 	else if( pRotMatrix.a1 > pRotMatrix.b2 && pRotMatrix.a1 > pRotMatrix.c3 )  
 	{	
-		// Column 0: 
+    // Column 0: 
 		float s = sqrt( 1.0f + pRotMatrix.a1 - pRotMatrix.b2 - pRotMatrix.c3) * 2.0f;
-		x = -0.25f * s;
+		x = 0.25f * s;
 		y = (pRotMatrix.a2 + pRotMatrix.b1) / s;
 		z = (pRotMatrix.c1 + pRotMatrix.a3) / s;
-		w = (pRotMatrix.c2 - pRotMatrix.b3) / s;
+		w = (pRotMatrix.b3 - pRotMatrix.c2) / s;
 	} 
 	else if( pRotMatrix.b2 > pRotMatrix.c3) 
 	{ 
-		// Column 1: 
+    // Column 1: 
 		float s = sqrt( 1.0f + pRotMatrix.b2 - pRotMatrix.a1 - pRotMatrix.c3) * 2.0f;
 		x = (pRotMatrix.a2 + pRotMatrix.b1) / s;
-		y = -0.25f * s;
+		y = 0.25f * s;
 		z = (pRotMatrix.b3 + pRotMatrix.c2) / s;
-		w = (pRotMatrix.a3 - pRotMatrix.c1) / s;
+		w = (pRotMatrix.c1 - pRotMatrix.a3) / s;
 	} else 
 	{ 
-		// Column 2:
+    // Column 2:
 		float s = sqrt( 1.0f + pRotMatrix.c3 - pRotMatrix.a1 - pRotMatrix.b2) * 2.0f;
 		x = (pRotMatrix.c1 + pRotMatrix.a3) / s;
 		y = (pRotMatrix.b3 + pRotMatrix.c2) / s;
-		z = -0.25f * s;
-		w = (pRotMatrix.b1 - pRotMatrix.a2) / s;
+		z = 0.25f * s;
+		w = (pRotMatrix.a2 - pRotMatrix.b1) / s;
 	}
 }
 
@@ -190,7 +213,72 @@ inline aiQuaternion::aiQuaternion( aiVector3D normalized)
 
 }
 
+// ---------------------------------------------------------------------------
+// Performs a spherical interpolation between two quaternions 
+// Implementation adopted from the gmtl project. All others I found on the net fail in some cases.
+// Congrats, gmtl!
+inline void aiQuaternion::Interpolate( aiQuaternion& pOut, const aiQuaternion& pStart, const aiQuaternion& pEnd, float pFactor)
+{
+  // calc cosine theta
+  float cosom = pStart.x * pEnd.x + pStart.y * pEnd.y + pStart.z * pEnd.z + pStart.w * pEnd.w;
 
+  // adjust signs (if necessary)
+  aiQuaternion end = pEnd;
+  if( cosom < 0.0f)
+  {
+    cosom = -cosom;
+    end.x = -end.x;   // Reverse all signs
+    end.y = -end.y;
+    end.z = -end.z;
+    end.w = -end.w;
+  } 
+
+  // Calculate coefficients
+  float sclp, sclq;
+  if( (1.0f - cosom) > 0.0001f) // 0.0001 -> some epsillon
+  {
+    // Standard case (slerp)
+    float omega, sinom;
+    omega = acos( cosom); // extract theta from dot product's cos theta
+    sinom = sin( omega);
+    sclp  = sin( (1.0f - pFactor) * omega) / sinom;
+    sclq  = sin( pFactor * omega) / sinom;
+  } else
+  {
+    // Very close, do linear interp (because it's faster)
+    sclp = 1.0f - pFactor;
+    sclq = pFactor;
+  }
+
+  pOut.x = sclp * pStart.x + sclq * end.x;
+  pOut.y = sclp * pStart.y + sclq * end.y;
+  pOut.z = sclp * pStart.z + sclq * end.z;
+  pOut.w = sclp * pStart.w + sclq * end.w;
+}
+
+// ---------------------------------------------------------------------------
+inline aiQuaternion& aiQuaternion::Normalize()
+{
+	// compute the magnitude and divide through it
+	const float mag = x*x+y*y+z*z+w*w;
+	if (mag)
+	{
+		x /= mag;
+		y /= mag;
+		z /= mag;
+		w /= mag;
+	}
+	return *this;
+}
+
+// ---------------------------------------------------------------------------
+inline aiQuaternion aiQuaternion::operator* (const aiQuaternion& t) const
+{
+	return aiQuaternion(w*t.w - x*t.x - y*t.y - z*t.z,
+		w*t.x + x*t.w + y*t.z - z*t.y,
+		w*t.y + y*t.w + z*t.x - x*t.z,
+		w*t.z + z*t.w + x*t.y - y*t.x);
+}
 
 } // end extern "C"
 #endif // __cplusplus

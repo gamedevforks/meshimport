@@ -10,9 +10,39 @@
  * Write detailed description for binding.h here.
  */
 
+#if defined(LINUX)
+#include "linux_compat.h"
+#endif
+
 #ifndef BINDING_H
 
 #define BINDING_H
+
+
+namespace SYSTEM_SERVICES
+{
+class SystemServices;
+};
+
+/*!
+* \brief
+* function type used by interface registration
+*/
+typedef void * (__cdecl * PLUGIN_INTERFACE_FUNC)     (int version,SYSTEM_SERVICES::SystemServices *services);
+
+/*!
+* \brief
+* Structure used pass the names of plug-in interfaces exported by a dll or library
+*/
+struct INTERFACE_EXPORT
+{
+  const char *name;
+  PLUGIN_INTERFACE_FUNC func;
+};
+
+typedef int    (__cdecl * PLUGIN_INTERFACE_LIST_FUNC)(const INTERFACE_EXPORT **);
+
+
 
 extern "C"
 {
@@ -42,9 +72,10 @@ extern "C"
  * \see
  * Separate items with the '|' character.
  */
-void *     getBindingInterfaceModule(const char *dll,int version_number,void *&module);
-void *     getBindingInterface(const char *dll,int version_number);
-bool       unloadBindingInterface(void *module);
+void       loadModuleInterfaces(const char *dll, void **rmodule = 0);
+void *     getBindingInterface(const char *dll, const char *name, int version_number, SYSTEM_SERVICES::SystemServices *services, void **rmodule = 0); 
+bool       unloadModule(void *module);
+
 
 void       setSuppressLoadError(bool state); // whether or not to suppress load error dialog boxes under windows.
 

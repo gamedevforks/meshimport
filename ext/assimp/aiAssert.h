@@ -1,3 +1,5 @@
+/** @file aiAssert.h
+ */
 #ifndef AI_DEBUG_H_INC
 #define AI_DEBUG_H_INC
 
@@ -18,7 +20,7 @@ void aiAssert (bool expression, const std::string &message, unsigned int uiLine,
 //!	\def	ai_assert
 //!	\brief	ASSIM specific assertion test
 #ifdef DEBUG  
-#  define	ai_assert(expression) aiAssert (expression, #expression, __LINE__, __FILE__);
+#  define	ai_assert(expression) Assimp::aiAssert (expression, #expression, __LINE__, __FILE__);
 #else
 #  define	ai_assert(expression)
 #endif

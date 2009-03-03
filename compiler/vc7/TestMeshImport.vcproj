@@ -92,14 +92,16 @@ SccProvider="MSCCI:Perforce SCM"
 </Configurations>
 <References></References>
 <Files>
-  <Filter Name="Common Binding Files" Filter="">
-    <Filter Name="binding" Filter="">
-      <File RelativePath="..\..\include\common\binding\binding.cpp"/>
-      <File RelativePath="..\..\include\common\binding\binding.h"/>
-    </Filter>
-    <Filter Name="MemoryServices" Filter="">
-      <File RelativePath="..\..\include\common\MemoryServices\MemoryContainer.cpp"/>
-      <File RelativePath="..\..\include\common\MemoryServices\MemoryContainer.h"/>
+  <Filter Name="MeshImport Files" Filter="">
+    <File RelativePath="..\..\include\MeshImport\MeshImport.cpp"/>
+    <File RelativePath="..\..\include\MeshImport\MeshImport.h"/>
+    <File RelativePath="..\..\include\MeshImport\MeshSystem.h"/>
+  </Filter>
+  <Filter Name="Common Include-Binding Files" Filter="">
+    <Filter Name="snippets" Filter="">
+      <File RelativePath="..\..\include\common\snippets\SystemServices.cpp"/>
+      <File RelativePath="..\..\include\common\snippets\SystemServices.h"/>
+      <File RelativePath="..\..\include\common\snippets\UserMemAlloc.h"/>
     </Filter>
   </Filter>
   <Filter Name="TestMeshImport" Filter="">

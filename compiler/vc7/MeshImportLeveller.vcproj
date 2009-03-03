@@ -64,7 +64,7 @@ SccProvider="MSCCI:Perforce SCM"
       PreprocessorDefinitions="WIN32;_WINDOWS;UNICODE=1;_UNICODE=1;MESHIMPORTLEVELLER_EXPORTS;NDEBUG;"
       WarningLevel="3"
       Optimization="4"
-      AdditionalOptions="/WX /W4 /fp:fast /O2 /MD /Zi "
+      AdditionalOptions="/Zi /WX /W4 /fp:fast /WX /MD /O2 "
       ExceptionHandling="1"
       />
     <Tool Name="VCCustomBuildTool"/>
@@ -101,6 +101,10 @@ SccProvider="MSCCI:Perforce SCM"
     <File RelativePath="..\..\include\MeshImportLeveller\MeshImportLeveller.h"/>
   </Filter>
   <Filter Name="Common Include-Binding Files" Filter="">
+    <Filter Name="snippets" Filter="">
+      <File RelativePath="..\..\include\common\snippets\SystemServices.cpp"/>
+      <File RelativePath="..\..\include\common\snippets\SystemServices.h"/>
+    </Filter>
     <Filter Name="MemoryServices" Filter="">
       <File RelativePath="..\..\include\common\MemoryServices\MemoryContainer.cpp"/>
       <File RelativePath="..\..\include\common\MemoryServices\MemoryContainer.h"/>

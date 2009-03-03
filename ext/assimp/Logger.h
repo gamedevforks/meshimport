@@ -38,35 +38,44 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ----------------------------------------------------------------------
 */
 
-#ifndef AI_LOGGER_H_INC
-#define AI_LOGGER_H_INC
+/** @file Logger.h
+ *  @brief Abstract base class 'Logger', base of the logging system. 
+ */
 
-#include <string>
-#include "aiDefines.h"
+#ifndef INCLUDED_AI_LOGGER_H
+#define INCLUDED_AI_LOGGER_H
 
-namespace Assimp
-{
+#include "aiTypes.h"
+namespace Assimp	{
 
 class LogStream;
 
-// ---------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------
 /**	@class	Logger
  *	@brief	Abstract interface for logger implementations.
+ *  Assimp provides a default implementation ('DefaultLogger').
  */
-class ASSIMP_API Logger
+class ASSIMP_API Logger : public Intern::AllocateFromAssimpHeap
 {
 public:
 	/**	@enum	LogSeverity
-	 *	@brief	Log severity to descripe granuality of logging.
+	 *	@brief	Log severity to describe the granularity of logging.
+	 *
+	 *  This is a general property of a Logger instance, NORMAL means
+	 *  that debug messages are rejected immediately.
 	 */
 	enum LogSeverity
 	{
-		NORMAL,		//!< Normal granlality of logging
+		NORMAL,		//!< Normal granularity of logging
 		VERBOSE		//!< Debug infos will be logged, too
 	};
 
 	/**	@enum	ErrorSeverity
-	 *	@brief	Description for severity of a log message
+	 *	@brief	Description for severity of a log message.
+	 *
+	 *  Every LogStream has a bitwise combination of these flags.
+	 *  A LogStream doesn't receive any messages of a specific type
+	 *  if it doesn't specify the corresponding ErrorSeverity flag.
 	 */
 	enum ErrorSeverity
 	{
@@ -77,63 +86,79 @@ public:
 	};
 
 public:
-	/**	@brief	Virtual destructor */
+	/** @brief	Virtual destructor */
 	virtual ~Logger();
 
-	/**	@brief	Writes a debug message
-	 *	@param	message		Debug message
+	/** @brief	Writes a debug message
+	 *	 @param	message		Debug message
 	 */
 	virtual void debug(const std::string &message)= 0;
 
-	/**	@brief	Writes a info message
-	 *	@param	message		Info message
+	/** @brief	Writes a info message
+	 *	 @param	message		Info message
 	 */
 	virtual void info(const std::string &message) = 0;
 
-	/**	@brief	Writes a warning message
-	 *	@param	message		Warn message
+	/** @brief	Writes a warning message
+	 *	 @param	message		Warn message
 	 */
 	virtual void warn(const std::string &message) = 0;
 
-	/**	@brief	Writes an error message
-	 *	@param	message		Error message
+	/** @brief	Writes an error message
+	 *	 @param	message		Error message
 	 */
 	virtual void error(const std::string &message) = 0;
 
-	/**	@brief	Set a new log severity.
-	 *	@param	log_severity	New severity for logging
+	/** @brief	Set a new log severity.
+	 *	 @param	log_severity	New severity for logging
 	 */
 	virtual void setLogSeverity(LogSeverity log_severity) = 0;
 
-	/**	@brief	Attach a new logstream
-	 *	@param	pStream		Logstream to attach
+	/** @brief	Attach a new logstream
+	 *
+	 *  The logger takes ownership of the stream and is responsible
+	 *  for its destruction (which is done when the logger itself 
+	 *  is destroyed). Call detachStream to detach a stream and to
+	 *  gain ownership of it again.
+	 *	 @param	pStream	 Logstream to attach
+	 *  @param severity  Message filter, specified which types of log
+	 *    messages are dispatched to the stream. Provide a bitwise
+	 *    combination of the ErrorSeverity flags.
 	 */
-	virtual void attachStream(LogStream *pStream, unsigned int severity) = 0;
+	virtual void attachStream(LogStream *pStream, 
+		unsigned int severity = DEBUGGING | ERR | WARN | INFO) = 0;
 
-	/**	@brief	Detach a still attached stream from logger
-	 *	@param	pStream		Logstream instance for detatching
+	/** @brief	Detach a still attached stream from the logger (or 
+	 *          modify the filter flags bits)
+	 *	 @param	pStream	Logstream instance for detaching
+	 *  @param severity Provide a bitwise combination of the ErrorSeverity
+	 *    flags. This value is &~ed with the current flags of the stream,
+	 *    if the result is 0 the stream is detached from the Logger and
+	 *    the caller retakes the possession of the stream.
 	 */
-	virtual void detatchStream(LogStream *pStream, unsigned int severity) = 0;
+	virtual void detatchStream(LogStream *pStream, 
+		unsigned int severity = DEBUGGING | ERR | WARN | INFO) = 0;
 
 protected:
 	/**	@brief	Default constructor	*/
 	Logger();
 };
-// ---------------------------------------------------------------------------
+
+// ----------------------------------------------------------------------------------
 //	Default constructor
 inline Logger::Logger()
 {
 	//	empty
 }
 
-// ---------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------
 //	Virtual destructor
 inline  Logger::~Logger()
 {
 	// empty
 }
-// ---------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------
 
 } // Namespace Assimp
 
-#endif
+#endif // !! INCLUDED_AI_LOGGER_H

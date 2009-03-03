@@ -1,5 +1,7 @@
 #include <assert.h>
-#include "./MeshImportObj/MeshImportObj.h"
+#include "common/snippets/UserMemAlloc.h"
+#include "MeshImport/MeshImport.h"
+#include "ImportObj.h"
 
 #ifdef WIN32
 #ifdef MESHIMPORTOBJ_EXPORTS
@@ -17,12 +19,12 @@ bool doShutdown(void);
 
 extern "C"
 {
-MESHIMPORTOBJ_API MESHIMPORTOBJ::MeshImportObj * getInterface(int version_number);
+MESHIMPORTOBJ_API MESHIMPORT::MeshImporter * getInterface(int version_number,SYSTEM_SERVICES::SystemServices *services);
 };
 
-namespace MESHIMPORTOBJ
+namespace MESHIMPORT
 {
-class MyMeshImportObj : public MeshImportObj
+class MyMeshImportObj : public MeshImporter
 {
 public:
   MyMeshImportObj(void)
@@ -48,9 +50,16 @@ public:
     return "Wavefront Obj Files";
   }
 
-  virtual bool importMesh(const char *meshName,const void *data,unsigned int dlen,MESHIMPORT::MeshImportInterface *callback,const char *options)
+  virtual bool importMesh(const char *meshName,const void *data,unsigned int dlen,MESHIMPORT::MeshImportInterface *callback,const char *options,MeshImportApplicationResource *appResource)
   {
     bool ret = false;
+
+    MeshImporter *imp = createMeshImportObj();
+    if ( imp )
+    {
+      ret = imp->importMesh(meshName,data,dlen,callback,options,appResource);
+      releaseMeshImportObj(imp);
+    }
 
     return ret;
   }
@@ -68,7 +77,7 @@ enum MeshImportObjAPI
 };  // End of Namespace
 
 
-using namespace MESHIMPORTOBJ;
+using namespace MESHIMPORT;
 
 
 static MyMeshImportObj *gInterface=0;
@@ -76,24 +85,28 @@ static MyMeshImportObj *gInterface=0;
 extern "C"
 {
 #ifdef PLUGINS_EMBEDDED
-  MeshImportObj * getInterfaceMeshImportObj(int version_number)
+  MeshImporter * getInterfaceMeshImportObj(int version_number,SYSTEM_SERVICES::SystemServices *services)
 #else
-MESHIMPORTOBJ_API MeshImportObj * getInterface(int version_number)
+MESHIMPORTOBJ_API MeshImporter * getInterface(int version_number,SYSTEM_SERVICES::SystemServices *services)
 #endif
 {
+  if ( services )
+  {
+    SYSTEM_SERVICES::gSystemServices = services;
+  }
   assert( gInterface == 0 );
-  if ( gInterface == 0 && version_number == MESHIMPORTOBJ_VERSION )
+  if ( gInterface == 0 && version_number == MESHIMPORT_VERSION )
   {
     gInterface = MEMALLOC_NEW(MyMeshImportObj);
   }
-  return static_cast<MeshImportObj *>(gInterface);
+  return static_cast<MeshImporter *>(gInterface);
 };
 
 };  // End of namespace PATHPLANNING
 
 #ifndef PLUGINS_EMBEDDED
 
-using namespace MESHIMPORTOBJ;
+using namespace MESHIMPORT;
 
 bool doShutdown(void)
 {
@@ -107,7 +120,7 @@ bool doShutdown(void)
   return ret;
 }
 
-using namespace MESHIMPORTOBJ;
+using namespace MESHIMPORT;
 
 #ifdef WIN32
 

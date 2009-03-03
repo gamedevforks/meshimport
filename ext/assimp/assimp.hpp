@@ -39,57 +39,68 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ---------------------------------------------------------------------------
 */
 
-/** @file Defines the CPP-API to the Asset Import Library. */
-#ifndef AI_ASSIMP_HPP_INC
-#define AI_ASSIMP_HPP_INC
+/** @file assimp.hpp
+ *  @brief Defines the C++-API to the Open Asset Import Library.
+ */
+#ifndef INCLUDED_AI_ASSIMP_HPP
+#define INCLUDED_AI_ASSIMP_HPP
 
 #ifndef __cplusplus
-#error This header requires C++ to be used.
+#	error This header requires C++ to be used. Use Assimp's C-API (assimp.h) \
+          to access the library from C code.
 #endif
 
-// STL headers
-#include <string>
 #include <map>
 #include <vector>
 
-// public ASSIMP headers
+// Public ASSIMP data structure headers
 #include "aiTypes.h"
 #include "aiConfig.h"
+#include "aiAssert.h"
 
-namespace Assimp
-{
+namespace Assimp	{
+
+	// =======================================================================
+	// Public interface to Assimp 
+	// =======================================================================
 	class Importer;
-}
+	class IOStream;
+	class IOSystem;
 
-// internal ASSIMP headers - for plugin development
-#include "./../code/BaseImporter.h"
-#include "./../code/BaseProcess.h"
+	// =======================================================================
+	// Plugin development
+	// Include the following headers for the definitions:
+	// =======================================================================
+	// BaseImporter.h
+	// BaseProcess.h
+	class BaseImporter;
+	class BaseProcess;
+	class SharedPostProcessInfo;
+	class BatchLoader;
+} //! namespace Assimp
 
 #define AI_PROPERTY_WAS_NOT_EXISTING 0xffffffff
 
 struct aiScene;
 struct aiFileIO;
-const aiScene* aiImportFileEx( const char*, unsigned int, aiFileIO*);
+extern "C" ASSIMP_API const aiScene* aiImportFileEx( const char*, unsigned int, aiFileIO*);
 
-namespace Assimp
-{
+namespace Assimp	{
 
-class BaseImporter;
-class BaseProcess;
-class IOStream;
-class IOSystem;
-
-// ---------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------
 /** The Importer class forms an C++ interface to the functionality of the 
-*   Asset Import library.
+*   Open Asset Import Library.
 *
 * Create an object of this class and call ReadFile() to import a file. 
 * If the import succeeds, the function returns a pointer to the imported data. 
 * The data remains property of the object, it is intended to be accessed 
 * read-only. The imported data will be destroyed along with the Importer 
-* object. If the import failes, ReadFile() returns a NULL pointer. In this
+* object. If the import fails, ReadFile() returns a NULL pointer. In this
 * case you can retrieve a human-readable error description be calling 
-* GetErrorString().
+* GetErrorString(). You can call ReadFile() multiple times with a single Importer
+* instance. Actually, constructing Importer objects involves quite many
+* allocations and may take some time, so it's better to reuse them as often as
+* possible.
 *
 * If you need the Importer to do custom file handling to access the files,
 * implement IOSystem and IOStream and supply an instance of your custom 
@@ -98,17 +109,18 @@ class IOSystem;
 * standard C++ IO logic will be used.
 *
 * @note One Importer instance is not thread-safe. If you use multiple
-* threads for loading each thread should manage its own Importer instance.
+* threads for loading each thread should maintain its own Importer instance.
 */
 class ASSIMP_API Importer
 {
 	// used internally
 	friend class BaseProcess;
+	friend class BatchLoader;
 	friend const aiScene* ::aiImportFileEx( const char*, unsigned int, aiFileIO*);
 
 public:
 
-	typedef uint32_t KeyType;
+	typedef unsigned int KeyType;
 	typedef std::map<KeyType, int>  		IntPropertyMap;
 	typedef std::map<KeyType, float>		FloatPropertyMap;
 	typedef std::map<KeyType, std::string>	StringPropertyMap;
@@ -121,6 +133,17 @@ public:
 	 * Call ReadFile() to start the import process.
 	 */
 	Importer();
+
+
+	// -------------------------------------------------------------------
+	/** Copy constructor.
+	 * 
+	 * This copies the configuration properties of another Importer.
+	 * If this Importer owns a scene it won't be copied.
+	 * Call ReadFile() to start the import process.
+	 */
+	Importer(const Importer& other);
+
 
 	// -------------------------------------------------------------------
 	/** Destructor. The object kept ownership of the imported data,
@@ -233,9 +256,11 @@ public:
 
 	// -------------------------------------------------------------------
 	/** Get a string configuration property
+	 *
+	 *  The return value remains valid until the property is modified.
 	 * @see GetPropertyInteger()
 	 */
-	std::string GetPropertyString(const char* szName,
+	const std::string& GetPropertyString(const char* szName,
 		const std::string& sErrorReturn = "") const;
 
 
@@ -281,27 +306,38 @@ public:
 	* If the call succeeds, the contents of the file are returned as a 
 	* pointer to an aiScene object. The returned data is intended to be 
 	* read-only, the importer object keeps ownership of the data and will
-    * destroy it upon destruction. If the import failes, NULL is returned.
+   * destroy it upon destruction. If the import fails, NULL is returned.
 	* A human-readable error description can be retrieved by calling 
-	* GetErrorString().
+	* GetErrorString(). The previous scene will be deleted during this call.
 	* @param pFile Path and filename to the file to be imported.
 	* @param pFlags Optional post processing steps to be executed after 
 	*   a successful import. Provide a bitwise combination of the 
 	*   #aiPostProcessSteps flags.
 	* @return A pointer to the imported data, NULL if the import failed.
+	*   The pointer to the scene remains in possession of the Importer
+	*   instance. Use GetOrphanedScene() to take ownership of it.
 	*/
 	const aiScene* ReadFile( const std::string& pFile, unsigned int pFlags);
 
 
 	// -------------------------------------------------------------------
-	/** Returns an error description of an error that occured in ReadFile(). 
+	/** Frees the current scene.
+	 *
+	 *  The function does nothing if no scene has previously been 
+	 *  read via ReadFile(). FreeScene() is called automatically by the
+	 *  destructor and ReadFile() itself.
+	 */
+	void FreeScene( );
+
+
+	// -------------------------------------------------------------------
+	/** Returns an error description of an error that occurred in ReadFile(). 
 	*
-	* Returns an empty string if no error occured.
+	* Returns an empty string if no error occurred.
 	* @return A description of the last error, an empty string if no 
-	*   error occured.
+	*   error occurred.
 	*/
-	inline const std::string& GetErrorString() const 
-		{ return mErrorString; }
+	const std::string& GetErrorString() const;
 
 
 	// -------------------------------------------------------------------
@@ -320,7 +356,8 @@ public:
 	*
 	* If a file extension is contained in the list this does, of course, not
 	* mean that ASSIMP is able to load all files with this extension.
-	* @param szOut String to receive the extension list.
+	* @param szOut String to receive the extension list. It just means there
+    *   is a loader which handles such files.
 	*   Format of the list: "*.3ds;*.obj;*.dae". 
 	*/
 	void GetExtensionList(std::string& szOut);
@@ -331,7 +368,7 @@ public:
 	*
 	*  This is quite similar to IsExtensionSupported() except a
 	*  BaseImporter instance is returned.
-	*  @param szExtension Extension to be checke, cases insensitive,
+	*  @param szExtension Extension to be checked, cases insensitive,
 	*    must include a trailing dot.
 	*  @return NULL if there is no loader for the extension.
 	*/
@@ -340,11 +377,22 @@ public:
 
 	// -------------------------------------------------------------------
 	/** Returns the scene loaded by the last successful call to ReadFile()
-	*
-	* @return Current scene or NULL if there is currently no scene loaded
-	*/
-	inline const aiScene* GetScene()
-		{return this->mScene;}
+	 *
+	 * @return Current scene or NULL if there is currently no scene loaded
+	 */
+	const aiScene* GetScene() const;
+
+
+	// -------------------------------------------------------------------
+	/** Returns the scene loaded by the last successful call to ReadFile()
+	 *  and releases the scene from the ownership of the Importer 
+	 *  instance. The application is now responsible for deleting the
+	 *  scene. Any further calls to GetScene() or GetOrphanedScene()
+	 *  will return NULL - until a new scene has been loaded via ReadFile().
+	 *
+	 * @return Current scene or NULL if there is currently no scene loaded
+	 */
+	aiScene* GetOrphanedScene();
 
 
 	// -------------------------------------------------------------------
@@ -361,16 +409,9 @@ public:
 	* all steps behave consequently in the same manner when modifying
 	* data structures.
 	*/
-	inline void SetExtraVerbose(bool bDo)
-		{this->bExtraVerbose = bDo;}
-
-private:
-
-	/** Empty copy constructor. */
-	Importer(const Importer &other);
+	void SetExtraVerbose(bool bDo);
 
 protected:
-
 
 	/** IO handler to use for all file accesses. */
 	IOSystem* mIOHandler;
@@ -401,10 +442,35 @@ protected:
 
 	/** Used for testing - extra verbose mode causes the
 	    validateDataStructure-Step to be executed before
-		and after every single postprocess step */
+		 and after every single postprocess step */
 	bool bExtraVerbose;
-};
 
-} // End of namespace Assimp
+	/** Used by post-process steps to share data */
+	SharedPostProcessInfo* mPPShared;
+}; //! class Importer
 
-#endif // AI_ASSIMP_HPP_INC
+// ----------------------------------------------------------------------------------
+inline const std::string& Importer::GetErrorString() const 
+{ 
+	return mErrorString;
+}
+// ----------------------------------------------------------------------------------
+inline void Importer::SetExtraVerbose(bool bDo)
+{
+	bExtraVerbose = bDo;
+}
+// ----------------------------------------------------------------------------------
+inline const aiScene* Importer::GetScene() const
+{
+	return mScene;
+}
+// ----------------------------------------------------------------------------------
+inline aiScene* Importer::GetOrphanedScene()
+{
+	aiScene* s = mScene;
+	mScene = NULL;
+	return s;
+}
+
+} // !namespace Assimp
+#endif // INCLUDED_AI_ASSIMP_HPP

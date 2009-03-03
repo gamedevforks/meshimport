@@ -105,6 +105,7 @@ namespace MemoryContainer
 
 #define DEFINE_MEMORYPOOL_IN_OTHER_CLASS_SECTION(sectionType,className) \
 sectionType: \
+  /*lint -save -e1511 */ \
   static void * operator new    (size_t s) { return MemoryContainer::MemoryPool_Private::OperatorNew(&className::MemoryPoolForClass, s,#className,__FILE__,__LINE__); } \
   static void operator delete   (void* p) { return MemoryContainer::MemoryPool_Private::OperatorDelete(&className::MemoryPoolForClass, p); } \
   static void * operator new[]  (size_t s) { return MemoryContainer::MemoryPool_Private::OperatorNewArray(&className::MemoryPoolForClass, s,#className,__FILE__,__LINE__); } \
@@ -113,7 +114,8 @@ sectionType: \
   static void   operator delete(void *, void *) {} \
   static void * operator new[](size_t, void* p) { return p; } \
   static void   operator delete[](void *, void *) {} \
-	typedef className object_pool_type;
+	typedef className object_pool_type; \
+  /*lint -restore */
 
 #define DEFINE_MEMORYPOOL_IN_CLASS_SECTION(sectionType,className) \
 public: \

@@ -1,5 +1,6 @@
 #include <assert.h>
-#include "MeshImportEzm/MeshImportEzm.h"
+#include "common/snippets/UserMemAlloc.h"
+#include "MeshImport/MeshImport.h"
 #include "ImportEzm.h"
 
 #ifdef WIN32
@@ -18,12 +19,12 @@ bool doShutdown(void);
 
 extern "C"
 {
-MESHIMPORTEZM_API MESHIMPORTEZM::MeshImportEzm * getInterface(int version_number);
+MESHIMPORTEZM_API MESHIMPORT::MeshImporter * getInterface(int version_number,SYSTEM_SERVICES::SystemServices *services);
 };
 
-namespace MESHIMPORTEZM
+namespace MESHIMPORT
 {
-class MyMeshImportEzm : public MeshImportEzm
+class MyMeshImportEzm : public MeshImporter
 {
 public:
   MyMeshImportEzm(void)
@@ -50,14 +51,14 @@ public:
   }
 
 
-  virtual bool importMesh(const char *meshName,const void *data,unsigned int dlen,MESHIMPORT::MeshImportInterface *callback,const char *options)
+  virtual bool importMesh(const char *meshName,const void *data,unsigned int dlen,MESHIMPORT::MeshImportInterface *callback,const char *options,MeshImportApplicationResource *appResource)
   {
     bool ret = false;
 
     MeshImporter *mi = MESHIMPORT::createMeshImportEZM();
     if ( mi )
     {
-      ret = mi->importMesh(meshName,data,dlen,callback,options);
+      ret = mi->importMesh(meshName,data,dlen,callback,options,appResource);
       MESHIMPORT::releaseMeshImportEZM(mi);
     }
 
@@ -72,7 +73,7 @@ public:
 
 
 
-using namespace MESHIMPORTEZM;
+using namespace MESHIMPORT;
 
 
 static MyMeshImportEzm *gInterface=0;
@@ -80,24 +81,28 @@ static MyMeshImportEzm *gInterface=0;
 extern "C"
 {
 #ifdef PLUGINS_EMBEDDED
-  MeshImportEzm * getInterfaceMeshImportEzm(int version_number)
+  MeshImporter * getInterfaceMeshImportEzm(int version_number,SYSTEM_SERVICES::SystemServices *services)
 #else
-MESHIMPORTEZM_API MeshImportEzm * getInterface(int version_number)
+MESHIMPORTEZM_API MeshImporter * getInterface(int version_number,SYSTEM_SERVICES::SystemServices *services)
 #endif
 {
+  if ( services )
+  {
+    SYSTEM_SERVICES::gSystemServices = services;
+  }
   assert( gInterface == 0 );
-  if ( gInterface == 0 && version_number == MESHIMPORTEZM_VERSION )
+  if ( gInterface == 0 && version_number == MESHIMPORT_VERSION )
   {
     gInterface = MEMALLOC_NEW(MyMeshImportEzm);
   }
-  return static_cast<MeshImportEzm *>(gInterface);
+  return static_cast<MeshImporter *>(gInterface);
 };
 
 };  // End of namespace PATHPLANNING
 
 #ifndef PLUGINS_EMBEDDED
 
-using namespace MESHIMPORTEZM;
+using namespace MESHIMPORT;
 
 bool doShutdown(void)
 {
@@ -111,7 +116,7 @@ bool doShutdown(void)
   return ret;
 }
 
-using namespace MESHIMPORTEZM;
+using namespace MESHIMPORT;
 
 #ifdef WIN32
 

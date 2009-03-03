@@ -39,38 +39,43 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ---------------------------------------------------------------------------
 */
 
-/** @file Defines the material system of the library
- *
+/** @file aiMaterial.inl
+ *  @brief Defines the material system of the library
  */
 
 #ifndef AI_MATERIAL_INL_INC
 #define AI_MATERIAL_INL_INC
 
 // ---------------------------------------------------------------------------
-inline aiReturn aiMaterial::GetTexture(unsigned int iIndex,
-	unsigned int iTexType,
-	aiString* szPath,
-	unsigned int* piUVIndex		,
-	float* pfBlendFactor		,
-	aiTextureOp* peTextureOp	,
-	aiTextureMapMode* peMapMode )
+inline aiReturn aiMaterial::GetTexture( aiTextureType type,
+   unsigned int  index,
+   C_STRUCT aiString* path,
+   aiTextureMapping* mapping	/*= NULL*/,
+   unsigned int* uvindex		/*= NULL*/,
+   float* blend				   /*= NULL*/,
+   aiTextureOp* op				/*= NULL*/,
+   aiTextureMapMode* mapmode	/*= NULL*/) const
 {
-	return aiGetMaterialTexture(this,iIndex,iTexType,szPath,
-		piUVIndex,pfBlendFactor,peTextureOp,peMapMode);
+	return ::aiGetMaterialTexture(this,type,index,path,mapping,uvindex,blend,op,mapmode);
 }
+
 // ---------------------------------------------------------------------------
 template <typename Type>
-inline aiReturn aiMaterial::Get(const char* pKey,Type* pOut,
-	unsigned int* pMax)
+inline aiReturn aiMaterial::Get(const char* pKey,unsigned int type,
+	unsigned int idx, Type* pOut,
+	unsigned int* pMax) const
 {
 	unsigned int iNum = pMax ? *pMax : 1;
 
 	aiMaterialProperty* prop;
-	aiReturn ret = aiGetMaterialProperty(this,pKey,&prop);
+	aiReturn ret = aiGetMaterialProperty(this,pKey,type,idx,&prop);
 	if ( AI_SUCCESS == ret )
 	{
-		if (prop->mDataLength < sizeof(Type)*iNum)return AI_FAILURE;
-		if (strcmp(prop->mData,(char*)aiPTI_Buffer)!=0)return AI_FAILURE;
+		if (prop->mDataLength < sizeof(Type)*iNum)
+			return AI_FAILURE;
+
+		if (::strcmp(prop->mData,(char*)aiPTI_Buffer)!=0)
+			return AI_FAILURE;
 
 		iNum = std::min((size_t)iNum,prop->mDataLength / sizeof(Type));
 		::memcpy(pOut,prop->mData,iNum * sizeof(Type));
@@ -78,58 +83,70 @@ inline aiReturn aiMaterial::Get(const char* pKey,Type* pOut,
 	}
 	return ret;
 }
+
 // ---------------------------------------------------------------------------
 template <typename Type>
-inline aiReturn aiMaterial::Get(const char* pKey,Type& pOut)
+inline aiReturn aiMaterial::Get(const char* pKey,unsigned int type,
+	unsigned int idx,Type& pOut) const
 {
 	aiMaterialProperty* prop;
-	aiReturn ret = aiGetMaterialProperty(this,pKey,&prop);
+	aiReturn ret = aiGetMaterialProperty(this,pKey,type,idx,&prop);
 	if ( AI_SUCCESS == ret )
 	{
-		if (prop->mDataLength < sizeof(Type))return AI_FAILURE;
-		if (strcmp(prop->mData,(char*)aiPTI_Buffer)!=0)return AI_FAILURE;
+		if (prop->mDataLength < sizeof(Type))
+			return AI_FAILURE;
+
+		if (::strcmp(prop->mData,(char*)aiPTI_Buffer)!=0)
+			return AI_FAILURE;
 
 		::memcpy(&pOut,prop->mData,sizeof(Type));
 	}
 	return ret;
 }
+
 // ---------------------------------------------------------------------------
 template <>
-inline aiReturn aiMaterial::Get<float>(const char* pKey,float* pOut,
-	unsigned int* pMax)
+inline aiReturn aiMaterial::Get<float>(const char* pKey,unsigned int type,
+	unsigned int idx,float* pOut,
+	unsigned int* pMax) const
 {
-	return aiGetMaterialFloatArray(this,pKey,pOut,pMax);
+	return ::aiGetMaterialFloatArray(this,pKey,type,idx,pOut,pMax);
 }
 // ---------------------------------------------------------------------------
 template <>
-inline aiReturn aiMaterial::Get<int>(const char* pKey,int* pOut,
-	unsigned int* pMax)
+inline aiReturn aiMaterial::Get<int>(const char* pKey,unsigned int type,
+	unsigned int idx,int* pOut,
+	unsigned int* pMax) const
 {
-	return aiGetMaterialIntegerArray(this,pKey,pOut,pMax);
+	return ::aiGetMaterialIntegerArray(this,pKey,type,idx,pOut,pMax);
 }
 // ---------------------------------------------------------------------------
 template <>
-inline aiReturn aiMaterial::Get<float>(const char* pKey,float& pOut)
+inline aiReturn aiMaterial::Get<float>(const char* pKey,unsigned int type,
+	unsigned int idx,float& pOut) const
 {
-	return aiGetMaterialFloat(this,pKey,&pOut);
+	return aiGetMaterialFloat(this,pKey,type,idx,&pOut);
 }
 // ---------------------------------------------------------------------------
 template <>
-inline aiReturn aiMaterial::Get<int>(const char* pKey,int& pOut)
+inline aiReturn aiMaterial::Get<int>(const char* pKey,unsigned int type,
+	unsigned int idx,int& pOut) const
 {
-	return aiGetMaterialInteger(this,pKey,&pOut);
+	return aiGetMaterialInteger(this,pKey,type,idx,&pOut);
 }
 // ---------------------------------------------------------------------------
 template <>
-inline aiReturn aiMaterial::Get<aiColor4D>(const char* pKey,aiColor4D& pOut)
+inline aiReturn aiMaterial::Get<aiColor4D>(const char* pKey,unsigned int type,
+	unsigned int idx,aiColor4D& pOut) const
 {
-	return aiGetMaterialColor(this,pKey,&pOut);
+	return aiGetMaterialColor(this,pKey,type,idx,&pOut);
 }
 // ---------------------------------------------------------------------------
 template <>
-inline aiReturn aiMaterial::Get<aiString>(const char* pKey,aiString& pOut)
+inline aiReturn aiMaterial::Get<aiString>(const char* pKey,unsigned int type,
+	unsigned int idx,aiString& pOut) const
 {
-	return aiGetMaterialString(this,pKey,&pOut);
+	return aiGetMaterialString(this,pKey,type,idx,&pOut);
 }
 
 #endif //! AI_MATERIAL_INL_INC
