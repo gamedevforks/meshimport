@@ -846,10 +846,10 @@ public:
   int                   mAssetVersion;
   MeshAABB              mAABB;
   unsigned int          mTextureCount;          // Are textures necessary? [rgd].
-  MeshRawTexture      **mTextures;              // Texture storage in mesh data is rare, and the name is simply an attribute of the material
+  MeshRawTexture       *mTextures;              // Texture storage in mesh data is rare, and the name is simply an attribute of the material
 
   unsigned int          mTetraMeshCount;        // number of tetrahedral meshes
-  MeshTetra           **mTetraMeshes;           // tetraheadral meshes
+  MeshTetra            *mTetraMeshes;           // tetraheadral meshes
 
   unsigned int          mSkeletonCount;         // number of skeletons
   MeshSkeleton        **mSkeletons;             // the skeletons.

@@ -117,7 +117,7 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalOptions="/WX /W4 /fp:fast /O2 /MD /Zi "
+				AdditionalOptions="/Zi /WX /W4 /fp:fast /WX /MD /O2 "
 				Optimization="4"
 				AdditionalIncludeDirectories="&quot;../../ext/deja_insight&quot;;&quot;../../include&quot;;&quot;../../include/common/snippets&quot;;&quot;../../include/common/binding&quot;;&quot;../../include/common/MemoryServices&quot;;"
 				PreprocessorDefinitions="WIN32;_WINDOWS;UNICODE=1;_UNICODE=1;MESHIMPORTLEVELLER_EXPORTS;NDEBUG;"
@@ -193,6 +193,18 @@
 		<Filter
 			Name="Common Include-Binding Files"
 			>
+			<Filter
+				Name="snippets"
+				>
+				<File
+					RelativePath="..\..\include\common\snippets\SystemServices.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\include\common\snippets\SystemServices.h"
+					>
+				</File>
+			</Filter>
 			<Filter
 				Name="MemoryServices"
 				>

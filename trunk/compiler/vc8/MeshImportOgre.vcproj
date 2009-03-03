@@ -117,7 +117,7 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalOptions="/WX /W4 /fp:fast /O2 /MD /Zi "
+				AdditionalOptions="/Zi /WX /W4 /fp:fast /WX /MD /O2 "
 				Optimization="4"
 				AdditionalIncludeDirectories="&quot;../../include&quot;;"
 				PreprocessorDefinitions="WIN32;_WINDOWS;UNICODE=1;_UNICODE=1;MESHIMPORTOGRE_EXPORTS;NDEBUG;"
@@ -222,30 +222,62 @@
 			Name="Common Include-Binding Files"
 			>
 			<Filter
-				Name="TinyXML"
+				Name="FileInterface"
 				>
 				<File
-					RelativePath="..\..\include\common\TinyXML\tinystr.cpp"
+					RelativePath="..\..\include\common\FileInterface\FileInterface.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\..\include\common\TinyXML\tinystr.h"
+					RelativePath="..\..\include\common\FileInterface\FileInterface.h"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="snippets"
+				>
+				<File
+					RelativePath="..\..\include\common\snippets\FastXml.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\..\include\common\TinyXML\tinyxml.cpp"
+					RelativePath="..\..\include\common\snippets\FastXml.h"
 					>
 				</File>
 				<File
-					RelativePath="..\..\include\common\TinyXML\tinyxml.h"
+					RelativePath="..\..\include\common\snippets\inparser.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\..\include\common\TinyXML\tinyxmlerror.cpp"
+					RelativePath="..\..\include\common\snippets\inparser.h"
 					>
 				</File>
 				<File
-					RelativePath="..\..\include\common\TinyXML\tinyxmlparser.cpp"
+					RelativePath="..\..\include\common\snippets\stable.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\include\common\snippets\stringdict.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\include\common\snippets\stringdict.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\include\common\snippets\sutil.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\include\common\snippets\sutil.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\include\common\snippets\SystemServices.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\include\common\snippets\SystemServices.h"
 					>
 				</File>
 			</Filter>
@@ -258,18 +290,6 @@
 				</File>
 				<File
 					RelativePath="..\..\include\common\MemoryServices\MemoryContainer.h"
-					>
-				</File>
-			</Filter>
-			<Filter
-				Name="FileInterface"
-				>
-				<File
-					RelativePath="..\..\include\common\FileInterface\FileInterface.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\include\common\FileInterface\FileInterface.h"
 					>
 				</File>
 			</Filter>

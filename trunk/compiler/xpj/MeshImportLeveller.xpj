@@ -33,8 +33,13 @@
 				<Files name="Plugin Header Files" root="../../include" type="header">
 				</Files>
 				<Files name="Common Include-Binding Files" root="../../include/common" type="header">
-         MemoryServices/*.cpp
-         MemoryServices/*.h
+         snippets/SystemServices.cpp
+         snippets/SystemServices.h
+         MemoryServices/MemoryContainer.cpp
+         MemoryServices/MemoryContainer.h
+         MemoryServices/GlobalNewDelete.cpp
+         MemoryServices/GlobalNewDelete.h
+
 				</Files>
 				<OutDir>../../bin/win32</OutDir>
 				<ImpDir>../../lib/win32</ImpDir>
@@ -67,7 +72,7 @@
 			</Configuration>
 
 			<Configuration name="release">
-				<CFlags>/WX /W4 /fp:fast /O2 /MD /Zi</CFlags>
+				<CFlags>/Zi /WX /W4 /fp:fast /WX /MD /O2</CFlags>
 				<LFlags>/DEBUG</LFlags>
 				<Preprocessor type="define">
 					NDEBUG

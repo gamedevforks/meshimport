@@ -42,7 +42,7 @@
 				Name="VCCLCompilerTool"
 				AdditionalOptions="/WX /W4 /fp:fast /MDd /Zi "
 				Optimization="4"
-				AdditionalIncludeDirectories="&quot;../../ext/deja_insight&quot;;&quot;../../include&quot;;&quot;../../include/common/snippets&quot;;&quot;../../include/common/binding&quot;;&quot;../../include/common/MemoryServices&quot;;"
+				AdditionalIncludeDirectories="&quot;../../include&quot;;&quot;../../ext/assimp&quot;;"
 				PreprocessorDefinitions="WIN32;_WINDOWS;UNICODE=1;_UNICODE=1;MESHIMPORTASSIMP_EXPORTS;_DEBUG;"
 				ExceptionHandling="1"
 				WarningLevel="3"
@@ -59,9 +59,9 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalOptions="/NODEFAULTLIB:libcp.lib /DEBUG "
-				AdditionalDependencies=""
+				AdditionalDependencies="&quot;assimp.lib&quot; "
 				OutputFile="$(OutDir)/MeshImportAssimp.dll"
-				AdditionalLibraryDirectories="&quot;../../lib/win32&quot;;&quot;../../ext/deja_insight/lib/win32&quot;;"
+				AdditionalLibraryDirectories="&quot;../../lib/win32&quot;;&quot;../../ext/assimp&quot;;"
 				ProgramDatabaseFile="$(OutDir)/MeshImportAssimp.dll.pdb"
 				GenerateMapFile="true"
 				MapFileName="$(OutDir)/MeshImportAssimp.dll.map"
@@ -117,9 +117,9 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalOptions="/WX /W4 /fp:fast /O2 /MD /Zi "
+				AdditionalOptions="/Zi /WX /W4 /fp:fast /WX /MD /O2 "
 				Optimization="4"
-				AdditionalIncludeDirectories="&quot;../../ext/deja_insight&quot;;&quot;../../include&quot;;&quot;../../include/common/snippets&quot;;&quot;../../include/common/binding&quot;;&quot;../../include/common/MemoryServices&quot;;"
+				AdditionalIncludeDirectories="&quot;../../include&quot;;&quot;../../ext/assimp&quot;;"
 				PreprocessorDefinitions="WIN32;_WINDOWS;UNICODE=1;_UNICODE=1;MESHIMPORTASSIMP_EXPORTS;NDEBUG;"
 				ExceptionHandling="1"
 				WarningLevel="3"
@@ -136,9 +136,9 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalOptions="/NODEFAULTLIB:libcp.lib /DEBUG "
-				AdditionalDependencies=""
+				AdditionalDependencies="&quot;assimp.lib&quot; "
 				OutputFile="$(OutDir)/MeshImportAssimp.dll"
-				AdditionalLibraryDirectories="&quot;../../lib/win32&quot;;&quot;../../ext/deja_insight/lib/win32&quot;;"
+				AdditionalLibraryDirectories="&quot;../../lib/win32&quot;;&quot;../../ext/assimp&quot;;"
 				ProgramDatabaseFile="$(OutDir)/MeshImportAssimp.dll.pdb"
 				GenerateMapFile="true"
 				MapFileName="$(OutDir)/MeshImportAssimp.dll.map"
@@ -191,8 +191,172 @@
 			</File>
 		</Filter>
 		<Filter
+			Name="External SDK Header Files"
+			>
+			<Filter
+				Name="assimp"
+				>
+				<File
+					RelativePath="..\..\ext\assimp\aiAnim.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\ext\assimp\aiAssert.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\ext\assimp\aiCamera.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\ext\assimp\aiConfig.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\ext\assimp\aiDefines.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\ext\assimp\aiFileIO.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\ext\assimp\aiLight.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\ext\assimp\aiMaterial.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\ext\assimp\aiMatrix3x3.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\ext\assimp\aiMatrix4x4.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\ext\assimp\aiMesh.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\ext\assimp\aiPostProcess.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\ext\assimp\aiQuaternion.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\ext\assimp\aiScene.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\ext\assimp\aiTexture.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\ext\assimp\aiTypes.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\ext\assimp\aiVector2D.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\ext\assimp\aiVector3D.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\ext\assimp\aiVersion.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\ext\assimp\assimp.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\ext\assimp\DefaultLogger.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\ext\assimp\IOStream.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\ext\assimp\IOSystem.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\ext\assimp\Logger.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\ext\assimp\LogStream.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\ext\assimp\NullLogger.h"
+					>
+				</File>
+				<Filter
+					Name="compiler"
+					>
+					<File
+						RelativePath="..\..\ext\assimp\compiler\poppack1.h"
+						>
+					</File>
+					<File
+						RelativePath="..\..\ext\assimp\compiler\pstdint.h"
+						>
+					</File>
+					<File
+						RelativePath="..\..\ext\assimp\compiler\pushpack1.h"
+						>
+					</File>
+					<Filter
+						Name="msvc"
+						>
+						<File
+							RelativePath="..\..\ext\assimp\compiler\msvc\stdint.h"
+							>
+						</File>
+					</Filter>
+				</Filter>
+			</Filter>
+		</Filter>
+		<Filter
 			Name="Common Include-Binding Files"
 			>
+			<Filter
+				Name="snippets"
+				>
+				<File
+					RelativePath="..\..\include\common\snippets\inparser.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\include\common\snippets\inparser.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\include\common\snippets\sutil.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\include\common\snippets\sutil.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\include\common\snippets\SystemServices.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\include\common\snippets\SystemServices.h"
+					>
+				</File>
+			</Filter>
 			<Filter
 				Name="MemoryServices"
 				>

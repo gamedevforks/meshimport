@@ -38,7 +38,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ----------------------------------------------------------------------
 */
 
-/** @file Definitions for import post processing steps */
+/** @file aiPostProcess.h
+ *  @brief Definitions for import post processing steps
+ */
 #ifndef AI_POSTPROCESS_H_INC
 #define AI_POSTPROCESS_H_INC
 
@@ -54,13 +56,15 @@ enum aiPostProcessSteps
 	/** Calculates the tangents and bitangents for the imported meshes. Does nothing
 	 * if a mesh does not have normals. You might want this post processing step to be
 	 * executed if you plan to use tangent space calculations such as normal mapping 
-	 * applied to the meshes.
+	 * applied to the meshes. There exists a configuration option,
+	* #AI_CONFIG_PP_CT_MAX_SMOOTHING_ANGLE that allows you to specify
+	* an angle maximum for the step.
 	 */
 	aiProcess_CalcTangentSpace = 1,
 
 	/** Identifies and joins identical vertex data sets within all imported meshes. 
 	 * After this step is run each mesh does contain only unique vertices anymore,
-	 * so a vertex is possibly used by multiple faces. You propably always want
+	 * so a vertex is possibly used by multiple faces. You usually want
 	 * to use this post processing step.*/
 	aiProcess_JoinIdenticalVertices = 2,
 
@@ -76,15 +80,29 @@ enum aiPostProcessSteps
 	/** Triangulates all faces of all meshes. By default the imported mesh data might 
 	 * contain faces with more than 3 indices. For rendering a mesh you usually need
 	 * all faces to be triangles. This post processing step splits up all higher faces
-	 * to triangles.
+	 * to triangles. This step won't modify line and point primitives. If you need
+	 * only triangles, do the following:<br>
+	 * 1. Specify both the aiProcess_Triangulate and the aiProcess_SortByPType
+	 * step. <br>
+	 * 2. Ignore all point and line meshes when you process assimp's output data.
 	 */
 	aiProcess_Triangulate = 8,
 
-	/** Omits all normals found in the file. This can be used together
-	 * with either the aiProcess_GenNormals or the aiProcess_GenSmoothNormals
-	 * flag to force the recomputation of the normals.
+	/** Removes some parts of the data structure (animations, materials, 
+	 *  light sources, cameras, textures, vertex components).
+	 *
+	 *  The  components to be removed are specified in a separate
+	 *  configuration option, #AI_CONFIG_PP_RVC_FLAGS. This is quite useful
+	 *  if you don't need all parts of the output structure. Especially vertex 
+	 *  colors are rarely used today ... . Calling this step to exclude non-required
+	 *  stuff from the pipeline as early as possible results in an increased 
+	 *  performance and a better optimized output data structure.
+	 *  This step is also useful if you want to force Assimp to recompute 
+	 *  normals or tangents. The corresponding steps don't recompute them if 
+	 *  they're already there ( loaded from the source asset). By using this 
+	 *  step you can make sure they are NOT there.
 	 */
-	aiProcess_KillNormals = 0x10,
+	aiProcess_RemoveComponent = 0x10,
 
 	/** Generates normals for all faces of all meshes. The normals are shared
 	* between the three vertices of a face. This is ignored
@@ -95,7 +113,9 @@ enum aiPostProcessSteps
 
 	/** Generates smooth normals for all vertices in the mesh. This is ignored
 	* if normals are already existing. This flag may not be specified together
-	* with aiProcess_GenNormals
+	* with aiProcess_GenNormals. There exists a configuration option,
+	* #AI_CONFIG_PP_GSN_MAX_SMOOTHING_ANGLE that allows you to specify
+	* an angle maximum for the step.
 	*/
 	aiProcess_GenSmoothNormals = 0x40,
 
@@ -110,10 +130,10 @@ enum aiPostProcessSteps
 	*/
 	aiProcess_SplitLargeMeshes = 0x80,
 
-	/** Removes the node graph and pretransforms all vertices with
+	/** Removes the node graph and pre-transforms all vertices with
 	* the local transformation matrices of their nodes. The output
 	* scene does still contain nodes, however, there is only a
-	* root node with childs, each one referencing only one mesh,
+	* root node with children, each one referencing only one mesh,
 	* each mesh referencing one material. For rendering, you can
 	* simply render all meshes in order, you don't need to pay
 	* attention to local transformations and the node hierarchy.
@@ -170,28 +190,61 @@ enum aiPostProcessSteps
 	 * the volume of the bounding box of all vertices without their normals.
 	 * This works well for most objects, problems might occur with planar
 	 * surfaces. However, the step tries to filter such cases.
-	 * The step inverts all infacing normals. Generally it is recommended
+	 * The step inverts all in-facing normals. Generally it is recommended
 	 * to enable this step, although the result is not always correct.
 	*/
 	aiProcess_FixInfacingNormals = 0x2000,
 
-	/** This step performs some optimizations on the node graph.
-	 * 
-	 * It is incompatible to the PreTransformVertices-Step. Some configuration
-	 * options exist, see aiConfig.h for more details. 
-	 * Generally, two actions are available:<br>
-	 *   1. Remove animation nodes and data from the scene. This allows other
-	 *      steps for further optimizations.<br>
-	 *   2. Combine very small meshes to larger ones. Only if the meshes
-	 *      are used by the same node or by nodes on the same hierarchy (with
-	 *      equal local transformations). Unlike PreTransformVertices, the
-	 *      OptimizeGraph-step doesn't transform vertices from one space 
-	 *      another.<br>
-	 *   3. Remove hierarchy levels<br>
+
+	/** This step splits meshes with more than one primitive type in 
+	 *  homogeneous submeshes. 
 	 *
-	 *  It is recommended to have this step run with the default configuration.
-	 */
-	aiProcess_OptimizeGraph = 0x4000
+	 *  The step is executed after the triangulation step. After the step
+	 *  returns, just one bit is set in aiMesh::mPrimitiveTypes. This is 
+	 *  especially useful for real-time rendering where point and line
+	 *  primitives are often ignored or rendered separately.
+	 *  You can use the AI_CONFIG_PP_SBP_REMOVE option to specify which
+	 *  primitive types you need. This can be used to easily exclude
+	 *  lines and points, which are rarely used, from the import.
+	*/
+	aiProcess_SortByPType = 0x8000,
+
+	/** This step searches all meshes for degenerated primitives and
+	 *  converts them to proper lines or points.
+	 *
+	 * A face is degenerated if one or more of its faces are identical.
+	*/
+	aiProcess_FindDegenerates = 0x10000,
+
+	/** This step searches all meshes for invalid data, such as zeroed
+	 *  normal vectors or invalid UV coords and removes them.
+	 *
+	 * This is especially useful for normals. If they are invalid, and
+	 * the step recognizes this, they will be removed and can later
+	 * be computed by one of the other steps.<br>
+	 * The step will also remove meshes that are infinitely small.
+	*/
+	aiProcess_FindInvalidData = 0x20000,
+
+	/** This step converts non-UV mappings (such as spherical or
+	 *  cylindrical) to proper UV mapping channels.
+	 *
+	 * Most applications will support UV mapping only, so you will
+	 * probably want to specify this step in every case.
+	*/
+	aiProcess_GenUVCoords = 0x40000,
+
+	/** This step pre-transforms UV coordinates by the UV transformations
+	 *  (such as scalings or rotations).
+	 *
+	 * UV transformations are specified per-texture - see the
+	 * AI_MATKEY_UVTRANSFORM key for more information on this topic.
+	 * This step finds all textures with transformed input UV
+	 * coordinates and generates a new, transformed, UV channel for it.
+	 * Most applications won't support UV transformations, so you will
+	 * probably want to specify this step in every case.
+	*/
+	aiProcess_TransformUVCoords = 0x80000
 };
 
 
@@ -206,11 +259,12 @@ enum aiPostProcessSteps
 	aiProcess_CalcTangentSpace		|  \
 	aiProcess_GenNormals			|  \
 	aiProcess_JoinIdenticalVertices |  \
-	aiProcess_Triangulate
+	aiProcess_Triangulate			|  \
+	aiProcess_GenUVCoords
 
 
- /** @def AI_POSTPROCESS_DEFAULT_REALTIME_FASTEST
- *  @brief Default postprocess configuration targeted at realtime applications.
+ /** @def AI_POSTPROCESS_DEFAULT_REALTIME
+ *   @brief Default postprocess configuration targeted at realtime applications.
  *    Unlike AI_POSTPROCESS_DEFAULT_REALTIME_FASTEST, this configuration
  *    performs some extra optimizations.
  *  
@@ -226,7 +280,8 @@ enum aiPostProcessSteps
 	aiProcess_RemoveRedundantMaterials      |  \
 	aiProcess_SplitLargeMeshes				|  \
 	aiProcess_OptimizeGraph					|  \
-	aiProcess_Triangulate
+	aiProcess_Triangulate					|  \
+	aiProcess_GenUVCoords
 
 
 #ifdef __cplusplus

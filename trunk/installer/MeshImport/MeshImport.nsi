@@ -7,8 +7,8 @@ XPStyle on
 
 !define ShortName      "MeshImport"
 !define LongName       "MeshImport - MeshImport plugin system by John W. Ratcliff"
-!define ShortVersion   "1.0"
-!define LongVersion    "v1.0"
+!define ShortVersion   "1.1"
+!define LongVersion    "v1.1"
 Icon                   "Rocket.ico"
 UninstallIcon          "Rocket.ico"
 !define RootDir        "..\.."
@@ -59,10 +59,8 @@ Section "MeshImport Executable and Data" sec1
   File "${RootDir}\bin\win32\Assimp32.dll"
   File "${RootDir}\bin\win32\MeshImportAssimp.dll"
   File "${RootDir}\bin\win32\MeshImportEzm.dll"
-  File "${RootDir}\bin\win32\MeshImportFbx.dll"
   File "${RootDir}\bin\win32\MeshImportLeveller.dll"
   File "${RootDir}\bin\win32\MeshImportObj.dll"
-  File "${RootDir}\bin\win32\MeshImportPsk.dll"
   File "${RootDir}\bin\win32\MeshImportOgre.dll"
 
 ## Install the various DLL components
@@ -91,17 +89,11 @@ Section "MeshImport Executable and Data" sec1
   SetOutPath "$INSTDIR\src\MeshImportEzm"
   File "${RootDir}\src\MeshImportEzm\*.cpp"
 
-  SetOutPath "$INSTDIR\src\MeshImportFbx"
-  File "${RootDir}\src\MeshImportFbx\*.cpp"
-
   SetOutPath "$INSTDIR\src\MeshImportLeveller"
   File "${RootDir}\src\MeshImportLeveller\*.cpp"
 
   SetOutPath "$INSTDIR\src\MeshImportObj"
   File "${RootDir}\src\MeshImportObj\*.cpp"
-
-  SetOutPath "$INSTDIR\src\MeshImportPsk"
-  File "${RootDir}\src\MeshImportPsk\*.cpp"
 
   SetOutPath "$INSTDIR\src\MeshImportOgre"
   File "${RootDir}\src\MeshImportOgre\*.cpp"
@@ -118,17 +110,11 @@ Section "MeshImport Executable and Data" sec1
   SetOutPath "$INSTDIR\include\MeshImportEzm"
   File "${RootDir}\include\MeshImportEzm\*.h"
 
-  SetOutPath "$INSTDIR\include\MeshImportFbx"
-  File "${RootDir}\include\MeshImportFbx\*.h"
-
   SetOutPath "$INSTDIR\include\MeshImportLeveller"
   File "${RootDir}\include\MeshImportLeveller\*.h"
 
   SetOutPath "$INSTDIR\include\MeshImportObj"
   File "${RootDir}\include\MeshImportObj\*.h"
-
-  SetOutPath "$INSTDIR\include\MeshImportPsk"
-  File "${RootDir}\include\MeshImportPsk\*.h"
 
   SetOutPath "$INSTDIR\include\MeshImportOgre"
   File "${RootDir}\include\MeshImportOgre\*.h"

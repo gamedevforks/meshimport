@@ -1,4 +1,6 @@
-/** @file Inline implementation of the 3x3 matrix operators */
+/** @file aiMatrix3x3.inl
+ *  @brief Inline implementation of the 3x3 matrix operators
+ */
 #ifndef AI_MATRIX3x3_INL_INC
 #define AI_MATRIX3x3_INL_INC
 
@@ -44,12 +46,34 @@ inline aiMatrix3x3 aiMatrix3x3::operator* (const aiMatrix3x3& m) const
 // ------------------------------------------------------------------------------------------------
 inline aiMatrix3x3& aiMatrix3x3::Transpose()
 {
-	std::swap( a2, b1);
-	std::swap( a3, c1);
-	std::swap( b3, c2);
+	// (float&) don't remove, GCC complains cause of packed fields
+	std::swap( (float&)a2, (float&)b1);
+	std::swap( (float&)a3, (float&)c1);
+	std::swap( (float&)b3, (float&)c2);
 	return *this;
 }
 
+// ------------------------------------------------------------------------------------------------
+inline aiMatrix3x3& aiMatrix3x3::Rotation(float a, aiMatrix3x3& out)
+{
+	out.a1 = out.b2 = ::cos(a);
+	out.b1 = ::sin(a);
+	out.a2 = - out.b1;
+
+	out.a3 = out.b3 = out.c1 = out.c2 = 0.f;
+	out.c3 = 1.f;
+
+	return out;
+}
+
+// ------------------------------------------------------------------------------------------------
+inline aiMatrix3x3& aiMatrix3x3::Translation( const aiVector2D& v, aiMatrix3x3& out)
+{
+	out = aiMatrix3x3();
+	out.a3 = v.x;
+	out.b3 = v.y;
+	return out;
+}
 
 
 #endif // __cplusplus

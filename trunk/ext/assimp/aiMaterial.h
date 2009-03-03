@@ -39,8 +39,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ---------------------------------------------------------------------------
 */
 
-/** @file Defines the material system of the library
- *
+/** @file aiMaterial.h
+ *  @brief Defines the material system of the library
  */
 
 #ifndef AI_MATERIAL_H_INC
@@ -52,97 +52,256 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 extern "C" {
 #endif
 
-// Default material name
+// Name for the default material
 #define AI_DEFAULT_MATERIAL_NAME "aiDefaultMat"
 
 // ---------------------------------------------------------------------------
-/** Defines type identifiers for use within the material system.
-*
-*/
-// ---------------------------------------------------------------------------
+/** @brief A very primitive RTTI system to store the data type of a 
+ *         material property.
+ */
 enum aiPropertyTypeInfo
 {
-    /** Array of single-precision floats
+    /** Array of single-precision (32 Bit) floats
+	 *
+	 *  It is possible to use aiGetMaterialInteger[Array]() (or the C++-API 
+	 *  aiMaterial::Get()) to query properties stored in floating-point format. 
+	 *  The material system performs the type conversion automatically.
     */
-    aiPTI_Float = 0x1,
+    aiPTI_Float   = 0x1,
 
-    /** aiString data structure
+    /** The material property is an aiString.
+	 *
+	 *  Arrays of strings aren't possible, aiGetMaterialString() (or the 
+	 *  C++-API aiMaterial::Get()) *must* be used to query a string property.
     */
-    aiPTI_String = 0x3,
+    aiPTI_String  = 0x3,
 
-    /** Array of Integers
+    /** Array of (32 Bit) integers
+	 *
+	 *  It is possible to use aiGetMaterialFloat[Array]() (or the C++-API 
+	 *  aiMaterial::Get()) to query properties stored in integer format. 
+	 *  The material system performs the type conversion automatically.
     */
     aiPTI_Integer = 0x4,
 
-    /** Simple binary buffer
+
+    /** Simple binary buffer, content undefined. Not convertible to anything.
     */
-    aiPTI_Buffer = 0x5
+    aiPTI_Buffer  = 0x5,
+
+
+	 /** This value is not used. It is just there to force the
+	 *  compiler to map this enum to a 32 Bit integer.
+	 */
+	_aiPTI_Force32Bit = 0x9fffffff
 };
 
 // ---------------------------------------------------------------------------
-/** Defines texture operations like add, mul ...
-*
-*/
-// ---------------------------------------------------------------------------
+/** @brief Defines how the Nth texture is combined with the N-1th texture.
+ *
+ *  Example (left: key, right: value): <br>
+ *  @code
+ *  DiffColor0     - gray
+ *  DiffTextureOp0 - aiTextureOpMultiply
+ *  DiffTexture0   - tex1.png
+ *  DiffTextureOp0 - aiTextureOpAdd
+ *  DiffTexture1   - tex2.png
+ *  @endcode
+ *  Written as equation, the final diffuse term for a specific pixel would be: 
+ *  @code
+ *  diffFinal = DiffColor0 * sampleTex(DiffTexture0,UV0) + 
+ *     sampleTex(DiffTexture1,UV0) * diffContrib;
+ *  @endcode
+ *  where 'diffContrib' is the intensity of the incoming light for that pixel.
+ */
 enum aiTextureOp
 {
-    /** T = T1 * T2
-     */
+    /** T = T1 * T2 */
     aiTextureOp_Multiply = 0x0,
 
-    /** T = T1 + T2
-     */
+    /** T = T1 + T2 */
     aiTextureOp_Add = 0x1,
 
-    /** T = T1 - T2
-     */
+    /** T = T1 - T2 */
     aiTextureOp_Subtract = 0x2,
 
-    /** T = T1 / T2
-     */
+    /** T = T1 / T2 */
     aiTextureOp_Divide = 0x3,
 
-    /** T = (T1 + T2) - (T1 * T2)
-     */
+    /** T = (T1 + T2) - (T1 * T2) */
     aiTextureOp_SmoothAdd = 0x4,
 
-    /** T = T1 + (T2-0.5)
-     */
-    aiTextureOp_SignedAdd = 0x5
+    /** T = T1 + (T2-0.5) */
+    aiTextureOp_SignedAdd = 0x5,
+
+
+	 /** This value is not used. It is just there to force the
+	 *  compiler to map this enum to a 32 Bit integer.
+	 */
+	_aiTextureOp_Force32Bit = 0x9fffffff
 };
 
 // ---------------------------------------------------------------------------
-/** Defines texture mapping for use within the material system.
-*
-*/
-// ---------------------------------------------------------------------------
+/** @brief Defines how UV coordinates outside the [0...1] range are handled.
+ *
+ */
 enum aiTextureMapMode
 {
     /** A texture coordinate u|v is translated to u%1|v%1 
-     */
+    */
     aiTextureMapMode_Wrap = 0x0,
 
-    /** Texture coordinates outside the area formed by 1|1 and 0|0
-     *  are clamped to the nearest valid value on an axis
-     */
+    /** Texture coordinates outside [0...1]
+    *  are clamped to the nearest valid value.
+    */
     aiTextureMapMode_Clamp = 0x1,
 
+	 /** If the texture coordinates for a pixel are outside [0...1]
+	 *  the texture is not applied to that pixel
+    */
+    aiTextureMapMode_Decal = 0x3,
+
     /** A texture coordinate u|v becomes u%1|v%1 if (u-(u%1))%2 is zero and
-     *  1-(u%1)|1-(v%1) otherwise
-     */
-    aiTextureMapMode_Mirror = 0x2
+    *  1-(u%1)|1-(v%1) otherwise
+    */
+    aiTextureMapMode_Mirror = 0x2,
+
+
+	 /** This value is not used. It is just here to force the
+	 *  compiler to map this enum to a 32 Bit integer.
+	 */
+	_aiTextureMapMode_Force32Bit = 0x9fffffff
 };
 
 // ---------------------------------------------------------------------------
-/** Defines all shading models supported by the library
-*
-*  @note The list of shading modes has been taken from Blender3D.
-*  See Blender3D documentation for more information. The API does
-*  not distinguish between "specular" and "diffuse" shaders (thus the
-*  specular term for diffuse shading models like Oren-Nayar remains
-*  undefined)
-*/
+/** @brief Defines how the mapping coords for a texture are generated.
+ *
+ *  Real-time applications typically require full UV coordinates, so the use of
+ *  the aiProcess_GenUVCoords step is highly recommended. It generates proper
+ *  UV channels for non-UV mapped objects, as long as an accurate description
+ *  how the mapping should look like (e.g spherical) is given.
+ *  See the #AI_MATKEY_MAPPING property for more details.
+ */
+enum aiTextureMapping
+{
+    /** The mapping coordinates are taken from an UV channel.
+	 *
+	 *  The #AI_MATKEY_UVWSRC key specifies from which (remember,
+	 *  meshes can have more than one UV channel). 
+    */
+    aiTextureMapping_UV = 0x0 ,
+
+	 /** Spherical mapping */
+    aiTextureMapping_SPHERE = 0x1,
+
+	 /** Cylindrical mapping */
+    aiTextureMapping_CYLINDER = 0x2,
+
+	 /** Cubic mapping */
+    aiTextureMapping_BOX = 0x3,
+
+	 /** Planar mapping */
+    aiTextureMapping_PLANE = 0x4,
+
+	 /** Undefined mapping. Have fun. */
+    aiTextureMapping_OTHER = 0x5,
+
+
+	 /** This value is not used. It is just here to force the
+	 *  compiler to map this enum to a 32 Bit integer.
+	 */
+	_aiTextureMapping_Force32Bit = 0x9fffffff
+};
+
 // ---------------------------------------------------------------------------
+/** @brief Defines which mesh axes are used to construct the projection shape
+ *  for non-UV mappings around the model.
+ *
+ *  This corresponds to the #AI_MATKEY_TEXMAP_AXIS property.
+*/
+enum aiAxis
+{
+	aiAxis_X = 0x0,
+	aiAxis_Y = 0x1,
+	aiAxis_Z = 0x2,
+
+
+	 /** This value is not used. It is just here to force the
+	 *  compiler to map this enum to a 32 Bit integer.
+	 */
+	_aiAxis_Force32Bit = 0x9fffffff
+};
+
+// ---------------------------------------------------------------------------
+/** Defines the purpose of a texture 
+*/
+enum aiTextureType
+{
+    /** The texture is combined with the result of the diffuse
+	 *  lighting equation.
+    */
+    aiTextureType_DIFFUSE = 0x0,
+
+	 /** The texture is combined with the result of the specular
+	 *  lighting equation.
+    */
+    aiTextureType_SPECULAR = 0x1,
+
+	 /** The texture is combined with the result of the ambient
+	 *  lighting equation.
+    */
+    aiTextureType_AMBIENT = 0x2,
+
+	 /** The texture is added to the result of the lighting
+	 *  calculation. It isn't influenced by any lighting.
+    */
+    aiTextureType_EMISSIVE = 0x3,
+
+	 /** The texture is a height map and serves as input for
+	 *  a normal map generator.
+    */
+    aiTextureType_HEIGHT = 0x4,
+
+	 /** The texture is a (tangent space) normal-map.
+	 *
+	 *  If the normal map does also contain a height channel
+	 *  for use with techniques such as Parallax Occlusion Mapping
+	 *  it is registered once as a normalmap.
+    */
+    aiTextureType_NORMALS = 0x5,
+
+	 /** The texture defines the glossiness of the material.
+	 *
+	 *  The glossiness is in fact the exponent of the specular
+	 *  lighting equation. Normally there is a conversion
+	 *  function define to map the linear color values in the
+	 *  texture to a suitable exponent. Have fun.
+    */
+    aiTextureType_SHININESS = 0x6,
+
+	 /** The texture defines a per-pixel opacity.
+	 *
+	 *  Normally 'white' means opaque and 'black' means 
+	 *  'transparency'. Or quite the opposite. Have fun.
+    */
+    aiTextureType_OPACITY = 0x7,
+
+
+	 /** This value is not used. It is just here to force the
+	 *  compiler to map this enum to a 32 Bit integer.
+	 */
+	_aiTextureType_Force32Bit = 0x9fffffff
+};
+
+// ---------------------------------------------------------------------------
+/** @brief Defines all shading models supported by the library
+ *
+ *  @note The list of shading modes has been taken from Blender3D.
+ *  See Blender3D documentation for more information. The API does
+ *  not distinguish between "specular" and "diffuse" shaders (thus the
+ *  specular term for diffuse shading models like Oren-Nayar remains
+ *  undefined)
+ */
 enum aiShadingMode
 {
     /** Flat shading. Shading is done on per-face base, 
@@ -150,7 +309,7 @@ enum aiShadingMode
     */
     aiShadingMode_Flat = 0x1,
 
-    /** Diffuse gouraud shading. Shading on per-vertex base
+    /** Diffuse Gouraud shading. Shading on per-vertex base
     */
     aiShadingMode_Gouraud =	0x2,
 
@@ -164,7 +323,7 @@ enum aiShadingMode
     /** Diffuse/Specular Phong-Blinn-Shading
     *
     *  Shading is applied on per-pixel base. This is a little
-    *  bit faster than phong and in some cases even
+    *  bit faster than Phong and in some cases even
     *  more realistic
     */
     aiShadingMode_Blinn	= 0x4,
@@ -178,7 +337,7 @@ enum aiShadingMode
 
     /** OrenNayar-Shading per pixel
     *
-    *  Extension to standard lambertian shading, taking the
+    *  Extension to standard Lambertian shading, taking the
     *  roughness of the material into account
     *	
     */
@@ -186,7 +345,7 @@ enum aiShadingMode
 
     /** Minnaert-Shading per pixel
     *
-    *  Extension to standard lambertian shading, taking the
+    *  Extension to standard Lambertian shading, taking the
     *  "darkness" of the material into account
     */
     aiShadingMode_Minnaert = 0x7,
@@ -197,26 +356,84 @@ enum aiShadingMode
 
     /** No shading at all
     */
-    aiShadingMode_NoShading = 0x8
+    aiShadingMode_NoShading = 0x9,
+
+	 /** Fresnel shading
+    */
+    aiShadingMode_Fresnel = 0xa,
+
+
+	 /** This value is not used. It is just there to force the
+	 *  compiler to map this enum to a 32 Bit integer.
+	 */
+	_aiShadingMode_Force32Bit = 0x9fffffff
 };
 
+#include "./Compiler/pushpack1.h"
 
 // ---------------------------------------------------------------------------
-/** Data structure for a single property inside a material
-*
-*  @see aiMaterial
-*/
+/** @brief Defines how an UV channel is transformed.
+ *
+ *  This is just a helper structure for the #AI_MATKEY_UVTRANSFORM key.
+ *  See its documentation for more details. 
+ *
+ *  Typically you'll want to build a matrix of this information. However,
+ *  we keep separate scaling/translation/rotation values to make it
+ *  easier to process and optimize UV transformations internally.
+ */
+struct aiUVTransform
+{
+	/** Translation on the u and v axes. */
+	C_STRUCT aiVector2D mTranslation;
+
+	/** Scaling on the u and v axes. */
+	C_STRUCT aiVector2D mScaling;
+
+	/** Rotation - in counter-clockwise direction.
+	*
+	*  The rotation angle is specified in radians. The
+	*  rotation center is 0.5f|0.5f.
+	*/
+	float mRotation;
+
+
+#ifdef __cplusplus
+	aiUVTransform()
+		:	mScaling	(1.f,1.f)
+		,	mRotation	(0.f)
+	{
+		// nothing to be done here ...
+	}
+#endif
+
+} PACK_STRUCT;
+
+#include "./Compiler/poppack1.h"
+
 // ---------------------------------------------------------------------------
+/** @brief Data structure for a single material property
+ *  @see aiMaterial
+ */
 struct aiMaterialProperty
 {
     /** Specifies the name of the property (key)
     *
-    * Keys are case insensitive.
+    * Keys are case insensitive. 
     */
     C_STRUCT aiString mKey;
 
+	/** Textures: Specifies the exact usage semantic
+	*/
+	unsigned int mSemantic;
+
+	/** Textures: Specifies the index of the texture
+	*
+	*  Textures are counted per-type.
+	*/
+	unsigned int mIndex;
+
     /**	Size of the buffer mData is pointing to, in bytes
-	* This value may not be 0.
+	 * This value may not be 0.
     */
     unsigned int mDataLength;
 
@@ -226,179 +443,139 @@ struct aiMaterialProperty
     * data buffer. This is used by the library
     * internally to perform debug checks.
     */
-    aiPropertyTypeInfo mType;
+    C_ENUM aiPropertyTypeInfo mType;
 
     /**	Binary buffer to hold the property's value
     *
     * The buffer has no terminal character. However,
     * if a string is stored inside it may use 0 as terminal,
     * but it would be contained in mDataLength. This member
-	* is never 0
+	 * is never 0
     */
     char* mData;
+
+#ifdef __cplusplus
+
+	aiMaterialProperty()
+	{
+		mData = NULL;
+		mIndex = mSemantic = 0;
+	}
+
+	~aiMaterialProperty()
+	{
+		delete[] mData;
+	}
+
+#endif
 };
 
 #ifdef __cplusplus
-} // need to end extern C block to allow template member functions
+} // We need to leave the "C" block here to allow template member functions
 #endif
 
-#define AI_TEXTYPE_OPACITY		0x0
-#define AI_TEXTYPE_SPECULAR		0x1
-#define AI_TEXTYPE_AMBIENT		0x2
-#define AI_TEXTYPE_EMISSIVE		0x3
-#define AI_TEXTYPE_HEIGHT		0x4
-#define AI_TEXTYPE_NORMALS		0x5
-#define AI_TEXTYPE_SHININESS	0x6
-#define AI_TEXTYPE_DIFFUSE		0x7
-
 // ---------------------------------------------------------------------------
-/** Data structure for a material
+/** @brief Data structure for a material
 *
-*  Material data is stored using a key-value structure, called property
-*  (to guarant that the system is maximally flexible).
-*  The library defines a set of standard keys (AI_MATKEY) which should be 
-*  enough for nearly all purposes. 
+*  Material data is stored using a key-value structure. A single key-value
+*  pair is called a 'material property'. C++ users should use the provided
+*  member functions of aiMaterial to process material properties, C users
+*  have to stick with the aiMaterialGetXXX family of unbound functions.
+*  The library defines a set of standard keys (AI_MATKEY_XXX).
 */
-// ---------------------------------------------------------------------------
 struct ASSIMP_API aiMaterial
 {
+
 #ifdef __cplusplus
-protected:
-    aiMaterial() {}
+
+	 /// NOTE: no initialization, instance Assimp::MaterialHelper instead
+	 aiMaterial() {}
+
 public:
 
+	~aiMaterial();
+
 	// -------------------------------------------------------------------
-    /** Retrieve an array of Type values with a specific key 
+    /** @brief Retrieve an array of Type values with a specific key 
      *  from the material
      *
      * @param pKey Key to search for. One of the AI_MATKEY_XXX constants.
+     * @param type Specifies the type of the texture to be retrieved (
+     *    e.g. diffuse, specular, height map ...)
+     * @param idx Index of the texture to be retrieved.
      * @param pOut Pointer to a buffer to receive the result. 
      * @param pMax Specifies the size of the given buffer, in Type's.
      * Receives the number of values (not bytes!) read. 
      * NULL is a valid value for this parameter.
      */
     template <typename Type>
-    inline aiReturn Get(const char* pKey,Type* pOut,
-        unsigned int* pMax);
+    aiReturn Get(const char* pKey,unsigned int type,
+		unsigned int idx, Type* pOut, unsigned int* pMax) const;
 
     // -------------------------------------------------------------------
-    /** Retrieve a Type value with a specific key 
+    /** @brief Retrieve a Type value with a specific key 
      *  from the material
 	 *
 	 * @param pKey Key to search for. One of the AI_MATKEY_XXX constants.
+    * @param type Specifies the type of the texture to be retrieved (
+    *    e.g. diffuse, specular, height map ...)
+    * @param idx Index of the texture to be retrieved.
 	 * @param pOut Reference to receive the output value
 	 */
 	template <typename Type>
-	inline aiReturn Get(const char* pKey,Type& pOut);
+	aiReturn Get(const char* pKey,unsigned int type,
+		unsigned int idx,Type& pOut) const;
 
 	// -------------------------------------------------------------------
-	/** Helper function to get a texture from a material
+	/** @brief Helper function to get a texture from a material.
 	*
-	*  This function is provided just for convinience. 
-	*  @param iIndex Index of the texture to retrieve. If the index is too 
-	*		large the function fails.
-	*  @param iTexType One of the AI_TEXTYPE constants. Specifies the type of
-	*		the texture to retrieve (e.g. diffuse, specular, height map ...)
-	*  @param szPath Receives the output path
-	*		NULL is no allowed as value
-	*  @param piUVIndex Receives the UV index of the texture. 
-	*		NULL is allowed as value.
-	*  @param pfBlendFactor Receives the blend factor for the texture
-	*		NULL is allowed as value.
-	*  @param peTextureOp Receives the texture operation to perform between
-	*		this texture and the previous texture. NULL is allowed as value.
-	*  @param peMapMode Receives the mapping modes to be used for the texture.
-	*      The parameter may be NULL but if it is a valid pointer it MUST
-	*      point to an array of 3 aiTextureMapMode variables (one for each
-	*      axis: UVW order (=XYZ)). 
+	*  This function is provided just for convenience, you could also
+	*  read the single material properties manually.
+	*  @param type Specifies the type of the texture to be retrieved (
+	*    e.g. diffuse, specular, height map ...)
+	*  @param index Index of the texture to be retrieved. The function fails
+	*    if there is no texture of that type with this index.
+	*  @param path Receives the path to the texture.
+	*	 NULL is a valid value.
+   *  @param mapping The texture mapping.
+   *		NULL is allowed as value.
+	*  @param uvindex Receives the UV index of the texture. 
+	*    NULL is a valid value.
+	*  @param blend Receives the blend factor for the texture
+	*	 NULL is a valid value.
+	*  @param op Receives the texture operation to be performed between
+	*	 this texture and the previous texture. NULL is allowed as value.
+	*  @param mapmode Receives the mapping modes to be used for the texture.
+	*    The parameter may be NULL but if it is a valid pointer it MUST
+	*    point to an array of 3 aiTextureMapMode's (one for each
+	*    axis: UVW order (=XYZ)). 
 	*/
 	// -------------------------------------------------------------------
-	inline aiReturn GetTexture(unsigned int iIndex,
-		unsigned int iTexType,
-		C_STRUCT aiString* szPath,
-		unsigned int* piUVIndex		= NULL,
-		float* pfBlendFactor		= NULL,
-		aiTextureOp* peTextureOp	= NULL,
-		aiTextureMapMode* peMapMode = NULL); 
+	aiReturn GetTexture(aiTextureType type,
+		unsigned int  index,
+		C_STRUCT aiString* path,
+		aiTextureMapping* mapping	= NULL,
+		unsigned int* uvindex		= NULL,
+		float* blend				   = NULL,
+		aiTextureOp* op				= NULL,
+		aiTextureMapMode* mapmode	= NULL) const; 
+
 #endif
 
-    /** List of all material properties loaded.
-    */
+    /** List of all material properties loaded. */
     C_STRUCT aiMaterialProperty** mProperties;
 
-    /** Number of properties loaded
-    */
+    /** Number of properties in the data base */
     unsigned int mNumProperties;
+
+	 /** Storage allocated */
     unsigned int mNumAllocated;
 };
 
+// Go back to extern "C" again
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-
-// ---------------------------------------------------------------------------
-/** @def AI_BUILD_KEY
- * Builds a material texture key with a dynamic index.
- * Applications <b>could</b> do this (C-example):
- * @code
- * int i;
- * struct aiMaterial* pMat = .... 
- * for (i = 0;true;++i) {
- *    if (AI_SUCCESS != aiGetMaterialFloat(pMat,AI_MATKEY_TEXTURE_DIFFUSE(i),...)) {
- *       ...
- *    }
- * }
- * @endcode 
- * However, this is wrong because AI_MATKEY_TEXTURE_DIFFUSE() builds the key 
- * string at <b>compile time</b>. <br>
- * Therefore, the dynamic indexing results in a
- * material key like this : "$tex.file.diffuse[i]" - and it is not very
- * propable that there is a key with this name ... (except the programmer
- * of an ASSIMP loader has made the same mistake :-) ).<br>
- * This is the right way:
- * @code
- * int i;
- * char szBuffer[512];
- * struct aiMaterial* pMat = .... 
- * for (i = 0;true;++i) {
- *    AI_BUILD_KEY(AI_MATKEY_TEXTURE_DIFFUSE_,i,szBuffer);
- *    if (AI_SUCCESS != aiGetMaterialFloat(pMat,szBuffer,...)) {
- *       ...
- *    }
- * }
- * @endcode 
- * @param base Base material key. This is the same key you'd have used
- *   normally with an underscore as suffix (e.g. AI_MATKEY_TEXTURE_DIFFUSE_)
- * @param index Index to be used. Here you may pass a variable!
- * @param out Array of chars to receive the output value. It must be 
- *  sufficiently large. This will be checked via a static assertion for
- *  C++0x. For MSVC8 and later versions the security enhanced version of
- *  sprintf() will be used. However, if your buffer is at least 256 bytes
- *  long you'll never overrun.
-*/
-// ---------------------------------------------------------------------------
-#if _MSC_VER >= 1400
-
-	// MSVC 8+. Use the sprintf_s function with security enhancements
-#	define AI_BUILD_KEY(base,index,out) \
-	::sprintf_s(out,"%s[%i]",base,index);
-
-#elif (defined ASSIMP_BUILD_CPP_09)
-
-	// C++09 compiler. Use a static assertion to validate the size
-	// of the output buffer
-#	define AI_BUILD_KEY(base,index,out) \
-	static_assert(sizeof(out) >= 180,"Output buffer is too small");  \
-	::sprintf(out,"%s[%i]",base,index); 
-
-#else
-
-	// otherwise ... simply hope the buffer is large enough :-)
-#	define AI_BUILD_KEY(base,index,out) \
-	::sprintf(out,"%s[%i]",base,index);
-#endif
-
 
 // ---------------------------------------------------------------------------
 /** @def AI_MATKEY_NAME
@@ -407,32 +584,35 @@ extern "C" {
  * <b>Type:</b> string (aiString)<br>
  * <b>Default value:</b> none <br>
 */
-#define AI_MATKEY_NAME "$mat.name"
+#define AI_MATKEY_NAME "$mat.name",0,0
 
-// ---------------------------------------------------------------------------
+
 /** @def AI_MATKEY_TWOSIDED
  *  Indicates that the material must be rendered two-sided
  * <br>
  * <b>Type:</b> int <br>
  * <b>Default value:</b> 0 <br>
 */
-#define AI_MATKEY_TWOSIDED "$mat.twosided"
+#define AI_MATKEY_TWOSIDED "$mat.twosided",0,0
 
-/** @def AI_MATKEY_SHADING_MODE
+
+/** @def AI_MATKEY_SHADING_MODEL
  *  Defines the shading model to use (aiShadingMode)
  * <br>
  * <b>Type:</b> int (aiShadingMode)<br>
  * <b>Default value:</b> aiShadingMode_Gouraud <br>
 */
-#define AI_MATKEY_SHADING_MODEL "$mat.shadingm"
+#define AI_MATKEY_SHADING_MODEL "$mat.shadingm",0,0
 
-/** @def AI_MATKEY_ENABLE_WIREFRAM
+
+/** @def AI_MATKEY_ENABLE_WIREFRAME
  *  Integer property. 1 to enable wireframe for rendering
  * <br>
  * <b>Type:</b> int <br>
  * <b>Default value:</b> 0 <br>
 */
-#define AI_MATKEY_ENABLE_WIREFRAME "$mat.wireframe"
+#define AI_MATKEY_ENABLE_WIREFRAME "$mat.wireframe",0,0
+
 
 /** @def AI_MATKEY_OPACITY
  *  Defines the base opacity of the material
@@ -440,7 +620,8 @@ extern "C" {
  * <b>Type:</b> float<br>
  * <b>Default value:</b> 1.0f <br>
 */
-#define AI_MATKEY_OPACITY "$mat.opacity"
+#define AI_MATKEY_OPACITY "$mat.opacity",0,0
+
 
 /** @def AI_MATKEY_BUMPSCALING
  *  Defines the height scaling of a bump map (for stuff like Parallax
@@ -449,16 +630,18 @@ extern "C" {
  * <b>Type:</b> float<br>
  * <b>Default value:</b> 1.0f <br>
 */
-#define AI_MATKEY_BUMPSCALING "$mat.bumpscaling"
+#define AI_MATKEY_BUMPSCALING "$mat.bumpscaling",0,0
+
 
 /** @def AI_MATKEY_SHININESS
  *  Defines the base shininess of the material
- *  This is the exponent of the phong shading equation.
+ *  This is the exponent of the Phong shading equation.
  * <br>
  * <b>Type:</b> float<br>
  * <b>Default value:</b> 0.0f <br>
 */
-#define AI_MATKEY_SHININESS "$mat.shininess"
+#define AI_MATKEY_SHININESS "$mat.shininess",0,0
+
 
 /** @def AI_MATKEY_SHININESS_STRENGTH
  * Defines the strength of the specular highlight.
@@ -467,7 +650,17 @@ extern "C" {
  * <b>Type:</b> float<br>
  * <b>Default value:</b> 1.0f <br>
 */
-#define AI_MATKEY_SHININESS_STRENGTH "$mat.shinpercent"
+#define AI_MATKEY_SHININESS_STRENGTH "$mat.shinpercent",0,0
+
+/** @def AI_MATKEY_REFRACTI
+ * Index of refraction of the material. This is used by some shading models,
+ * e.g. Cook-Torrance. The value is the ratio of the speed of light in a 
+ * vacuum to the speed of light in the material (always >= 1.0 in the real world).
+ * <br>
+ * <b>Type:</b> float<br>
+ * <b>Default value:</b> 1.0f <br>
+*/
+#define AI_MATKEY_REFRACTI "$mat.refracti",0,0
 
 // ---------------------------------------------------------------------------
 /** @def AI_MATKEY_COLOR_DIFFUSE
@@ -476,7 +669,7 @@ extern "C" {
  * <b>Type:</b> color (aiColor4D or aiColor3D)<br>
  * <b>Default value:</b> 0.0f|0.0f|0.0f|1.0f <br>
 */
-#define AI_MATKEY_COLOR_DIFFUSE "$clr.diffuse"
+#define AI_MATKEY_COLOR_DIFFUSE "$clr.diffuse",0,0
 
 /** @def AI_MATKEY_COLOR_AMBIENT
  *  Defines the ambient base color of the material
@@ -484,7 +677,7 @@ extern "C" {
  * <b>Type:</b> color (aiColor4D or aiColor3D)<br>
  * <b>Default value:</b> 0.0f|0.0f|0.0f|1.0f <br>
 */
-#define AI_MATKEY_COLOR_AMBIENT "$clr.ambient"
+#define AI_MATKEY_COLOR_AMBIENT "$clr.ambient",0,0
 
 /** @def AI_MATKEY_COLOR_SPECULAR
  *  Defines the specular base color of the material
@@ -492,7 +685,7 @@ extern "C" {
  * <b>Type:</b> color (aiColor4D or aiColor3D)<br>
  * <b>Default value:</b> 0.0f|0.0f|0.0f|1.0f <br>
 */
-#define AI_MATKEY_COLOR_SPECULAR "$clr.specular"
+#define AI_MATKEY_COLOR_SPECULAR "$clr.specular",0,0
 
 /** @def AI_MATKEY_COLOR_EMISSIVE
  *  Defines the emissive base color of the material
@@ -500,497 +693,597 @@ extern "C" {
  * <b>Type:</b> color (aiColor4D or aiColor3D)<br>
  * <b>Default value:</b> 0.0f|0.0f|0.0f|1.0f <br>
 */
-#define AI_MATKEY_COLOR_EMISSIVE "$clr.emissive"
+#define AI_MATKEY_COLOR_EMISSIVE "$clr.emissive",0,0
 
 // ---------------------------------------------------------------------------
-/** @def AI_MATKEY_TEXTURE_DIFFUSE
-*  Defines a specific diffuse texture channel of the material
- *  <br>
- * <b>Type:</b> string (aiString)<br>
- * <b>Default value:</b> none <br>
- * @note The key string is built at compile time, therefore it is not 
- * posible  to use this macro in a loop with varying values for N. 
- * However, you can  use the macro suffixed with '_' to build the key 
- * dynamically. The AI_BUILD_KEY()-macro can be used to do this.
-*/
-#define AI_MATKEY_TEXTURE_DIFFUSE(N) "$tex.file.diffuse["#N"]"
-#define AI_MATKEY_TEXTURE_DIFFUSE_  "$tex.file.diffuse"
-
-/** @def AI_MATKEY_TEXTURE_AMBIENT
- *  Defines a specific ambient texture channel of the material
- *  <br>
- * <b>Type:</b> string (aiString)<br>
- * <b>Default value:</b> none <br>
- * @note The key string is built at compile time, therefore it is not 
- * posible  to use this macro in a loop with varying values for N. 
- * However, you can  use the macro suffixed with '_' to build the key 
- * dynamically. The AI_BUILD_KEY()-macro can be used to do this.
-*/
-#define AI_MATKEY_TEXTURE_AMBIENT(N) "$tex.file.ambient["#N"]"
-#define AI_MATKEY_TEXTURE_AMBIENT_   "$tex.file.ambient"
-
-/** @def AI_MATKEY_TEXTURE_SPECULAR
- *  Defines a specific specular texture channel of the material
- *  <br>
- * <b>Type:</b> string (aiString)<br>
- * <b>Default value:</b> none <br>
- * @note The key string is built at compile time, therefore it is not 
- * posible  to use this macro in a loop with varying values for N. 
- * However, you can  use the macro suffixed with '_' to build the key 
- * dynamically. The AI_BUILD_KEY()-macro can be used to do this.
-*/
-#define AI_MATKEY_TEXTURE_SPECULAR(N) "$tex.file.specular["#N"]"
-#define AI_MATKEY_TEXTURE_SPECULAR_   "$tex.file.specular"
-
-/** @def AI_MATKEY_TEXTURE_EMISSIVE
- *  Defines a specific emissive texture channel of the material
- *  <br>
- * <b>Type:</b> string (aiString)<br>
- * <b>Default value:</b> none <br>
- * @note The key string is built at compile time, therefore it is not 
- * posible  to use this macro in a loop with varying values for N. 
- * However, you can  use the macro suffixed with '_' to build the key 
- * dynamically. The AI_BUILD_KEY()-macro can be used to do this.
-*/
-#define AI_MATKEY_TEXTURE_EMISSIVE(N) "$tex.file.emissive["#N"]"
-#define AI_MATKEY_TEXTURE_EMISSIVE_   "$tex.file.emissive"
-
-/** @def AI_MATKEY_TEXTURE_NORMALS
- *  Defines a specific normal texture channel of the material
- *  <br>
- * <b>Type:</b> string (aiString)<br>
- * <b>Default value:</b> none <br>
- * @note The key string is built at compile time, therefore it is not 
- * posible  to use this macro in a loop with varying values for N. 
- * However, you can  use the macro suffixed with '_' to build the key 
- * dynamically. The AI_BUILD_KEY()-macro can be used to do this.
-*/
-#define AI_MATKEY_TEXTURE_NORMALS(N) "$tex.file.normals["#N"]"
-#define AI_MATKEY_TEXTURE_NORMALS_   "$tex.file.normals"
-
-/** @def AI_MATKEY_TEXTURE_HEIGHT
- * Defines a specified bumpmap texture (=heightmap) channel of the material
- * This is very similar to #AI_MATKEY_TEXTURE_NORMALS. It is provided
- * to allow applications to determine whether the input data for
- * normal mapping is already a normal map or needs to be converted from
- * a heightmap to a normal map.
+/** @def AI_MATKEY_TEXTURE 
+ * Parameters: type, N<br>
+ * Specifies the path to the Nth texture of type "type".
+ * This can either be a path to the texture or a string of the form '*&lt;i&gt;'
+ * where i is an index into the array of embedded textures that has been
+ * imported along with the scene. See aiTexture for more details.
  * <br>
- * <b>Type:</b> string (aiString)<br>
- * <b>Default value:</b> none <br>
- * @note The key string is built at compile time, therefore it is not 
- * posible  to use this macro in a loop with varying values for N. 
- * However, you can  use the macro suffixed with '_' to build the key 
- * dynamically. The AI_BUILD_KEY()-macro can be used to do this.
-*/
-#define AI_MATKEY_TEXTURE_HEIGHT(N) "$tex.file.height["#N"]"
-#define AI_MATKEY_TEXTURE_HEIGHT_   "$tex.file.height"
-
-/** @def AI_MATKEY_TEXTURE_SHININESS
- *  Defines a specific shininess texture channel of the material
- *  <br>
- * <b>Type:</b> string (aiString)<br>
- * <b>Default value:</b> none <br>
- * @note The key string is built at compile time, therefore it is not 
- * posible  to use this macro in a loop with varying values for N. 
- * However, you can  use the macro suffixed with '_' to build the key 
- * dynamically. The AI_BUILD_KEY()-macro can be used to do this.
-*/
-#define AI_MATKEY_TEXTURE_SHININESS(N) "$tex.file.shininess["#N"]"
-#define AI_MATKEY_TEXTURE_SHININESS_   "$tex.file.shininess"
-
-/** @def AI_MATKEY_TEXTURE_OPACITY
- *  Defines a specific opacity texture channel of the material
- *  <br>
- * <b>Type:</b> string (aiString)<br>
- * <b>Default value:</b> none <br>
- * @note The key string is built at compile time, therefore it is not 
- * posible  to use this macro in a loop with varying values for N. 
- * However, you can  use the macro suffixed with '_' to build the key 
- * dynamically. The AI_BUILD_KEY()-macro can be used to do this.
-*/
-#define AI_MATKEY_TEXTURE_OPACITY(N) "$tex.file.opacity["#N"]"
-#define AI_MATKEY_TEXTURE_OPACITY_   "$tex.file.opacity"
-
-
-// ---------------------------------------------------------------------------
-/** @def AI_MATKEY_TEXOP_DIFFUSE
- * Specifies the blend operation too be used to combine the Nth
- * diffuse texture with the (N-1)th diffuse texture (or the diffuse
- * base color for the first diffuse texture)
- * <br>
- * <b>Type:</b> int (aiTextureOp)<br>
- * <b>Default value:</b> 0<br>
- * <b>Requires:</b> AI_MATKEY_TEXTURE_DIFFUSE(0)<br>
- * @note The key string is built at compile time, therefore it is not posible 
- * to use this macro in a loop with varying values for N. However, you can 
- * use the macro suffixed with '_' to build the key dynamically. The 
- * AI_BUILD_KEY()-macro can be used to do this.
+ * <b>Type:</b> String<br>
+ * <b>Default value to be assumed if this key isn't there:</b> n/a<br>
  */
-#define AI_MATKEY_TEXOP_DIFFUSE(N)	"$tex.op.diffuse["#N"]"
-/** @see AI_MATKEY_TEXOP_DIFFUSE */
-#define AI_MATKEY_TEXOP_AMBIENT(N)	"$tex.op.ambient["#N"]"
-/** @see AI_MATKEY_TEXOP_DIFFUSE */
-#define AI_MATKEY_TEXOP_SPECULAR(N)	"$tex.op.specular["#N"]"
-/** @see AI_MATKEY_TEXOP_DIFFUSE */
-#define AI_MATKEY_TEXOP_EMISSIVE(N)	"$tex.op.emissive["#N"]"
-/** @see AI_MATKEY_TEXOP_DIFFUSE */
-#define AI_MATKEY_TEXOP_NORMALS(N)	"$tex.op.normals["#N"]"
-/** @see AI_MATKEY_TEXOP_DIFFUSE */
-#define AI_MATKEY_TEXOP_HEIGHT(N)	"$tex.op.height["#N"]"
-/** @see AI_MATKEY_TEXOP_DIFFUSE */
-#define AI_MATKEY_TEXOP_SHININESS(N)"$tex.op.shininess["#N"]"
-/** @see AI_MATKEY_TEXOP_DIFFUSE */
-#define AI_MATKEY_TEXOP_OPACITY(N)	"$tex.op.opacity["#N"]"
+// ---------------------------------------------------------------------------
+#define AI_MATKEY_TEXTURE(type, N) "$tex.file",type,N
 
-#define AI_MATKEY_TEXOP_DIFFUSE_	"$tex.op.diffuse"
-#define AI_MATKEY_TEXOP_AMBIENT_	"$tex.op.ambient"
-#define AI_MATKEY_TEXOP_SPECULAR_	"$tex.op.specular"
-#define AI_MATKEY_TEXOP_EMISSIVE_	"$tex.op.emissive"
-#define AI_MATKEY_TEXOP_NORMALS_	"$tex.op.normals"
-#define AI_MATKEY_TEXOP_HEIGHT_		"$tex.op.height"
-#define AI_MATKEY_TEXOP_SHININESS_	"$tex.op.shininess"
-#define AI_MATKEY_TEXOP_OPACITY_	"$tex.op.opacity"
+// for backward compatibility
+#define AI_MATKEY_TEXTURE_DIFFUSE(N)	\
+	AI_MATKEY_TEXTURE(aiTextureType_DIFFUSE,N)
+
+#define AI_MATKEY_TEXTURE_SPECULAR(N)	\
+	AI_MATKEY_TEXTURE(aiTextureType_SPECULAR,N)
+
+#define AI_MATKEY_TEXTURE_AMBIENT(N)	\
+	AI_MATKEY_TEXTURE(aiTextureType_AMBIENT,N)
+
+#define AI_MATKEY_TEXTURE_EMISSIVE(N)	\
+	AI_MATKEY_TEXTURE(aiTextureType_EMISSIVE,N)
+
+#define AI_MATKEY_TEXTURE_NORMALS(N)	\
+	AI_MATKEY_TEXTURE(aiTextureType_NORMALS,N)
+
+#define AI_MATKEY_TEXTURE_HEIGHT(N)	\
+	AI_MATKEY_TEXTURE(aiTextureType_HEIGHT,N)
+
+#define AI_MATKEY_TEXTURE_SHININESS(N)	\
+	AI_MATKEY_TEXTURE(aiTextureType_SHININESS,N)
+
+#define AI_MATKEY_TEXTURE_OPACITY(N)	\
+	AI_MATKEY_TEXTURE(aiTextureType_OPACITY,N)
+
 
 // ---------------------------------------------------------------------------
-/** @def AI_MATKEY_UVWSRC_DIFFUSE
- * Specifies the UV channel to be used for the Nth diffuse texture
+/** @def AI_MATKEY_UVWSRC
+ * Parameters: type, N<br>
+ * Specifies which UV channel is used as source for the mapping coordinates 
+ * of the Nth texture of type "type".
  * <br>
  * <b>Type:</b> int<br>
- * <b>Default value:</b> 0<br>
- * <b>Requires:</b> AI_MATKEY_TEXTURE_DIFFUSE(0)<br>
- * @note The key string is built at compile time, therefore it is not posible 
- * to use this macro in a loop with varying values for N. However, you can 
- * use the macro suffixed with '_' to build the key dynamically. The 
- * AI_BUILD_KEY()-macro can be used to do this.
+ * <b>Default value to be assumed if this key isn't there:</b> 0<br>
+ * <b>Requires:</b> AI_MATKEY_TEXTURE(type,N) 
+ * and AI_MATKEY_MAPPING(type,N) == UV<br>
  */
-#define AI_MATKEY_UVWSRC_DIFFUSE(N)		"$tex.uvw.diffuse["#N"]"
-/** @see AI_MATKEY_UVWSRC_DIFFUSE */
-#define AI_MATKEY_UVWSRC_AMBIENT(N)		"$tex.uvw.ambient["#N"]"
-/** @see AI_MATKEY_UVWSRC_DIFFUSE */
-#define AI_MATKEY_UVWSRC_SPECULAR(N)	"$tex.uvw.specular["#N"]"
-/** @see AI_MATKEY_UVWSRC_DIFFUSE */
-#define AI_MATKEY_UVWSRC_EMISSIVE(N)	"$tex.uvw.emissive["#N"]"
-/** @see AI_MATKEY_UVWSRC_DIFFUSE */
-#define AI_MATKEY_UVWSRC_NORMALS(N)		"$tex.uvw.normals["#N"]"
-/** @see AI_MATKEY_UVWSRC_DIFFUSE */
-#define AI_MATKEY_UVWSRC_HEIGHT(N)		"$tex.uvw.height["#N"]"
-/** @see AI_MATKEY_UVWSRC_DIFFUSE */
-#define AI_MATKEY_UVWSRC_SHININESS(N)	"$tex.uvw.shininess["#N"]"
-/** @see AI_MATKEY_UVWSRC_DIFFUSE */
-#define AI_MATKEY_UVWSRC_OPACITY(N)		"$tex.uvw.opacity["#N"]"
+// ---------------------------------------------------------------------------
+#define AI_MATKEY_UVWSRC(type, N) "$tex.uvwsrc",type,N
 
-#define AI_MATKEY_UVWSRC_DIFFUSE_		"$tex.uvw.diffuse"
-#define AI_MATKEY_UVWSRC_AMBIENT_		"$tex.uvw.ambient"
-#define AI_MATKEY_UVWSRC_SPECULAR_		"$tex.uvw.specular"
-#define AI_MATKEY_UVWSRC_EMISSIVE_		"$tex.uvw.emissive"
-#define AI_MATKEY_UVWSRC_NORMALS_		"$tex.uvw.normals"
-#define AI_MATKEY_UVWSRC_HEIGHT_		"$tex.uvw.height"
-#define AI_MATKEY_UVWSRC_SHININESS_		"$tex.uvw.shininess"
-#define AI_MATKEY_UVWSRC_OPACITY_		"$tex.uvw.opacity"
+// for backward compatibility
+#define AI_MATKEY_UVWSRC_DIFFUSE(N)	\
+	AI_MATKEY_UVWSRC(aiTextureType_DIFFUSE,N)
+
+#define AI_MATKEY_UVWSRC_SPECULAR(N)	\
+	AI_MATKEY_UVWSRC(aiTextureType_SPECULAR,N)
+
+#define AI_MATKEY_UVWSRC_AMBIENT(N)	\
+	AI_MATKEY_UVWSRC(aiTextureType_AMBIENT,N)
+
+#define AI_MATKEY_UVWSRC_EMISSIVE(N)	\
+	AI_MATKEY_UVWSRC(aiTextureType_EMISSIVE,N)
+
+#define AI_MATKEY_UVWSRC_NORMALS(N)	\
+	AI_MATKEY_UVWSRC(aiTextureType_NORMALS,N)
+
+#define AI_MATKEY_UVWSRC_HEIGHT(N)	\
+	AI_MATKEY_UVWSRC(aiTextureType_HEIGHT,N)
+
+#define AI_MATKEY_UVWSRC_SHININESS(N)	\
+	AI_MATKEY_UVWSRC(aiTextureType_SHININESS,N)
+
+#define AI_MATKEY_UVWSRC_OPACITY(N)	\
+	AI_MATKEY_UVWSRC(aiTextureType_OPACITY,N)
+
 
 // ---------------------------------------------------------------------------
-/** @def AI_MATKEY_TEXBLEND_DIFFUSE
- * Specifies the blend factor to be used for the Nth diffuse texture.
+/** @def AI_MATKEY_TEXOP 
+ * Parameters: type, N<br>
+ * Specifies how the Nth texture of type "type" is combined with
+ * the result of all color values from all previous textures combined.
+ * <br>
+ * <b>Type:</b> int (aiTextureOp)<br>
+ * <b>Default value to be assumed if this key isn't there:</b> multiply<br>
+ * <b>Requires:</b> AI_MATKEY_TEXTURE(type,N)<br>
+ */
+// ---------------------------------------------------------------------------
+#define AI_MATKEY_TEXOP(type, N) "$tex.op",type,N
+
+// for backward compatibility
+#define AI_MATKEY_TEXOP_DIFFUSE(N)	\
+	AI_MATKEY_TEXOP(aiTextureType_DIFFUSE,N)
+
+#define AI_MATKEY_TEXOP_SPECULAR(N)	\
+	AI_MATKEY_TEXOP(aiTextureType_SPECULAR,N)
+
+#define AI_MATKEY_TEXOP_AMBIENT(N)	\
+	AI_MATKEY_TEXOP(aiTextureType_AMBIENT,N)
+
+#define AI_MATKEY_TEXOP_EMISSIVE(N)	\
+	AI_MATKEY_TEXOP(aiTextureType_EMISSIVE,N)
+
+#define AI_MATKEY_TEXOP_NORMALS(N)	\
+	AI_MATKEY_TEXOP(aiTextureType_NORMALS,N)
+
+#define AI_MATKEY_TEXOP_HEIGHT(N)	\
+	AI_MATKEY_TEXOP(aiTextureType_HEIGHT,N)
+
+#define AI_MATKEY_TEXOP_SHININESS(N)	\
+	AI_MATKEY_TEXOP(aiTextureType_SHININESS,N)
+
+#define AI_MATKEY_TEXOP_OPACITY(N)	\
+	AI_MATKEY_TEXOP(aiTextureType_OPACITY,N)
+
+
+// ---------------------------------------------------------------------------
+/** @def AI_MATKEY_MAPPING 
+ * Parameters: type, N<br>
+ * Specifies how the Nth texture of type "type" is mapped.
+ * <br>
+ * <b>Type:</b> int (aiTextureMapping)<br>
+ * <b>Default value to be assumed if this key isn't there:</b> UV<br>
+ * <b>Requires:</b> AI_MATKEY_TEXTURE(type,N)<br>
+ */
+// ---------------------------------------------------------------------------
+#define AI_MATKEY_MAPPING(type, N) "$tex.mapping",type,N
+
+// for backward compatibility
+#define AI_MATKEY_MAPPING_DIFFUSE(N)	\
+	AI_MATKEY_MAPPING(aiTextureType_DIFFUSE,N)
+
+#define AI_MATKEY_MAPPING_SPECULAR(N)	\
+	AI_MATKEY_MAPPING(aiTextureType_SPECULAR,N)
+
+#define AI_MATKEY_MAPPING_AMBIENT(N)	\
+	AI_MATKEY_MAPPING(aiTextureType_AMBIENT,N)
+
+#define AI_MATKEY_MAPPING_EMISSIVE(N)	\
+	AI_MATKEY_MAPPING(aiTextureType_EMISSIVE,N)
+
+#define AI_MATKEY_MAPPING_NORMALS(N)	\
+	AI_MATKEY_MAPPING(aiTextureType_NORMALS,N)
+
+#define AI_MATKEY_MAPPING_HEIGHT(N)	\
+	AI_MATKEY_MAPPING(aiTextureType_HEIGHT,N)
+
+#define AI_MATKEY_MAPPING_SHININESS(N)	\
+	AI_MATKEY_MAPPING(aiTextureType_SHININESS,N)
+
+#define AI_MATKEY_MAPPING_OPACITY(N)	\
+	AI_MATKEY_MAPPING(aiTextureType_OPACITY,N)
+
+// ---------------------------------------------------------------------------
+/** @def AI_MATKEY_TEXBLEND (
+ * Parameters: type, N<br>
+ * Specifies the strength of the <N>th texture of type <type>. This is just
+ * a multiplier for the texture's color values.
  * <br>
  * <b>Type:</b> float<br>
- * <b>Default value:</b> 1.0f<br>
- * <b>Requires:</b> AI_MATKEY_TEXTURE_DIFFUSE(0)<br>
- * @note The key string is built at compile time, therefore it is not posible 
- * to use this macro in a loop with varying values for N. However, you can 
- * use the macro suffixed with '_' to build the key dynamically. The 
- * AI_BUILD_KEY()-macro can be used to do this.
+ * <b>Default value to be assumed if this key isn't there:</b> 1.f<br>
+ * <b>Requires:</b> AI_MATKEY_TEXTURE(type,N)<br>
  */
-#define AI_MATKEY_TEXBLEND_DIFFUSE(N)	"$tex.blend.diffuse["#N"]"
-/** @see AI_MATKEY_TEXBLEND_DIFFUSE */
-#define AI_MATKEY_TEXBLEND_AMBIENT(N)	"$tex.blend.ambient["#N"]"
-/** @see AI_MATKEY_TEXBLEND_DIFFUSE */
-#define AI_MATKEY_TEXBLEND_SPECULAR(N)	"$tex.blend.specular["#N"]"
-/** @see AI_MATKEY_TEXBLEND_DIFFUSE */
-#define AI_MATKEY_TEXBLEND_EMISSIVE(N)	"$tex.blend.emissive["#N"]"
-/** @see AI_MATKEY_TEXBLEND_DIFFUSE */
-#define AI_MATKEY_TEXBLEND_NORMALS(N)	"$tex.blend.normals["#N"]"
-/** @see AI_MATKEY_TEXBLEND_DIFFUSE */
-#define AI_MATKEY_TEXBLEND_HEIGHT(N)	"$tex.blend.height["#N"]"
-/** @see AI_MATKEY_TEXBLEND_DIFFUSE */
-#define AI_MATKEY_TEXBLEND_SHININESS(N)	"$tex.blend.shininess["#N"]"
-/** @see AI_MATKEY_TEXBLEND_DIFFUSE */
-#define AI_MATKEY_TEXBLEND_OPACITY(N)	"$tex.blend.opacity["#N"]"
+// ---------------------------------------------------------------------------
+#define AI_MATKEY_TEXBLEND(type, N) "$tex.blend",type,N
 
-#define AI_MATKEY_TEXBLEND_DIFFUSE_		"$tex.blend.diffuse"
-#define AI_MATKEY_TEXBLEND_AMBIENT_		"$tex.blend.ambient"
-#define AI_MATKEY_TEXBLEND_SPECULAR_	"$tex.blend.specular"
-#define AI_MATKEY_TEXBLEND_EMISSIVE_	"$tex.blend.emissive"
-#define AI_MATKEY_TEXBLEND_NORMALS_		"$tex.blend.normals"
-#define AI_MATKEY_TEXBLEND_HEIGHT_		"$tex.blend.height"
-#define AI_MATKEY_TEXBLEND_SHININESS_	"$tex.blend.shininess"
-#define AI_MATKEY_TEXBLEND_OPACITY_		"$tex.blend.opacity"
+// for backward compatibility
+#define AI_MATKEY_TEXBLEND_DIFFUSE(N)	\
+	AI_MATKEY_TEXBLEND(aiTextureType_DIFFUSE,N)
+
+#define AI_MATKEY_TEXBLEND_SPECULAR(N)	\
+	AI_MATKEY_TEXBLEND(aiTextureType_SPECULAR,N)
+
+#define AI_MATKEY_TEXBLEND_AMBIENT(N)	\
+	AI_MATKEY_TEXBLEND(aiTextureType_AMBIENT,N)
+
+#define AI_MATKEY_TEXBLEND_EMISSIVE(N)	\
+	AI_MATKEY_TEXBLEND(aiTextureType_EMISSIVE,N)
+
+#define AI_MATKEY_TEXBLEND_NORMALS(N)	\
+	AI_MATKEY_TEXBLEND(aiTextureType_NORMALS,N)
+
+#define AI_MATKEY_TEXBLEND_HEIGHT(N)	\
+	AI_MATKEY_TEXBLEND(aiTextureType_HEIGHT,N)
+
+#define AI_MATKEY_TEXBLEND_SHININESS(N)	\
+	AI_MATKEY_TEXBLEND(aiTextureType_SHININESS,N)
+
+#define AI_MATKEY_TEXBLEND_OPACITY(N)	\
+	AI_MATKEY_TEXBLEND(aiTextureType_OPACITY,N)
 
 // ---------------------------------------------------------------------------
-/** @def AI_MATKEY_MAPPINGMODE_U_DIFFUSE
- * Specifies the texture mapping mode for the Nth diffuse texture in
+/** @def AI_MATKEY_MAPPINGMODE_U 
+ * Parameters: type, N<br>
+ * Specifies the texture mapping mode for the <N>th texture of type <type> in
  * the u (x) direction
  * <br>
  * <b>Type:</b> int (aiTextureMapMode)<br>
  * <b>Default value:</b> aiTextureMapMode_Wrap<br>
- * <b>Requires:</b> AI_MATKEY_TEXTURE_DIFFUSE(0)<br>
- * @note The key string is built at compile time, therefore it is not posible 
- * to use this macro in a loop with varying values for N. However, you can 
- * use the macro suffixed with '_' to build the key dynamically. The 
- * AI_BUILD_KEY()-macro can be used to do this.
+ * <b>Requires:</b> AI_MATKEY_TEXTURE(type,N)<br>
  */
-#define AI_MATKEY_MAPPINGMODE_U_DIFFUSE(N)	"$tex.mapmodeu.diffuse["#N"]"
-/** @see AI_MATKEY_MAPPINGMODE_U_DIFFUSE */
-#define AI_MATKEY_MAPPINGMODE_U_AMBIENT(N)	"$tex.mapmodeu.ambient["#N"]"
-/** @see AI_MATKEY_MAPPINGMODE_U_DIFFUSE */
-#define AI_MATKEY_MAPPINGMODE_U_SPECULAR(N)	"$tex.mapmodeu.specular["#N"]"
-/** @see AI_MATKEY_MAPPINGMODE_U_DIFFUSE */
-#define AI_MATKEY_MAPPINGMODE_U_EMISSIVE(N)	"$tex.mapmodeu.emissive["#N"]"
-/** @see AI_MATKEY_MAPPINGMODE_U_DIFFUSE */
-#define AI_MATKEY_MAPPINGMODE_U_NORMALS(N)	"$tex.mapmodeu.normals["#N"]"
-/** @see AI_MATKEY_MAPPINGMODE_U_DIFFUSE */
-#define AI_MATKEY_MAPPINGMODE_U_HEIGHT(N)	"$tex.mapmodeu.height["#N"]"
-/** @see AI_MATKEY_MAPPINGMODE_U_DIFFUSE */
-#define AI_MATKEY_MAPPINGMODE_U_SHININESS(N)"$tex.mapmodeu.shininess["#N"]"
-/** @see AI_MATKEY_MAPPINGMODE_U_DIFFUSE */
-#define AI_MATKEY_MAPPINGMODE_U_OPACITY(N)	"$tex.mapmodeu.opacity["#N"]"
+// ---------------------------------------------------------------------------
+#define AI_MATKEY_MAPPINGMODE_U(type, N) "$tex.mapmodeu",type,N
 
-#define AI_MATKEY_MAPPINGMODE_U_DIFFUSE_	"$tex.mapmodeu.diffuse"
-#define AI_MATKEY_MAPPINGMODE_U_AMBIENT_	"$tex.mapmodeu.ambient"
-#define AI_MATKEY_MAPPINGMODE_U_SPECULAR_	"$tex.mapmodeu.specular"
-#define AI_MATKEY_MAPPINGMODE_U_EMISSIVE_	"$tex.mapmodeu.emissive"
-#define AI_MATKEY_MAPPINGMODE_U_NORMALS_	"$tex.mapmodeu.normals"
-#define AI_MATKEY_MAPPINGMODE_U_HEIGHT_		"$tex.mapmodeu.height"
-#define AI_MATKEY_MAPPINGMODE_U_SHININESS_	"$tex.mapmodeu.shininess"
-#define AI_MATKEY_MAPPINGMODE_U_OPACITY_	"$tex.mapmodeu.opacity"
+// for backward compatibility
+#define AI_MATKEY_MAPPINGMODE_U_DIFFUSE(N)	\
+	AI_MATKEY_MAPPINGMODE_U(aiTextureType_DIFFUSE,N)
+
+#define AI_MATKEY_MAPPINGMODE_U_SPECULAR(N)	\
+	AI_MATKEY_MAPPINGMODE_U(aiTextureType_SPECULAR,N)
+
+#define AI_MATKEY_MAPPINGMODE_U_AMBIENT(N)	\
+	AI_MATKEY_MAPPINGMODE_U(aiTextureType_AMBIENT,N)
+
+#define AI_MATKEY_MAPPINGMODE_U_EMISSIVE(N)	\
+	AI_MATKEY_MAPPINGMODE_U(aiTextureType_EMISSIVE,N)
+
+#define AI_MATKEY_MAPPINGMODE_U_NORMALS(N)	\
+	AI_MATKEY_MAPPINGMODE_U(aiTextureType_NORMALS,N)
+
+#define AI_MATKEY_MAPPINGMODE_U_HEIGHT(N)	\
+	AI_MATKEY_MAPPINGMODE_U(aiTextureType_HEIGHT,N)
+
+#define AI_MATKEY_MAPPINGMODE_U_SHININESS(N)	\
+	AI_MATKEY_MAPPINGMODE_U(aiTextureType_SHININESS,N)
+
+#define AI_MATKEY_MAPPINGMODE_U_OPACITY(N)	\
+	AI_MATKEY_MAPPINGMODE_U(aiTextureType_OPACITY,N)
 
 // ---------------------------------------------------------------------------
-/** @def AI_MATKEY_MAPPINGMODE_V_DIFFUSE
- * Specifies the texture mapping mode for the Nth diffuse texture in
- * the v (y) direction
- * <br>
- * <b>Type:</b> int (aiTextureMapMode)<br>
- * <b>Default value:</b> aiTextureMapMode_Wrap<br>
- * <b>Requires:</b> AI_MATKEY_TEXTURE_DIFFUSE(0)<br>
- * @note The key string is built at compile time, therefore it is not posible 
- * to use this macro in a loop with varying values for N. However, you can 
- * use the macro suffixed with '_' to build the key dynamically. The 
- * AI_BUILD_KEY()-macro can be used to do this.
- */
-#define AI_MATKEY_MAPPINGMODE_V_DIFFUSE(N)	"$tex.mapmodev.diffuse["#N"]"
-/** @see AI_MATKEY_MAPPINGMODE_V_DIFFUSE */
-#define AI_MATKEY_MAPPINGMODE_V_AMBIENT(N)	"$tex.mapmodev.ambient["#N"]"
-/** @see AI_MATKEY_MAPPINGMODE_V_DIFFUSE */
-#define AI_MATKEY_MAPPINGMODE_V_SPECULAR(N)	"$tex.mapmodev.specular["#N"]"
-/** @see AI_MATKEY_MAPPINGMODE_V_DIFFUSE */
-#define AI_MATKEY_MAPPINGMODE_V_EMISSIVE(N)	"$tex.mapmodev.emissive["#N"]"
-/** @see AI_MATKEY_MAPPINGMODE_V_DIFFUSE */
-#define AI_MATKEY_MAPPINGMODE_V_NORMALS(N)	"$tex.mapmodev.normals["#N"]"
-/** @see AI_MATKEY_MAPPINGMODE_V_DIFFUSE */
-#define AI_MATKEY_MAPPINGMODE_V_HEIGHT(N)	"$tex.mapmodev.height["#N"]"
-/** @see AI_MATKEY_MAPPINGMODE_V_DIFFUSE */
-#define AI_MATKEY_MAPPINGMODE_V_SHININESS(N)"$tex.mapmodev.shininess["#N"]"
-/** @see AI_MATKEY_MAPPINGMODE_V_DIFFUSE */
-#define AI_MATKEY_MAPPINGMODE_V_OPACITY(N)	"$tex.mapmodev.opacity["#N"]"
-
-#define AI_MATKEY_MAPPINGMODE_V_DIFFUSE_	"$tex.mapmodev.diffuse"
-#define AI_MATKEY_MAPPINGMODE_V_AMBIENT_	"$tex.mapmodev.ambient"
-#define AI_MATKEY_MAPPINGMODE_V_SPECULAR_	"$tex.mapmodev.specular"
-#define AI_MATKEY_MAPPINGMODE_V_EMISSIVE_	"$tex.mapmodev.emissive"
-#define AI_MATKEY_MAPPINGMODE_V_NORMALS_	"$tex.mapmodev.normals"
-#define AI_MATKEY_MAPPINGMODE_V_HEIGHT_		"$tex.mapmodev.height"
-#define AI_MATKEY_MAPPINGMODE_V_SHININESS_	"$tex.mapmodev.shininess"
-#define AI_MATKEY_MAPPINGMODE_V_OPACITY_	"$tex.mapmodev.opacity"
-
-// ---------------------------------------------------------------------------
-/** @def AI_MATKEY_MAPPINGMODE_W_DIFFUSE
- * Specifies the texture mapping mode for the Nth diffuse texture in
+/** @def AI_MATKEY_MAPPINGMODE_V 
+ * Parameters: type, N<br>
+ * Specifies the texture mapping mode for the <N>th texture of type <type> in
  * the w (z) direction
  * <br>
  * <b>Type:</b> int (aiTextureMapMode)<br>
  * <b>Default value:</b> aiTextureMapMode_Wrap<br>
- * <b>Requires:</b> AI_MATKEY_TEXTURE_DIFFUSE(0)<br>
- * @note The key string is built at compile time, therefore it is not posible 
- * to use this macro in a loop with varying values for N. However, you can 
- * use the macro suffixed with '_' to build the key dynamically. The 
- * AI_BUILD_KEY()-macro can be used to do this.
+ * <b>Requires:</b> AI_MATKEY_TEXTURE(type,N)<br>
  */
-#define AI_MATKEY_MAPPINGMODE_W_DIFFUSE(N)	"$tex.mapmodew.diffuse["#N"]"
-/** @see AI_MATKEY_MAPPINGMODE_W_DIFFUSE */
-#define AI_MATKEY_MAPPINGMODE_W_AMBIENT(N)	"$tex.mapmodew.ambient["#N"]"
-/** @see AI_MATKEY_MAPPINGMODE_W_DIFFUSE */
-#define AI_MATKEY_MAPPINGMODE_W_SPECULAR(N)	"$tex.mapmodew.specular["#N"]"
-/** @see AI_MATKEY_MAPPINGMODE_W_DIFFUSE */
-#define AI_MATKEY_MAPPINGMODE_W_EMISSIVE(N)	"$tex.mapmodew.emissive["#N"]"
-/** @see AI_MATKEY_MAPPINGMODE_W_DIFFUSE */
-#define AI_MATKEY_MAPPINGMODE_W_NORMALS(N)	"$tex.mapmodew.normals["#N"]"
-/** @see AI_MATKEY_MAPPINGMODE_W_DIFFUSE */
-#define AI_MATKEY_MAPPINGMODE_W_HEIGHT(N)	"$tex.mapmodew.bump["#N"]"
-/** @see AI_MATKEY_MAPPINGMODE_W_DIFFUSE */
-#define AI_MATKEY_MAPPINGMODE_W_SHININESS(N)"$tex.mapmodew.shininess["#N"]"
-/** @see AI_MATKEY_MAPPINGMODE_W_DIFFUSE */
-#define AI_MATKEY_MAPPINGMODE_W_OPACITY(N)	"$tex.mapmodew.opacity["#N"]"
+// ---------------------------------------------------------------------------
+#define AI_MATKEY_MAPPINGMODE_V(type, N) "$tex.mapmodev",type,N
 
-#define AI_MATKEY_MAPPINGMODE_W_DIFFUSE_	"$tex.mapmodew.diffuse"
-#define AI_MATKEY_MAPPINGMODE_W_AMBIENT_	"$tex.mapmodew.ambient"
-#define AI_MATKEY_MAPPINGMODE_W_SPECULAR_	"$tex.mapmodew.specular"
-#define AI_MATKEY_MAPPINGMODE_W_EMISSIVE_	"$tex.mapmodew.emissive"
-#define AI_MATKEY_MAPPINGMODE_W_NORMALS_	"$tex.mapmodew.normals"
-#define AI_MATKEY_MAPPINGMODE_W_HEIGHT_		"$tex.mapmodew.height"
-#define AI_MATKEY_MAPPINGMODE_W_SHININESS_	"$tex.mapmodew.shininess"
-#define AI_MATKEY_MAPPINGMODE_W_OPACITY_	"$tex.mapmodew.opacity"
+// for backward compatibility
+#define AI_MATKEY_MAPPINGMODE_V_DIFFUSE(N)	\
+	AI_MATKEY_MAPPINGMODE_V(aiTextureType_DIFFUSE,N)
 
-#define AI_MATKEY_ORENNAYAR_ROUGHNESS	 "$shading.orennayar.roughness"
-#define AI_MATKEY_MINNAERT_DARKNESS		 "$shading.minnaert.darkness"
-#define AI_MATKEY_COOK_TORRANCE_REFRACTI "$shading.cookt.refracti"
-#define AI_MATKEY_COOK_TORRANCE_PARAM	 "$shading.cookt.param"
+#define AI_MATKEY_MAPPINGMODE_V_SPECULAR(N)	\
+	AI_MATKEY_MAPPINGMODE_V(aiTextureType_SPECULAR,N)
+
+#define AI_MATKEY_MAPPINGMODE_V_AMBIENT(N)	\
+	AI_MATKEY_MAPPINGMODE_V(aiTextureType_AMBIENT,N)
+
+#define AI_MATKEY_MAPPINGMODE_V_EMISSIVE(N)	\
+	AI_MATKEY_MAPPINGMODE_V(aiTextureType_EMISSIVE,N)
+
+#define AI_MATKEY_MAPPINGMODE_V_NORMALS(N)	\
+	AI_MATKEY_MAPPINGMODE_V(aiTextureType_NORMALS,N)
+
+#define AI_MATKEY_MAPPINGMODE_V_HEIGHT(N)	\
+	AI_MATKEY_MAPPINGMODE_V(aiTextureType_HEIGHT,N)
+
+#define AI_MATKEY_MAPPINGMODE_V_SHININESS(N)	\
+	AI_MATKEY_MAPPINGMODE_V(aiTextureType_SHININESS,N)
+
+#define AI_MATKEY_MAPPINGMODE_V_OPACITY(N)	\
+	AI_MATKEY_MAPPINGMODE_V(aiTextureType_OPACITY,N)
+
+// ---------------------------------------------------------------------------
+/** @def AI_MATKEY_MAPPINGMODE_W 
+ * Parameters: type, N<br>
+ * Specifies the texture mapping mode for the <N>th texture of type <type> in
+ * the w (z) direction
+ * <br>
+ * <b>Type:</b> int (aiTextureMapMode)<br>
+ * <b>Default value:</b> aiTextureMapMode_Wrap<br>
+ * <b>Requires:</b> AI_MATKEY_TEXTURE(type,N)<br>
+ */
+// ---------------------------------------------------------------------------
+#define AI_MATKEY_MAPPINGMODE_W(type, N) "$tex.mapmodew",type,N
+
+// for backward compatibility
+#define AI_MATKEY_MAPPINGMODE_W_DIFFUSE(N)	\
+	AI_MATKEY_MAPPINGMODE_W(aiTextureType_DIFFUSE,N)
+
+#define AI_MATKEY_MAPPINGMODE_W_SPECULAR(N)	\
+	AI_MATKEY_MAPPINGMODE_W(aiTextureType_SPECULAR,N)
+
+#define AI_MATKEY_MAPPINGMODE_W_AMBIENT(N)	\
+	AI_MATKEY_MAPPINGMODE_W(aiTextureType_AMBIENT,N)
+
+#define AI_MATKEY_MAPPINGMODE_W_EMISSIVE(N)	\
+	AI_MATKEY_MAPPINGMODE_W(aiTextureType_EMISSIVE,N)
+
+#define AI_MATKEY_MAPPINGMODE_W_NORMALS(N)	\
+	AI_MATKEY_MAPPINGMODE_W(aiTextureType_NORMALS,N)
+
+#define AI_MATKEY_MAPPINGMODE_W_HEIGHT(N)	\
+	AI_MATKEY_MAPPINGMODE_W(aiTextureType_HEIGHT,N)
+
+#define AI_MATKEY_MAPPINGMODE_W_SHININESS(N)	\
+	AI_MATKEY_MAPPINGMODE_W(aiTextureType_SHININESS,N)
+
+#define AI_MATKEY_MAPPINGMODE_W_OPACITY(N)	\
+	AI_MATKEY_MAPPINGMODE_W(aiTextureType_OPACITY,N)
+
+
+// ---------------------------------------------------------------------------
+/** @def AI_MATKEY_TEXMAP_AXIS
+ * Parameters: type, N<br>
+ * Specifies the main mapping axis of the Nth texture of type "type".
+ * This applies to non-UV mapped textures. For spherical, cylindrical and
+ * planar this is the main axis of the corresponding geometric shape.
+ * <br>
+ * <b>Type:</b> int (aiAxis)<br>
+ * <b>Default value:</b> aiAxis_Z<br>
+ * <b>Requires:</b> AI_MATKEY_TEXTURE(type,N) and 
+ * AI_MATKEY_MAPPING(type,N) != UV<br>
+ */
+// ---------------------------------------------------------------------------
+#define AI_MATKEY_TEXMAP_AXIS(type, N) "$tex.mapaxis",type,N
+
+// ---------------------------------------------------------------------------
+/** @def AI_MATKEY_UVTRANSFORM 
+ * Parameters: type, N<br>
+ * Specifies how the UV mapping coordinates for the Nth texture of type
+ * "type" are transformed before they're used for mapping. This is an array
+ * of five floats - use the aiUVTransform structure for simplicity. 
+ * <br>
+ * <b>Type:</b> Array of 5 floats<br>
+ * <b>Default value:</b> 0.f,0.f,1.f,1.f,0.f <br>
+ * <b>Requires:</b> AI_MATKEY_TEXTURE(type,N) and 
+ * AI_MATKEY_MAPPING(type,N) == UV<br>
+ * <b>Note:</b>Transformed 3D texture coordinates are not supported
+ */
+// ---------------------------------------------------------------------------
+#define AI_MATKEY_UVTRANSFORM(type, N) "$tex.uvtrafo",type,N
+
+// for backward compatibility
+#define AI_MATKEY_UVTRANSFORM_DIFFUSE(N)	\
+	AI_MATKEY_UVTRANSFORM(aiTextureType_DIFFUSE,N)
+
+#define AI_MATKEY_UVTRANSFORM_SPECULAR(N)	\
+	AI_MATKEY_UVTRANSFORM(aiTextureType_SPECULAR,N)
+
+#define AI_MATKEY_UVTRANSFORM_AMBIENT(N)	\
+	AI_MATKEY_UVTRANSFORM(aiTextureType_AMBIENT,N)
+
+#define AI_MATKEY_UVTRANSFORM_EMISSIVE(N)	\
+	AI_MATKEY_UVTRANSFORM(aiTextureType_EMISSIVE,N)
+
+#define AI_MATKEY_UVTRANSFORM_NORMALS(N)	\
+	AI_MATKEY_UVTRANSFORM(aiTextureType_NORMALS,N)
+
+#define AI_MATKEY_UVTRANSFORM_HEIGHT(N)	\
+	AI_MATKEY_UVTRANSFORM(aiTextureType_HEIGHT,N)
+
+#define AI_MATKEY_UVTRANSFORM_SHININESS(N)	\
+	AI_MATKEY_UVTRANSFORM(aiTextureType_SHININESS,N)
+
+#define AI_MATKEY_UVTRANSFORM_OPACITY(N)	\
+	AI_MATKEY_UVTRANSFORM(aiTextureType_OPACITY,N)
+
+
+
+
+#define AI_MATKEY_ORENNAYAR_ROUGHNESS	 "$shading.orennayar.roughness",0,0
+#define AI_MATKEY_MINNAERT_DARKNESS		 "$shading.minnaert.darkness",0,0
+#define AI_MATKEY_COOK_TORRANCE_PARAM	 "$shading.cookt.param",0,0
 
 /** @def AI_MATKEY_GLOBAL_BACKGROUND_IMAGE
 *  Global property defined by some loaders. Contains the path to 
 *  the image file to be used as background image.
 */
-#define AI_MATKEY_GLOBAL_BACKGROUND_IMAGE "$global.bg.image2d"
+#define AI_MATKEY_GLOBAL_BACKGROUND_IMAGE "$global.bg.image2d",0,0
 
 
 // ---------------------------------------------------------------------------
-/** Retrieve a material property with a specific key from the material
+/** @brief Retrieve a material property with a specific key from the material
 *
 *  @param pMat Pointer to the input material. May not be NULL
 *  @param pKey Key to search for. One of the AI_MATKEY_XXX constants.
+*  @param type Specifies the type of the texture to be retrieved (
+*    e.g. diffuse, specular, height map ...)
+*  @param index Index of the texture to be retrieved.
 *  @param pPropOut Pointer to receive a pointer to a valid aiMaterialProperty
 *         structure or NULL if the key has not been found. 
 */
 // ---------------------------------------------------------------------------
-ASSIMP_API aiReturn aiGetMaterialProperty(const C_STRUCT aiMaterial* pMat, 
+ASSIMP_API C_ENUM aiReturn aiGetMaterialProperty(
+	 const C_STRUCT aiMaterial* pMat, 
     const char* pKey,
+	 C_ENUM aiTextureType type,
+    unsigned int  index,
     const C_STRUCT aiMaterialProperty** pPropOut);
 
 
 // ---------------------------------------------------------------------------
-/** Retrieve an array of float values with a specific key 
+/** @brief Retrieve an array of float values with a specific key 
 *  from the material
+*
+* Pass one of the AI_MATKEY_XXX constants for the last three parameters (the
+* example reads the #AI_MATKEY_UVTRANSFORM property of the first diffuse texture)
+* @code
+* aiUVTransform trafo;
+* unsigned int max = sizeof(aiUVTransform);
+* if (AI_SUCCESS != aiGetMaterialFloatArray(mat, AI_MATKEY_UVTRANSFORM(aiTextureType_DIFFUSE,0),
+*    (float*)&trafo, &max) || sizeof(aiUVTransform) != max)
+* {
+*   // error handling 
+* }
+* @endcode
 *
 * @param pMat Pointer to the input material. May not be NULL
 * @param pKey Key to search for. One of the AI_MATKEY_XXX constants.
 * @param pOut Pointer to a buffer to receive the result. 
 * @param pMax Specifies the size of the given buffer, in float's.
 *        Receives the number of values (not bytes!) read. 
+* @param type (see the code sample above)
+* @param index (see the code sample above)
+* @return Specifies whether the key has been found. If not, the output
+*   arrays remains unmodified and pMax is set to 0.
 */
 // ---------------------------------------------------------------------------
-ASSIMP_API aiReturn aiGetMaterialFloatArray(const C_STRUCT aiMaterial* pMat, 
+ASSIMP_API C_ENUM aiReturn aiGetMaterialFloatArray(
+	 const C_STRUCT aiMaterial* pMat, 
     const char* pKey,
+	 unsigned int type,
+    unsigned int index,
     float* pOut,
     unsigned int* pMax);
 
-#ifdef __cplusplus
-// inline it
-inline aiReturn aiGetMaterialFloat(const C_STRUCT aiMaterial* pMat, 
-     const char* pKey,
-     float* pOut)
-    {return aiGetMaterialFloatArray(pMat,pKey,pOut,(unsigned int*)0x0);}
-#else 
-// use our friend, the C preprocessor
-#define aiGetMaterialFloat (pMat, pKey, pOut) \
-    aiGetMaterialFloatArray(pMat, pKey, pOut, NULL)
-#endif //!__cplusplus
 
+
+#ifdef __cplusplus
 
 // ---------------------------------------------------------------------------
-/** Retrieve an array of integer values with a specific key 
-*  from the material
+/** @brief Retrieve a single float property with a specific key from the material.
+*
+* Pass one of the AI_MATKEY_XXX constants for the last three parameters (the
+* example reads the #AI_MATKEY_SHININESS_STRENGTH property of the first diffuse texture)
+* @code
+* float specStrength = 1.f; // default value, remains unmodified if we fail.
+* aiGetMaterialFloat(mat, AI_MATKEY_SHININESS_STRENGTH,
+*    (float*)&specStrength);
+* @endcode
 *
 * @param pMat Pointer to the input material. May not be NULL
 * @param pKey Key to search for. One of the AI_MATKEY_XXX constants.
-* @param pOut Pointer to a buffer to receive the result. 
-* @param pMax Specifies the size of the given buffer, in int's.
-*        Receives the number of values (not bytes!) read. 
+* @param pOut Receives the output float.
+* @param type (see the code sample above)
+* @param index (see the code sample above)
+* @return Specifies whether the key has been found. If not, the output
+*   float remains unmodified.
 */
 // ---------------------------------------------------------------------------
-ASSIMP_API aiReturn aiGetMaterialIntegerArray(const C_STRUCT aiMaterial* pMat, 
+inline aiReturn aiGetMaterialFloat(const aiMaterial* pMat, 
+	const char* pKey,
+	unsigned int type,
+   unsigned int index,
+	float* pOut)
+{
+	return aiGetMaterialFloatArray(pMat,pKey,type,index,pOut,(unsigned int*)0x0);
+}
+
+#else 
+
+// Use our friend, the C preprocessor
+#define aiGetMaterialFloat (pMat, type, index, pKey, pOut) \
+    aiGetMaterialFloatArray(pMat, type, index, pKey, pOut, NULL)
+
+#endif //!__cplusplus
+
+
+// ---------------------------------------------------------------------------
+/** @brief Retrieve an array of integer values with a specific key 
+*  from a material
+*
+* See the sample for aiGetMaterialFloatArray for more information.
+*/
+// ---------------------------------------------------------------------------
+ASSIMP_API C_ENUM aiReturn aiGetMaterialIntegerArray(const C_STRUCT aiMaterial* pMat, 
     const char* pKey,
+	 unsigned int  type,
+	 unsigned int  index,
     int* pOut,
     unsigned int* pMax);
 
+
 #ifdef __cplusplus
-// inline it
+
+// ---------------------------------------------------------------------------
+/** @brief Retrieve an integer property with a specific key from a material
+*
+* See the sample for aiGetMaterialFloat for more information.
+*/
+// ---------------------------------------------------------------------------
 inline aiReturn aiGetMaterialInteger(const C_STRUCT aiMaterial* pMat, 
-    const char* pKey,
-    int* pOut)
-    {return aiGetMaterialIntegerArray(pMat,pKey,pOut,(unsigned int*)0x0);}
+	const char* pKey,
+	unsigned int type,
+   unsigned int index,
+	int* pOut)
+{
+	return aiGetMaterialIntegerArray(pMat,pKey,type,index,pOut,(unsigned int*)0x0);
+}
+
 #else 
+
 // use our friend, the C preprocessor
-#define aiGetMaterialInteger (pMat, pKey, pOut) \
-    aiGetMaterialIntegerArray(pMat, pKey, pOut, NULL)
+#define aiGetMaterialInteger (pMat, type, index, pKey, pOut) \
+    aiGetMaterialIntegerArray(pMat, type, index, pKey, pOut, NULL)
+
 #endif //!__cplusplus
 
 
 
 // ---------------------------------------------------------------------------
-/** Retrieve a color value from the material property table
+/** @brief Retrieve a color value from the material property table
 *
-*	@param pMat Pointer to the input material. May not be NULL
-*	@param pKey Key to search for. One of the AI_MATKEY_XXX constants.
-*	@param pOut Pointer to a buffer to receive the result. 
+* See the sample for aiGetMaterialFloat for more information.
 */
 // ---------------------------------------------------------------------------
-ASSIMP_API aiReturn aiGetMaterialColor(const C_STRUCT aiMaterial* pMat, 
+ASSIMP_API C_ENUM aiReturn aiGetMaterialColor(const C_STRUCT aiMaterial* pMat, 
     const char* pKey,
-    aiColor4D* pOut);
+	 unsigned int type,
+    unsigned int index,
+	 C_STRUCT aiColor4D* pOut);
 
 
 // ---------------------------------------------------------------------------
-/** Retrieve a string from the material property table
+/** @brief Retrieve a string from the material property table
 *
-*	@param pMat Pointer to the input material. May not be NULL
-*	@param pKey Key to search for. One of the AI_MATKEY_XXX constants.
-*	@param pOut Pointer to a buffer to receive the result. 
+* See the sample for aiGetMaterialFloat for more information.
 */
 // ---------------------------------------------------------------------------
-ASSIMP_API aiReturn aiGetMaterialString(const C_STRUCT aiMaterial* pMat, 
+ASSIMP_API C_ENUM aiReturn aiGetMaterialString(const C_STRUCT aiMaterial* pMat, 
     const char* pKey,
-    aiString* pOut);
+	 unsigned int type,
+    unsigned int index,
+    C_STRUCT aiString* pOut);
 
 
 // ---------------------------------------------------------------------------
-/** Helper function to get a texture from a material
+/** @brief Helper function to get a texture from a material structure.
  *
- *  This function is provided just for convinience. 
- *  @param pMat Pointer to the input material. May not be NULL
- *  @param iIndex Index of the texture to retrieve. If the index is too 
+ *  This function is provided just for convenience. 
+ *  @param mat Pointer to the input material. May not be NULL
+ *  @param index Index of the texture to retrieve. If the index is too 
  *		large the function fails.
- *  @param iTexType One of the AI_TEXTYPE constants. Specifies the type of
- *		the texture to retrieve (e.g. diffuse, specular, height map ...)
- *  @param szPath Receives the output path
- *		NULL is no allowed as value
- *  @param piUVIndex Receives the UV index of the texture. 
+ *  @param type Specifies the type of the texture to retrieve (e.g. diffuse,
+ *     specular, height map ...)
+ *  @param path Receives the output path
+ *		NULL is not allowed as value
+ *  @param mapping The texture mapping.
  *		NULL is allowed as value.
- *  @param pfBlendFactor Receives the blend factor for the texture
+ *  @param uvindex Receives the UV index of the texture. 
  *		NULL is allowed as value.
- *  @param peTextureOp Receives the texture operation to perform between
+ *  @param blend Receives the blend factor for the texture
+ *		NULL is allowed as value.
+ *  @param op Receives the texture operation to perform between
  *		this texture and the previous texture. NULL is allowed as value.
- *  @param peMapMode Receives the mapping modes to be used for the texture.
+ *  @param mapmode Receives the mapping modes to be used for the texture.
  *      The parameter may be NULL but if it is a valid pointer it MUST
  *      point to an array of 3 aiTextureMapMode variables (one for each
  *      axis: UVW order (=XYZ)). 
  */
 // ---------------------------------------------------------------------------
 #ifdef __cplusplus
-ASSIMP_API aiReturn aiGetMaterialTexture(const C_STRUCT aiMaterial* pMat,
-    unsigned int iIndex,
-    unsigned int iTexType,
-    C_STRUCT aiString* szPath,
-    unsigned int* piUVIndex		= NULL,
-    float* pfBlendFactor		= NULL,
-    aiTextureOp* peTextureOp	= NULL,
-	aiTextureMapMode* peMapMode = NULL); 
+ASSIMP_API aiReturn aiGetMaterialTexture(const C_STRUCT aiMaterial* mat,
+	 aiTextureType type,
+    unsigned int  index,
+    aiString* path,
+	 aiTextureMapping* mapping	= NULL,
+    unsigned int* uvindex		= NULL,
+    float* blend				= NULL,
+    aiTextureOp* op				= NULL,
+	 aiTextureMapMode* mapmode	= NULL); 
 #else
-aiReturn aiGetMaterialTexture(const C_STRUCT aiMaterial* pMat,
-    unsigned int iIndex,
-    unsigned int iTexType,
-    C_STRUCT aiString* szPath,
-    unsigned int* piUVIndex,
-    float* pfBlendFactor,
-    aiTextureOp* peTextureOp,
-	aiTextureMapMode* peMapMode); 
+C_ENUM aiReturn aiGetMaterialTexture(const C_STRUCT aiMaterial* mat,
+    C_ENUM aiTextureType type,
+    unsigned int  index,
+    C_STRUCT aiString* path,
+	 C_ENUM aiTextureMapping* mapping	/*= NULL*/,
+    unsigned int* uvindex				/*= NULL*/,
+    float* blend						/*= NULL*/,
+    C_ENUM aiTextureOp* op				/*= NULL*/,
+	 C_ENUM aiTextureMapMode* mapmode	/*= NULL*/); 
 #endif // !#ifdef __cplusplus
 
 #ifdef __cplusplus

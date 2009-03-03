@@ -1,16 +1,36 @@
+#if defined(LINUX)
+#include "linux_compat.h"
+#endif
+
 #include "binding.h"
+#include "../snippets/UserMemAlloc.h"
+#include <hash_map>
+#include <string>
 
 #ifndef OPEN_SOURCE
 #include "../../HeClientPlugins/HeClientPlugins.h"
 #include "../../HeServerPlugins/HeServerPlugins.h"
-
-HECLIENTPLUGINS::HeClientPlugins *gHeClientPlugins=0;
-HESERVERPLUGINS::HeServerPlugins *gHeServerPlugins=0;
 #endif
+
+#define DLL_IN_EXT       ".dll"
+
+typedef USER_STL_EXT::hash_map<USER_STL::string, PLUGIN_INTERFACE_FUNC> PLUGIN_INTERFACE_HASH;
+PLUGIN_INTERFACE_HASH *gPluginInterfaceHash=0;
+
+PLUGIN_INTERFACE_HASH & getHash(void)
+{
+  if ( gPluginInterfaceHash == 0 )
+  {
+    gPluginInterfaceHash = MEMALLOC_NEW(PLUGIN_INTERFACE_HASH);
+  }
+  return *gPluginInterfaceHash;
+}
+
 
 #ifdef _WIN32
 
 #include <windows.h>
+#endif
 
 extern "C"
 {
@@ -22,91 +42,98 @@ void setSuppressLoadError(bool state) // whether or not to suppress load error d
   gSuppressLoadError = state;
 }
 
-void *getBindingInterfaceModule(const char *dll,int version_number,void *&rmodule) // loads the tetra maker DLL and returns the interface pointer.
+void loadModuleInterfaces(const char *dll, void **rmodule) // loads the interface from a dll and populates it's internal list
 {
-  void *ret = 0;
-
+#if defined(WIN32)
   UINT errorMode = 0;
   if ( gSuppressLoadError ) errorMode = SEM_FAILCRITICALERRORS;
   UINT oldErrorMode = SetErrorMode(errorMode);
   HMODULE module = LoadLibraryA(dll);
   SetErrorMode(oldErrorMode);
+#else
+  USER_STL::string mname(dll);
+  mname.assign(mname.substr(0, mname.rfind(DLL_IN_EXT)));
+  mname.insert(0,"lib");
+  mname.append(".so");
+  HMODULE module = (HMODULE)dlopen(mname.c_str(), RTLD_LAZY);
+#endif
+
+  bool found_exports = (module != 0);
 
   if ( module )
-  {
-    void *proc = GetProcAddress(module,"getInterface");
+  {    
+    #if defined(WIN32)
+    void *proc = GetProcAddress(module,"getInterfaceList");
+    #else
+    void *proc = dlsym(module, "getInterfaceList");
+    #endif
     if ( proc )
     {
-      typedef void * (__cdecl * NX_GetToolkit)(int version);
-  	  ret = ((NX_GetToolkit)proc)(version_number);
+      const INTERFACE_EXPORT *interfaces;
+      int num = ((PLUGIN_INTERFACE_LIST_FUNC)proc)(&interfaces);
+      for (int i = 0; i < num; i++)
+      {
+        getHash()[interfaces[i].name] = interfaces[i].func;
+        found_exports = true;
+      }
     }
+    //LEGACY SUPPORT
+    else // DO it the old way
+    {
+      #if defined(WIN32)
+      void *proc = GetProcAddress(module,"getInterface");
+      #else
+      void *proc = dlsym(module, "getInterface");
+      #endif
+      if ( proc )
+      {
+        // store the name of the dll sans extension as the classname lookup
+        USER_STL::string cname(dll);
+        getHash()[cname.substr(0, cname.rfind(DLL_IN_EXT))] = (PLUGIN_INTERFACE_FUNC)proc;
+        found_exports = true;
+      }
+    }
+    //END LEGACY
   }
 
-  if ( ret )
+  if (found_exports)
   {
-    rmodule = module;
+    if (rmodule)
+      *rmodule = module;
   }
   else
   {
-    unloadBindingInterface(module);
-    rmodule = 0;
+    unloadModule(module);
+    if (rmodule)
+      *rmodule = 0;
   }
-
-  return ret;
 }
 
-
-void *getBindingInterface(const char *dll,int version_number) // loads the tetra maker DLL and returns the interface pointer.
+void *getBindingInterface(const char *dll, const char *name, int version_number, SYSTEM_SERVICES::SystemServices *services, void **rmodule) // loads the dll and grabs the interface
 {
-  void *ret = 0;
-
-#ifndef OPEN_SOURCE
-  if ( gHeClientPlugins )
+  if (dll)
+    loadModuleInterfaces(dll, rmodule);
+  
+  if (getHash()[name])
   {
-    HECLIENTPLUGINS::PluginType type = gHeClientPlugins->getPluginType(dll);
-    if ( type != HECLIENTPLUGINS::PT_UNKNOWN )
-    {
-      ret = gHeClientPlugins->getPluginInterface(type,version_number);
-    }
+    return getHash()[name](version_number, services);
   }
-  else if ( gHeServerPlugins )
-  {
-    HESERVERPLUGINS::PluginType type = gHeServerPlugins->getPluginType(dll);
-    if ( type != HESERVERPLUGINS::PT_UNKNOWN )
-    {
-      ret = gHeServerPlugins->getPluginInterface(type,version_number);
-    }
-  }
-#endif
-  if ( ret == 0 )
-  {
-    UINT errorMode = 0;
-    if ( gSuppressLoadError ) errorMode = SEM_FAILCRITICALERRORS;
-    UINT oldErrorMode = SetErrorMode(errorMode);
-    HMODULE module = LoadLibraryA(dll);
-    SetErrorMode(oldErrorMode);
-    if ( module )
-    {
-      void *proc = GetProcAddress(module,"getInterface");
-      if ( proc )
-      {
-        typedef void * (__cdecl * NX_GetToolkit)(int version);
-    	  ret = ((NX_GetToolkit)proc)(version_number);
-      }
-    }
-  }
-  return ret;
+  return 0;
 }
 
 
-bool            unloadBindingInterface(void *module)
+bool unloadModule(void *module)
 {
   bool ret = false;
 
   if ( module )
   {
     HMODULE hm = (HMODULE) module;
+    #if defined(WIN32)
     BOOL b = FreeLibrary(hm);
+    #else
+    BOOL b = dlclose(hm);
+    #endif
     if ( b )
       ret = true;
   }
@@ -116,84 +143,3 @@ bool            unloadBindingInterface(void *module)
 }
 
 };
-
-#endif
-
-#ifdef LINUX
-#include <dlfcn.h>
-#include <stdio.h>
-#include <string>
-
-#define __cdecl
-void * getBindingInterface(const char *dll_in,int version_number)
-{
-  void *ret = 0;
-
-  if ( strcasecmp(dll_in,"HbPhysics.dll") == 0 )
-  {
-    dll_in = "libHbPhysics.so";
-  }
-  else if ( strcasecmp(dll_in,"PhysicsAsset.dll") == 0 )
-  {
-    dll_in = "libPhysicsAsset.so";
-  }
-  else if ( strcasecmp(dll_in,"RenderDebug.dll") == 0 )
-  {
-    dll_in = "libRenderDebug.so";
-  }
-  else if ( strcasecmp(dll_in,"HeroWorld.dll") == 0 )
-  {
-    dll_in = "libHeroWorld.so";
-  }
-  else if ( strcasecmp(dll_in,"CreateDynamics.dll") == 0 )
-  {
-    dll_in = "libCreateDynamics.so";
-  }
-  else if ( strcasecmp(dll_in,"SpeedTree.dll") == 0 )
-  {
-    dll_in = "libSpeedTree.so";
-  }
-  else if ( strcasecmp(dll_in,"PathMaker.dll") == 0 )
-  {
-    dll_in = "libPathMaker.so";
-  }
-  else if ( strcasecmp(dll_in,"HbPathSystem.dll") == 0 )
-  {
-    dll_in = "libHBPathSystem.so";
-  }
-  else if ( strcasecmp(dll_in,"HBPathSystem_AIWISDOM.dll") == 0 )
-  {
-    dll_in = "libHBPathSystem_AIWISDOM.so";
-  }
-
-  void* module = dlopen(dll_in, RTLD_LAZY);
-  if ( module )
-  {
-    void* proc = dlsym(module, "getInterface");
-    if ( proc )
-    {
-      typedef void * (__cdecl * NX_GetToolkit)(int version);
-  	  ret = ((NX_GetToolkit)proc)(version_number);
-    }
-    else
-    {
-      printf("%s\n", dlerror());
-    }
-  }
-  else
-  {
-    printf("%s\n%s\n", dlerror(), dll_in);
-  }
-  return ret;
-}
-
-bool            unloadBindingInterface(void *module)
-{
-	bool ret = false;
-	if(module)
-		if(!dlclose(module)) //0 == succeess
-			ret = true;
-	return ret;
-}
-
-#endif

@@ -64,7 +64,7 @@ SccProvider="MSCCI:Perforce SCM"
       PreprocessorDefinitions="WIN32;_WINDOWS;UNICODE=1;_UNICODE=1;MESHIMPORTEZM_EXPORTS;NDEBUG;"
       WarningLevel="3"
       Optimization="4"
-      AdditionalOptions="/WX /W4 /fp:fast /O2 /MD /Zi "
+      AdditionalOptions="/Zi /WX /W4 /fp:fast /WX /MD /O2 "
       ExceptionHandling="1"
       />
     <Tool Name="VCCustomBuildTool"/>
@@ -114,25 +114,25 @@ SccProvider="MSCCI:Perforce SCM"
     <Filter Name="snippets" Filter="">
       <File RelativePath="..\..\include\common\snippets\asc2bin.cpp"/>
       <File RelativePath="..\..\include\common\snippets\asc2bin.h"/>
+      <File RelativePath="..\..\include\common\snippets\FastXml.cpp"/>
+      <File RelativePath="..\..\include\common\snippets\FastXml.h"/>
+      <File RelativePath="..\..\include\common\snippets\inparser.cpp"/>
+      <File RelativePath="..\..\include\common\snippets\inparser.h"/>
       <File RelativePath="..\..\include\common\snippets\stable.h"/>
       <File RelativePath="..\..\include\common\snippets\stringdict.cpp"/>
       <File RelativePath="..\..\include\common\snippets\stringdict.h"/>
-    </Filter>
-    <Filter Name="MemoryServices" Filter="">
-      <File RelativePath="..\..\include\common\MemoryServices\MemoryContainer.cpp"/>
-      <File RelativePath="..\..\include\common\MemoryServices\MemoryContainer.h"/>
-    </Filter>
-    <Filter Name="TinyXML" Filter="">
-      <File RelativePath="..\..\include\common\TinyXML\tinystr.cpp"/>
-      <File RelativePath="..\..\include\common\TinyXML\tinystr.h"/>
-      <File RelativePath="..\..\include\common\TinyXML\tinyxml.cpp"/>
-      <File RelativePath="..\..\include\common\TinyXML\tinyxml.h"/>
-      <File RelativePath="..\..\include\common\TinyXML\tinyxmlerror.cpp"/>
-      <File RelativePath="..\..\include\common\TinyXML\tinyxmlparser.cpp"/>
+      <File RelativePath="..\..\include\common\snippets\sutil.cpp"/>
+      <File RelativePath="..\..\include\common\snippets\sutil.h"/>
+      <File RelativePath="..\..\include\common\snippets\SystemServices.cpp"/>
+      <File RelativePath="..\..\include\common\snippets\SystemServices.h"/>
     </Filter>
     <Filter Name="FileInterface" Filter="">
       <File RelativePath="..\..\include\common\FileInterface\FileInterface.cpp"/>
       <File RelativePath="..\..\include\common\FileInterface\FileInterface.h"/>
+    </Filter>
+    <Filter Name="MemoryServices" Filter="">
+      <File RelativePath="..\..\include\common\MemoryServices\MemoryContainer.cpp"/>
+      <File RelativePath="..\..\include\common\MemoryServices\MemoryContainer.h"/>
     </Filter>
   </Filter>
 </Files>

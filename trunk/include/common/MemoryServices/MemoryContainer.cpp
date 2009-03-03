@@ -30,7 +30,7 @@ IMPLEMENT_MEMORYPOOL_IN_CLASS(GlobalMemoryPool);
 void* malloc(size_t s,const MemoryPoolClassDefinition& pool,const char *_file,int lineno)
 {
 #if HE_USE_MEMORY_TRACKING
-  return MEMALLOC::malloc(MEMALLOC::gMemAlloc,(unsigned int)s,0,pool.name(), _file,lineno, MEMALLOC::MAT_MALLOC );
+  return SYSTEM_SERVICES::init()->malloc((unsigned int)s,0,pool.name(), _file,lineno, SYSTEM_SERVICES::MAT_MALLOC );
 #else
   return MEMALLOC_MALLOC(s);
 #endif
@@ -49,7 +49,7 @@ void* realloc(void* p, size_t s, const MemoryPoolClassDefinition& pool)
   void* malloc_aligned(size_t alignment, size_t s, const MemoryPoolClassDefinition& pool,const char *file,int lineno)
   {
 #if HE_USE_MEMORY_TRACKING
-    void * p = MEMALLOC::malloc( 0,(unsigned int)s, (unsigned int)alignment, pool.name(),file,lineno,MEMALLOC::MAT_MALLOC);
+    void * p = SYSTEM_SERVICES::init()->malloc((unsigned int)s, (unsigned int)alignment, pool.name(),file,lineno,SYSTEM_SERVICES::MAT_MALLOC);
 #else
     assert(0);    // not implemented!
     void *p = 0;
@@ -61,7 +61,7 @@ void* realloc(void* p, size_t s, const MemoryPoolClassDefinition& pool)
 void* mallocSTL(size_t s, const MemoryPoolClassDefinition& pool)
 {
 #if HE_USE_MEMORY_TRACKING
-  return MEMALLOC::malloc(MEMALLOC::gMemAlloc,(unsigned int)s,0,"STL",__FILE__,__LINE__, MEMALLOC::MAT_MALLOC );
+  return SYSTEM_SERVICES::init()->malloc((unsigned int)s,0,"STL",__FILE__,__LINE__, SYSTEM_SERVICES::MAT_MALLOC );
 #else
   return MEMALLOC_MALLOC(s);
 #endif
@@ -79,7 +79,7 @@ void* reallocSTL(void* p, size_t s, const MemoryPoolClassDefinition& pool)
 void* MemoryPool_Private::OperatorNew(POOL_NUMBER pool, size_t s,const char *className,const char *file,int lineno)
 {
 #if HE_USE_MEMORY_TRACKING
-  return MEMALLOC::malloc(MEMALLOC::gMemAlloc,(unsigned int)s,0,className,file,lineno, MEMALLOC::MAT_NEW );
+  return SYSTEM_SERVICES::init()->malloc((unsigned int)s,0,className,file,lineno, SYSTEM_SERVICES::MAT_NEW );
 #else
   return MEMALLOC_MALLOC(s);
 #endif
@@ -89,7 +89,7 @@ void* MemoryPool_Private::OperatorNew(POOL_NUMBER pool, size_t s,const char *cla
 void  MemoryPool_Private::OperatorDelete(POOL_NUMBER pool, void* ptr)
 {
 #if HE_USE_MEMORY_TRACKING
-  if ( ptr ) MEMALLOC::free(MEMALLOC::gMemAlloc,ptr,MEMALLOC::MAT_NEW);
+  if ( ptr ) SYSTEM_SERVICES::init()->free(ptr,SYSTEM_SERVICES::MAT_NEW);
 #else
   MEMALLOC_FREE(ptr);
 #endif
@@ -103,7 +103,7 @@ void* MemoryPool_Private::OperatorNewArray(POOL_NUMBER pool, size_t s,const char
 void  MemoryPool_Private::OperatorDeleteArray(POOL_NUMBER pool, void* ptr)
 {
 #if HE_USE_MEMORY_TRACKING
-  MEMALLOC::free(MEMALLOC::gMemAlloc,ptr,MEMALLOC::MAT_NEW_ARRAY);
+  SYSTEM_SERVICES::init()->free(ptr,SYSTEM_SERVICES::MAT_NEW_ARRAY);
 #else
   MEMALLOC_FREE(ptr);
 #endif

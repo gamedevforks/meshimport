@@ -175,29 +175,37 @@
 	</References>
 	<Files>
 		<Filter
-			Name="Common Binding Files"
+			Name="MeshImport Files"
+			>
+			<File
+				RelativePath="..\..\include\MeshImport\MeshImport.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\include\MeshImport\MeshImport.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\include\MeshImport\MeshSystem.h"
+				>
+			</File>
+		</Filter>
+		<Filter
+			Name="Common Include-Binding Files"
 			>
 			<Filter
-				Name="binding"
+				Name="snippets"
 				>
 				<File
-					RelativePath="..\..\include\common\binding\binding.cpp"
+					RelativePath="..\..\include\common\snippets\SystemServices.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\..\include\common\binding\binding.h"
-					>
-				</File>
-			</Filter>
-			<Filter
-				Name="MemoryServices"
-				>
-				<File
-					RelativePath="..\..\include\common\MemoryServices\MemoryContainer.cpp"
+					RelativePath="..\..\include\common\snippets\SystemServices.h"
 					>
 				</File>
 				<File
-					RelativePath="..\..\include\common\MemoryServices\MemoryContainer.h"
+					RelativePath="..\..\include\common\snippets\UserMemAlloc.h"
 					>
 				</File>
 			</Filter>

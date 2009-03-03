@@ -60,20 +60,19 @@
 #include <string.h>
 #include <assert.h>
 #include <stdarg.h>
-
-#include "MeshImport/MeshSystem.h"
+#include "common/snippets/UserMemAlloc.h"
 #include "MeshImport/MeshImport.h"
 #include "ImportEZM.h"
 #include "common/snippets/SendTextMessage.h"
 #include "common/snippets/StringDict.h"
+#include "common/snippets/sutil.h"
 #include "common/snippets/stable.h"
 #include "common/snippets/asc2bin.h"
-#include "common/TinyXML/tinyxml.h"
+#include "common/snippets/inparser.h"
+#include "common/snippets/FastXml.h"
 
 #pragma warning(disable:4100)
 #pragma warning(disable:4996)
-
-using namespace TINYXML;
 
 namespace MESHIMPORT
 {
@@ -94,14 +93,28 @@ enum NodeType
 	NT_NODE_TRIANGLE,
 	NT_NODE_INSTANCE,
 	NT_ANIM_TRACK,
+  NT_MESH_SYSTEM,
+  NT_MESH_AABB,
+  NT_SKELETONS,
+  NT_ANIMATIONS,
+  NT_MATERIALS,
+  NT_MATERIAL,
+  NT_MESHES,
+  NT_MESH_COLLISION_REPRESENTATIONS,
+  NT_MESH_COLLISION_REPRESENTATION,
+  NT_MESH_COLLISION,
+  NT_MESH_COLLISION_CONVEX,
 	NT_LAST
 };
 
 enum AttributeType
 {
 	AT_NONE,
+  AT_ASSET_NAME,
+  AT_ASSET_INFO,
 	AT_NAME,
 	AT_COUNT,
+  AT_TRIANGLE_COUNT,
 	AT_PARENT,
 	AT_MATERIAL,
 	AT_CTYPE,
@@ -112,97 +125,26 @@ enum AttributeType
 	AT_DTIME,
 	AT_TRACK_COUNT,
 	AT_FRAME_COUNT,
+  AT_HAS_SCALE,
+  AT_MESH_SYSTEM_VERSION,
+  AT_MESH_SYSTEM_ASSET_VERSION,
+  AT_MIN,
+  AT_MAX,
+  AT_SCALE,
+  AT_META_DATA,
+  AT_SKELETON,
+  AT_SUBMESH_COUNT,
+  AT_INFO,
+  AT_TYPE,
+  AT_TRANSFORM,
 	AT_LAST
 };
 
-class GeometryDeformVertex
-{
-public:
-	float        mPos[3];
-	float        mNormal[3];
-	float        mTexel1[2];
-	float        mTexel2[2];
-	float        mWeight[4];
-	unsigned short mBone[4];
-};
-
-class MaxVertex
-{
-public:
-	float         mPos[3];
-	float         mWeight[4];
-	unsigned char mBone[4];
-	float         mNormal[3];
-	float         mTexel[2];
-	float         mTangent[3];
-	float         mBinormal[3];
-};
-
-static void getVertex(const float *buffer,MeshVertex &vtx)
-{
-	vtx.mPos[0] = buffer[0];
-	vtx.mPos[1] = buffer[1];
-  vtx.mPos[2] = buffer[2];
-	vtx.mNormal[0] = buffer[3];
-	vtx.mNormal[1] = buffer[4];
-	vtx.mNormal[2] = buffer[5];
-	vtx.mTexel1[0] = buffer[6];
-	vtx.mTexel1[1] = buffer[7];
-	vtx.mTexel2[0] = buffer[8];
-	vtx.mTexel2[0] = buffer[9];
-}
-
-struct tempVertex
-{
-  float pos[3];
-  float normal[3];
-  float tex1[2];
-  float tex2[2];
-  float w[4];
-  unsigned short b[4];
-};
-
-static void getVertex(const tempVertex &s,MeshVertex &d)
-{
-  d.mPos[0] = s.pos[0];
-  d.mPos[1] = s.pos[1];
-  d.mPos[2] = s.pos[2];
-
-  d.mNormal[0] = s.normal[0];
-  d.mNormal[1] = s.normal[1];
-  d.mNormal[2] = s.normal[2];
-
-  d.mTexel1[0] = s.tex1[0];
-  d.mTexel1[1] = s.tex1[1];
-
-  d.mTexel2[0] = s.tex2[0];
-  d.mTexel2[1] = s.tex2[1];
-
-  d.mWeight[0] = s.w[0];
-  d.mWeight[1] = s.w[1];
-  d.mWeight[2] = s.w[2];
-  d.mWeight[3] = s.w[3];
-
-  d.mBone[0] = s.b[0];
-  d.mBone[1] = s.b[1];
-  d.mBone[2] = s.b[2];
-  d.mBone[3] = s.b[3];
-}
-
-struct GeometryVertex
-{
-  float mPos[3];
-  float mNormal[3];
-  float mTexel1[2];
-  float mTexel2[2];
-};
-
-class MeshImportEZM : public MeshImporter
+class MeshImportEZM : public MeshImporter, public FastXmlInterface
 {
 public:
 	MeshImportEZM(void)
 	{
-//		mCallback = 0;
 		mType     = NT_NONE;
 		mBone     = 0;
 		mFrameCount = 0;
@@ -210,6 +152,7 @@ public:
 		mTrackCount = 0;
 		mDtime      = 0;
 		mTrackIndex = 0;
+    mVertexFlags = 0;
 
 		mToElement.SetCaseSensitive(false);
 		mToAttribute.SetCaseSensitive(false);
@@ -225,9 +168,21 @@ public:
 		mToElement.Add("NodeTriangle",                     NT_NODE_TRIANGLE);
 		mToElement.Add("NodeInstance",                     NT_NODE_INSTANCE);
 		mToElement.Add("AnimTrack",                        NT_ANIM_TRACK);
+    mToElement.Add("MeshSystem",                       NT_MESH_SYSTEM);
+    mToElement.Add("MeshAABB",                         NT_MESH_AABB);
+    mToElement.Add("Skeletons",                        NT_SKELETONS);
+    mToElement.Add("Animations",                       NT_ANIMATIONS);
+    mToElement.Add("Materials",                        NT_MATERIALS);
+    mToElement.Add("Material",                         NT_MATERIAL);
+    mToElement.Add("Meshes",                           NT_MESHES);
+    mToElement.Add("MeshCollisionRepresentations",     NT_MESH_COLLISION_REPRESENTATIONS);
+    mToElement.Add("MeshCollisionRepresentation",      NT_MESH_COLLISION_REPRESENTATION);
+    mToElement.Add("MeshCollision",                    NT_MESH_COLLISION);
+    mToElement.Add("MeshCollisionConvex",              NT_MESH_COLLISION_CONVEX);
 
 		mToAttribute.Add("name",                           AT_NAME);
 		mToAttribute.Add("count",                          AT_COUNT);
+    mToAttribute.Add("triangle_count",                 AT_TRIANGLE_COUNT);
 		mToAttribute.Add("parent",                         AT_PARENT);
 		mToAttribute.Add("material",                       AT_MATERIAL);
 		mToAttribute.Add("ctype",                          AT_CTYPE);
@@ -238,7 +193,22 @@ public:
 		mToAttribute.Add("dtime",                          AT_DTIME);
 		mToAttribute.Add("trackcount",                     AT_TRACK_COUNT);
 		mToAttribute.Add("framecount",                     AT_FRAME_COUNT);
+		mToAttribute.Add("has_scale",                      AT_HAS_SCALE);
+    mToAttribute.Add("asset_name",                     AT_ASSET_NAME);
+    mToAttribute.Add("asset_info",                     AT_ASSET_INFO);
+    mToAttribute.Add("mesh_system_version",            AT_MESH_SYSTEM_VERSION);
+    mToAttribute.Add("mesh_system_asset_version",                  AT_MESH_SYSTEM_ASSET_VERSION);
+    mToAttribute.Add("min", AT_MIN);
+    mToAttribute.Add("max", AT_MAX);
+    mToAttribute.Add("scale", AT_SCALE);
+    mToAttribute.Add("meta_data", AT_META_DATA);
+    mToAttribute.Add("skeleton", AT_SKELETON);
+    mToAttribute.Add("submesh_count", AT_SUBMESH_COUNT);
+    mToAttribute.Add("info", AT_INFO);
+    mToAttribute.Add("type", AT_TYPE);
+    mToAttribute.Add("transform", AT_TRANSFORM);
 
+    mHasScale      = false;
 		mName          = 0;
 		mCount         = 0;
 		mParent        = 0;
@@ -248,12 +218,264 @@ public:
 		mBoneIndex     = 0;
 		mIndexBuffer   = 0;
 		mVertexBuffer  = 0;
+    mVertices      = 0;
 		mVertexCount   = 0;
 		mIndexCount    = 0;
 		mAnimTrack     = 0;
 		mAnimation     = 0;
+    mVertices      = 0;
+    mMeshSystemVersion = 0;
+    mMeshSystemAssetVersion = 0;
+    mMeshCollisionRepresentation = 0;
+    mMeshCollision = 0;
+    mMeshCollisionConvex = 0;
 
 	}
+
+  const unsigned char * getVertex(const unsigned char *src,MeshVertex &v,const char **types,int tcount)
+  {
+    bool firstTexel =true;
+
+    for (int i=0; i<tcount; i++)
+    {
+      const char *type = types[i];
+      if ( stricmp(type,"position") == 0 )
+      {
+        const float * scan = (const float *)src;
+        v.mPos[0] = scan[0];
+        v.mPos[1] = scan[1];
+        v.mPos[2] = scan[2];
+        src+=sizeof(float)*3;
+      }
+      else if ( stricmp(type,"normal") == 0 )
+      {
+        const float * scan = (const float *)src;
+        v.mNormal[0] = scan[0];
+        v.mNormal[1] = scan[1];
+        v.mNormal[2] = scan[2];
+        src+=sizeof(float)*3;
+      }
+      else if ( stricmp(type,"color") == 0 )
+      {
+        const unsigned int *scan = (const unsigned int *)src;
+        v.mColor = scan[0];
+        src+=sizeof(unsigned int);
+      }
+      else if ( stricmp(type,"texcoord") == 0 || stricmp(type,"texcoord1") == 0 || stricmp(type,"texel1") == 0 )
+      {
+        const float * scan = (const float *)src;
+        if ( firstTexel )
+        {
+          v.mTexel1[0] = scan[0];
+          v.mTexel1[1] = scan[1];
+          firstTexel =false;
+        }
+        else
+        {
+          v.mTexel2[0] = scan[0];
+          v.mTexel2[1] = scan[1];
+        }
+        src+=sizeof(float)*2;
+      }
+      else if ( stricmp(type,"texcoord2") == 0 || stricmp(type,"texel2") == 0 )
+      {
+        const float * scan = (const float *)src;
+        v.mTexel2[0] = scan[0];
+        v.mTexel2[1] = scan[1];
+        src+=sizeof(float)*2;
+      }
+      else if ( stricmp(type,"texcoord3") == 0 || stricmp(type,"texel3") == 0 )
+      {
+        const float * scan = (const float *)src;
+        v.mTexel3[0] = scan[0];
+        v.mTexel3[1] = scan[1];
+        src+=sizeof(float)*2;
+      }
+      else if ( stricmp(type,"texcoord4") == 0 || stricmp(type,"texel4") == 0 )
+      {
+        const float * scan = (const float *)src;
+        v.mTexel4[0] = scan[0];
+        v.mTexel4[1] = scan[1];
+        src+=sizeof(float)*2;
+      }
+      else if ( stricmp(type,"tangent") == 0 )
+      {
+        const float * scan = (const float *)src;
+        v.mTangent[0] = scan[0];
+        v.mTangent[1] = scan[1];
+        v.mTangent[2] = scan[2];
+        src+=sizeof(float)*3;
+      }
+      else if ( stricmp(type,"binormal") == 0 )
+      {
+        const float * scan = (const float *)src;
+        v.mBiNormal[0] = scan[0];
+        v.mBiNormal[1] = scan[1];
+        v.mBiNormal[2] = scan[2];
+        src+=sizeof(float)*3;
+      }
+      else if ( stricmp(type,"blendweights") == 0 || stricmp(type,"blendweighting") == 0 || stricmp(type,"boneweighting") == 0 )
+      {
+        const float * scan = (const float *)src;
+        v.mWeight[0] = scan[0];
+        v.mWeight[1] = scan[1];
+        v.mWeight[2] = scan[2];
+        v.mWeight[3] = scan[3];
+        src+=sizeof(float)*4;
+      }
+      else if ( stricmp(type,"blendindices") == 0 || stricmp(type,"blendindices") == 0 )
+      {
+        const unsigned short * scan = (const unsigned short *)src;
+        v.mBone[0] = scan[0];
+        v.mBone[1] = scan[1];
+        v.mBone[2] = scan[2];
+        v.mBone[3] = scan[3];
+        if ( v.mWeight[0] == 0 )
+        {
+          v.mBone[0] = 0;
+        }
+        if ( v.mWeight[1] == 0 )
+        {
+          v.mBone[1] = 0;
+        }
+        if ( v.mWeight[2] == 0 )
+        {
+          v.mBone[2] = 0;
+        }
+        if ( v.mWeight[3] == 0 )
+        {
+          v.mBone[3] = 0;
+        }
+
+        assert( v.mBone[0] < 256 );
+        assert( v.mBone[1] < 256 );
+        assert( v.mBone[2] < 256 );
+        assert( v.mBone[3] < 256 );
+        src+=sizeof(unsigned short)*4;
+      }
+      else if ( stricmp(type,"radius") == 0 )
+      {
+        const float *scan = (const float *)src;
+        v.mRadius = scan[0];
+        src+=sizeof(float);
+      }
+      else
+      {
+        assert(0);
+      }
+
+    }
+    return src;
+  }
+
+  unsigned int validateSemantics(const char **a1,const char **a2,int count)
+  {
+    bool ret = true;
+
+    for (int i=0; i<count; i++)
+    {
+      const char *p = a1[i];
+      const char *t = a2[i];
+
+      if ( stricmp(t,"position") == 0 ||
+           stricmp(t,"normal") == 0 ||
+           stricmp(t,"tangent") == 0 ||
+           stricmp(t,"binormal") == 0 )
+      {
+        if ( stricmp(p,"fff") != 0 )
+        {
+          ret = false;
+          break;
+        }
+      }
+      else if ( stricmp(t,"color") == 0 )
+      {
+        if ( stricmp(p,"x4") != 0 )
+        {
+          ret = false;
+          break;
+        }
+      }
+      else if ( stricmp(t,"texel1") == 0 ||
+                stricmp(t,"texel2") == 0 ||
+                stricmp(t,"texel3") == 0 ||
+                stricmp(t,"texel4") == 0 ||
+                stricmp(t,"tecoord") == 0 ||
+                stricmp(t,"texcoord1") == 0 ||
+                stricmp(t,"texcoord2") == 0 ||
+                stricmp(t,"texcoord3") == 0 ||
+                stricmp(t,"texcoord4") == 0 )
+      {
+        if ( stricmp(p,"ff") != 0 )
+        {
+          ret =false;
+          break;
+        }
+      }
+      else if ( stricmp(t,"blendweights") == 0 )
+      {
+        if ( stricmp(p,"ffff") != 0 )
+        {
+          ret = false;
+          break;
+        }
+      }
+      else if ( stricmp(t,"blendindices") == 0 )
+      {
+        if ( stricmp(p,"hhhh") != 0 )
+        {
+          ret = false;
+          break;
+        }
+      }
+      else if ( stricmp(t,"radius") == 0 )
+      {
+        if ( stricmp(p,"f") != 0 )
+        {
+          ret = false;
+          break;
+        }
+      }
+    }
+
+    unsigned int flags = 0;
+
+    if ( ret )
+    {
+      for (int i=0; i<count; i++)
+      {
+        const char *t = a2[i];
+
+             if ( stricmp(t,"position") == 0 ) flags|=MIVF_POSITION;
+        else if ( stricmp(t,"normal") == 0 )   flags|=MIVF_NORMAL;
+        else if ( stricmp(t,"color") == 0 )    flags|=MIVF_COLOR;
+        else if ( stricmp(t,"texel1") == 0 )   flags|=MIVF_TEXEL1;
+        else if ( stricmp(t,"texel2") == 0 )   flags|=MIVF_TEXEL2;
+        else if ( stricmp(t,"texel3") == 0 )   flags|=MIVF_TEXEL3;
+        else if ( stricmp(t,"texel4") == 0 )   flags|=MIVF_TEXEL4;
+        else if ( stricmp(t,"texcoord1") == 0 )   flags|=MIVF_TEXEL1;
+        else if ( stricmp(t,"texcoord2") == 0 )   flags|=MIVF_TEXEL2;
+        else if ( stricmp(t,"texcoord3") == 0 )   flags|=MIVF_TEXEL3;
+        else if ( stricmp(t,"texcoord4") == 0 )   flags|=MIVF_TEXEL4;
+        else if ( stricmp(t,"texcoord") == 0 )
+        {
+          if ( flags & MIVF_TEXEL1 )
+            flags|=MIVF_TEXEL2;
+          else
+            flags|=MIVF_TEXEL1;
+        }
+        else if ( stricmp(t,"tangent") == 0) flags|=MIVF_TANGENT;
+        else if ( stricmp(t,"binormal") == 0 ) flags|=MIVF_BINORMAL;
+        else if ( stricmp(t,"blendweights") == 0 ) flags|=MIVF_BONE_WEIGHTING;
+        else if ( stricmp(t,"blendindices") == 0 ) flags|=MIVF_BONE_WEIGHTING;
+        else if ( stricmp(t,"boneweights") == 0 ) flags|=MIVF_BONE_WEIGHTING;
+        else if ( stricmp(t,"boneindices") == 0 ) flags|=MIVF_BONE_WEIGHTING;
+        else if ( stricmp(t,"radius") == 0 ) flags|=MIVF_RADIUS;
+      }
+    }
+
+    return flags;
+  }
 
 
   virtual const char * getExtension(int index)  // report the default file name extension for this mesh type.
@@ -266,7 +488,7 @@ public:
     return "PhysX Rocket EZ-Mesh format";
   }
 
-  virtual bool  importMesh(const char *meshName,const void *data,unsigned int dlen,MeshImportInterface *callback,const char *options)
+  virtual bool  importMesh(const char *meshName,const void *data,unsigned int dlen,MeshImportInterface *callback,const char *options,MeshImportApplicationResource *appResource)
   {
     bool ret = false;
 
@@ -274,183 +496,207 @@ public:
 
     if ( data && mCallback )
     {
-  		TiXmlDocument *doc = MEMALLOC_NEW(TiXmlDocument);
-  		bool ok = doc->LoadFile(meshName,data,dlen);
+      FastXml *f = createFastXml();
+      bool ok = f->processXml((const char *)data,dlen,this);
   		if ( ok )
   		{
-        mCallback->importAssetName(meshName,0);
-  			Traverse(doc,0);
+        mCallback->importAssetName(mStrings.Get(meshName).Get(),0);
   			ret = true;
   		}
-
   		if ( mAnimation )
   		{
   			mCallback->importAnimation(*mAnimation);
+        for (int i=0; i<mAnimation->mTrackCount; i++)
+        {
+          MeshAnimTrack *t = mAnimation->mTracks[i];
+          MEMALLOC_DELETE_ARRAY(MeshAnimPose,t->mPose);
+          MEMALLOC_DELETE(MeshAnimTrack,t);
+        }
+        MEMALLOC_DELETE_ARRAY(MeshAnimTrack *,mAnimation->mTracks);
         MEMALLOC_DELETE(MeshAnimation,mAnimation);
   			mAnimation = 0;
   		}
 
-      MEMALLOC_DELETE(TiXmlDocument,doc);
+      MEMALLOC_DELETE(MeshCollisionRepresentation,mMeshCollisionRepresentation);
+      MEMALLOC_DELETE(MeshCollision,mMeshCollision);
+      MEMALLOC_DELETE(MeshCollisionConvex,mMeshCollisionConvex);
+      mMeshCollisionRepresentation = 0;
+      mMeshCollision = 0;
+      mMeshCollisionConvex = 0;
+
+      releaseFastXml(f);
 
     }
 
     return ret;
   }
 
-	void Traverse(TiXmlNode *node,int depth)
+	void ProcessNode(const char *svalue)
 	{
-
-		Process(node,depth);
-
-		node = node->FirstChild();
-
-		while (node )
+    mType = (NodeType)mToElement.Get(svalue);
+		switch ( mType )
 		{
-
-			if ( node->NoChildren() )
-			{
-				Process(node,depth);
-			}
-			else
-			{
-				Traverse(node,depth+1);
-			}
-
-			node = node->NextSibling();
-		}
-
-	}
-
-	void Process(TiXmlNode *node,int depth)
-	{
-
-		const char *value = node->Value();
-
-		ProcessNode(node->Type(),value,depth);
-
-		TiXmlElement *element = node->ToElement(); // is there an element?  Yes, traverse it's attribute key-pair values.
-
-		if ( element )
-		{
-			TiXmlAttribute *atr = element->FirstAttribute();
-			while ( atr )
-			{
-				const char *aname  = atr->Name();
-				const char *avalue = atr->Value();
-				ProcessAttribute( node->Type(), value, depth, aname, avalue );
-				atr = atr->Next();
-			}
-		}
-	}
-
-
-	void ProcessNode(int ntype,const char *svalue,int depth)
-	{
-		char value[43];
-		value[39] = '.';
-		value[40] = '.';
-		value[41] = '.';
-		value[42] = 0;
-
-		strncpy(value,svalue,39);
-
-		switch ( ntype )
-		{
-			case TiXmlNode::ELEMENT:
-			case TiXmlNode::DOCUMENT:
+      case NT_NONE:
+        assert(0);
+        break;
+      case NT_MESH_COLLISION_REPRESENTATION:
+        MEMALLOC_DELETE(MeshCollisionRepresentation,mMeshCollisionRepresentation);
+        mMeshCollisionRepresentation = MEMALLOC_NEW(MeshCollisionRepresentation);
+        break;
+      case NT_MESH_COLLISION:
+        if ( mMeshCollisionRepresentation )
+        {
+          mCallback->importCollisionRepresentation( mMeshCollisionRepresentation->mName, mMeshCollisionRepresentation->mInfo );
+          mCollisionRepName = mMeshCollisionRepresentation->mName;
+          MEMALLOC_DELETE(MeshCollisionRepresentation,mMeshCollisionRepresentation);
+          mMeshCollisionRepresentation = 0;
+        }
+        MEMALLOC_DELETE(MeshCollision,mMeshCollision);
+        mMeshCollision = MEMALLOC_NEW(MeshCollision);
+        break;
+      case NT_MESH_COLLISION_CONVEX:
+        assert(mMeshCollision);
+        if ( mMeshCollision )
+        {
+          MEMALLOC_DELETE(MeshCollisionConvex,mMeshCollisionConvex);
+          mMeshCollisionConvex = MEMALLOC_NEW(MeshCollisionConvex);
+          MeshCollision *d = static_cast< MeshCollision *>(mMeshCollisionConvex);
+          *d = *mMeshCollision;
+          MEMALLOC_DELETE(MeshCollision,mMeshCollision);
+          mMeshCollision = 0;
+        }
+        break;
+			case NT_ANIMATION:
+				if ( mAnimation )
 				{
-					if ( ntype == TiXmlNode::DOCUMENT )
-						Display(depth,"Node(DOCUMENT): %s\n", value);
-					else
+					mCallback->importAnimation(*mAnimation);
+					MEMALLOC_DELETE(MeshAnimation,mAnimation);
+					mAnimation = 0;
+				}
+				mName       = 0;
+				mFrameCount = 0;
+				mDuration   = 0;
+				mTrackCount = 0;
+				mDtime      = 0;
+				mTrackIndex = 0;
+				break;
+			case NT_ANIM_TRACK:
+				if ( mAnimation == 0 )
+				{
+					if ( mName && mFrameCount && mDuration && mTrackCount && mDtime )
 					{
-						mType = (NodeType)mToElement.Get(svalue);
-						switch ( mType )
+						int framecount = atoi( mFrameCount );
+						float duration = (float) atof( mDuration );
+						int trackcount = atoi(mTrackCount);
+						float dtime = (float) atof(mDtime);
+						if ( trackcount >= 1 && framecount >= 1 )
 						{
-							case NT_ANIMATION:
-								if ( mAnimation )
-								{
-									mCallback->importAnimation(*mAnimation);
-									MEMALLOC_DELETE(MeshAnimation,mAnimation);
-									mAnimation = 0;
-								}
-								mName       = 0;
-								mFrameCount = 0;
-								mDuration   = 0;
-								mTrackCount = 0;
-								mDtime      = 0;
-								mTrackIndex = 0;
-								break;
-							case NT_ANIM_TRACK:
-								if ( mAnimation == 0 )
-								{
-									if ( mName && mFrameCount && mDuration && mTrackCount && mDtime )
-									{
-										int framecount = atoi( mFrameCount );
-										float duration = (float) atof( mDuration );
-										int trackcount = atoi(mTrackCount);
-										float dtime = (float) atof(mDtime);
-										if ( trackcount >= 1 && framecount >= 1 )
-										{
-											mAnimation = MEMALLOC_NEW(MeshAnimation)(mName, trackcount, framecount, duration, dtime );
-										}
-									}
-								}
-								if ( mAnimation )
-								{
-									mAnimTrack = mAnimation->GetTrack(mTrackIndex);
-									mTrackIndex++;
-								}
-								break;
-							case NT_SKELETON:
-								{
-									MEMALLOC_DELETE(MeshSkeleton,mSkeleton);
-									mSkeleton = MEMALLOC_NEW(MeshSkeleton)("bip01");
-								}
-							case NT_BONE:
-								if ( mSkeleton )
-								{
-									mBone = mSkeleton->GetBonePtr(mBoneIndex);
-								}
-								break;
+							mAnimation = MEMALLOC_NEW(MeshAnimation);
+                  mAnimation->mName = mName;
+                  mAnimation->mTrackCount = trackcount;
+                  mAnimation->mFrameCount = framecount;
+                  mAnimation->mDuration = duration;
+                  mAnimation->mDtime = dtime;
+                  mAnimation->mTracks = MEMALLOC_NEW_ARRAY(MeshAnimTrack *,mAnimation->mTrackCount)[mAnimation->mTrackCount];
+                  for (int i=0; i<mAnimation->mTrackCount; i++)
+                  {
+                    MeshAnimTrack *track = MEMALLOC_NEW(MeshAnimTrack);
+                    track->mDtime = mAnimation->mDuration;
+                    track->mFrameCount = mAnimation->mFrameCount;
+                    track->mDuration = mAnimation->mDuration;
+                    track->mPose = MEMALLOC_NEW_ARRAY(MeshAnimPose,track->mFrameCount)[track->mFrameCount];
+                    mAnimation->mTracks[i] = track;
+                  }
 						}
-						Display(depth,"Node(ELEMENT): %s\n", value);
 					}
 				}
-				break;
-			case TiXmlNode::TEXT:
-				Display(depth,"Node(TEXT): %s\n", value);
-				switch ( mType )
+				if ( mAnimation )
 				{
-					case NT_ANIM_TRACK:
-						if ( mAnimTrack )
-						{
-							mAnimTrack->SetName(mName);
-							int count = atoi( mCount );
-							if ( count == mAnimTrack->GetFrameCount() )
-							{
-								float *buff = (float *) MEMALLOC_MALLOC(sizeof(float)*7*count);
-								Asc2Bin(svalue, count, "fff ffff", buff );
-								for (int i=0; i<count; i++)
-								{
-									MeshAnimPose *p = mAnimTrack->GetPose(i);
-									const float *src = &buff[i*7];
-									p->mPos[0]  = src[0];
-									p->mPos[1]  = src[1];
-									p->mPos[2]  = src[2];
-									p->mQuat[0] = src[3];
-									p->mQuat[1] = src[4];
-									p->mQuat[2] = src[5];
-									p->mQuat[3] = src[6];
-								}
+					mAnimTrack = mAnimation->GetTrack(mTrackIndex);
+					mTrackIndex++;
+				}
+				break;
+			case NT_SKELETON:
+				{
+					MEMALLOC_DELETE(MeshSkeleton,mSkeleton);
+					mSkeleton = MEMALLOC_NEW(MeshSkeleton);
+				}
+			case NT_BONE:
+				if ( mSkeleton )
+				{
+					mBone = mSkeleton->GetBonePtr(mBoneIndex);
+				}
+				break;
+		}
+  }
+  void ProcessData(const char *svalue)
+  {
+    if ( svalue )
+    {
+  		switch ( mType )
+  		{
+  			case NT_ANIM_TRACK:
+  				if ( mAnimTrack )
+  				{
+  					mAnimTrack->SetName(mStrings.Get(mName).Get());
+  					int count = atoi( mCount );
+  					if ( count == mAnimTrack->GetFrameCount() )
+  					{
+                if ( mHasScale )
+                {
+  								float *buff = (float *) MEMALLOC_MALLOC(sizeof(float)*10*count);
+  								Asc2Bin(svalue, count, "fff ffff fff", buff );
+  								for (int i=0; i<count; i++)
+  								{
+  									MeshAnimPose *p = mAnimTrack->GetPose(i);
+  									const float *src = &buff[i*10];
 
-							}
-						}
-						break;
-					case NT_NODE_INSTANCE:
-						if ( mName )
-						{
-							float transform[4*4];
-							Asc2Bin(svalue, 4, "ffff", transform );
+  									p->mPos[0]  = src[0];
+  									p->mPos[1]  = src[1];
+  									p->mPos[2]  = src[2];
+
+  									p->mQuat[0] = src[3];
+  									p->mQuat[1] = src[4];
+  									p->mQuat[2] = src[5];
+  									p->mQuat[3] = src[6];
+
+                    p->mScale[0] = src[7];
+                    p->mScale[1] = src[8];
+                    p->mScale[2] = src[9];
+  								}
+                }
+                else
+                {
+  								float *buff = (float *) MEMALLOC_MALLOC(sizeof(float)*7*count);
+  								Asc2Bin(svalue, count, "fff ffff", buff );
+  								for (int i=0; i<count; i++)
+  								{
+  									MeshAnimPose *p = mAnimTrack->GetPose(i);
+  									const float *src = &buff[i*7];
+
+  									p->mPos[0]  = src[0];
+  									p->mPos[1]  = src[1];
+  									p->mPos[2]  = src[2];
+
+  									p->mQuat[0] = src[3];
+  									p->mQuat[1] = src[4];
+  									p->mQuat[2] = src[5];
+  									p->mQuat[3] = src[6];
+
+                    p->mScale[0] = 1;
+                    p->mScale[1] = 1;
+                    p->mScale[2] = 1;
+  								}
+                }
+  					}
+  				}
+  				break;
+  			case NT_NODE_INSTANCE:
+            #if 0 // TODO TODO
+  				if ( mName )
+  				{
+  					float transform[4*4];
+  					Asc2Bin(svalue, 4, "ffff", transform );
               MeshBone b;
               b.SetTransform(transform);
               float pos[3];
@@ -458,242 +704,163 @@ public:
               float scale[3] = { 1, 1, 1 };
               b.ExtractOrientation(quat);
               b.GetPos(pos);
-							mCallback->importMeshInstance(mName,pos,quat,scale);
-							mName = 0;
-						}
-						break;
-					case NT_NODE_TRIANGLE:
-						if ( mCtype && mSemantic )
-						{
-							if ( stricmp(mSemantic,"position normal texcoord texcoord blendweights blendindices") == 0 )
-							{
-                tempVertex tvtx[3];
-								MeshVertex vtx[3];
+  					mCallback->importMeshInstance(mName,pos,quat,scale);
+  					mName = 0;
+  				}
+            #endif
+  				break;
+  			case NT_NODE_TRIANGLE:
+  				if ( mCtype && mSemantic )
+  				{
+              HeI32 c1,c2;
+              char scratch1[2048];
+              char scratch2[2048];
+              strcpy(scratch1,mCtype);
+              strcpy(scratch2,mSemantic);
+              const char **a1 = mParser1.GetArglist(scratch1,c1);
+              const char **a2 = mParser2.GetArglist(scratch2,c2);
+              if ( c1 > 0 && c2 > 0 && c1 == c2 )
+              {
+                mVertexFlags = validateSemantics(a1,a2,c1);
+                if ( mVertexFlags )
+                {
+  								MeshVertex vtx[3];
+  								const unsigned char *temp = (const unsigned char *)Asc2Bin(svalue, 3, mCtype, 0 );
+                  temp = getVertex(temp,vtx[0],a2,c2);
+                  temp = getVertex(temp,vtx[1],a2,c2);
+                  temp = getVertex(temp,vtx[2],a2,c2);
+                  mCallback->importTriangle(mCurrentMesh.Get(),mCurrentMaterial.Get(),mVertexFlags,vtx[0],vtx[1],vtx[2]);
+                  MEMALLOC_FREE((void *)temp);
+                }
+  					}
+  					mCtype = 0;
+  					mSemantic = 0;
+  				}
+  				break;
+  			case NT_VERTEX_BUFFER:
+  	      MEMALLOC_FREE( mVertexBuffer);
+            MEMALLOC_DELETE_ARRAY(MeshVertex,mVertices);
+            mVertices = 0;
+  				mVertexCount = 0;
+  				mVertexBuffer = 0;
 
-								Asc2Bin(svalue, 3, mCtype, tvtx );
+  				if ( mCtype && mCount )
+  				{
+  					mVertexCount  = atoi(mCount);
+  					if ( mVertexCount > 0 )
+  					{
+  						mVertexBuffer = Asc2Bin(svalue, mVertexCount, mCtype, 0 );
 
-                getVertex(tvtx[0],vtx[0]);
-                getVertex(tvtx[1],vtx[1]);
-                getVertex(tvtx[2],vtx[2]);
+                if ( mVertexBuffer )
+                {
 
-                mCallback->importTriangle(mCurrentMesh.Get(),mCurrentMaterial.Get(),MIVF_POSITION | MIVF_NORMAL | MIVF_TEXEL1 | MIVF_TEXEL2 | MIVF_BONE_WEIGHTING,vtx);
+                  HeI32 c1,c2;
+                  char scratch1[2048];
+                  char scratch2[2048];
+                  strcpy(scratch1,mCtype);
+                  strcpy(scratch2,mSemantic);
 
-							}
-							else if ( stricmp(mSemantic,"position normal texcoord texcoord") == 0 )
-							{
-								MeshVertex vtx[3];
-								float buffer[10*3];
-								Asc2Bin(svalue, 3, mCtype, buffer );
-								getVertex(buffer,vtx[0]);
-								getVertex(&buffer[10],vtx[1]);
-								getVertex(&buffer[20],vtx[2]);
+                  const char **a1 = mParser1.GetArglist(scratch1,c1);
+                  const char **a2 = mParser2.GetArglist(scratch2,c2);
 
-                mCallback->importTriangle(mCurrentMesh.Get(),mCurrentMaterial.Get(),MIVF_POSITION | MIVF_NORMAL | MIVF_TEXEL1 | MIVF_TEXEL2,vtx);
-							}
-							mCtype = 0;
-							mSemantic = 0;
+                  if ( c1 > 0 && c2 > 0 && c1 == c2 )
+                  {
+                    mVertexFlags = validateSemantics(a1,a2,c1);
+                    if ( mVertexFlags )
+                    {
+                      mVertices = MEMALLOC_NEW_ARRAY(MeshVertex,mVertexCount)[mVertexCount];
+                      const unsigned char *scan = (const unsigned char *)mVertexBuffer;
+                      for (int i=0; i<mVertexCount; i++)
+                      {
+                        scan = getVertex(scan,mVertices[i],a2,c2);
+                      }
+                    }
+                  }
+      			      MEMALLOC_FREE( mVertexBuffer);
+                  mVertexBuffer = 0;
+                }
 
-						}
-						break;
-					case NT_VERTEX_BUFFER:
-						if ( mCtype && mCount )
-						{
-							mVertexCount  = atoi(mCount);
-							if ( mVertexCount > 0 )
-							{
-								mVertexBuffer = Asc2Bin(svalue, mVertexCount, mCtype, 0 );
-							}
-							mCtype = 0;
-							mCount = 0;
-						}
-						break;
-					case NT_INDEX_BUFFER:
-						if ( mCount )
-						{
-							mIndexCount = atoi(mCount);
-							if ( mIndexCount > 0 )
-							{
-								mIndexBuffer = Asc2Bin(svalue, mIndexCount, "ddd", 0 );
-							}
-						}
+  					}
+  					mCtype = 0;
+  					mCount = 0;
+  				}
+  				break;
+  			case NT_INDEX_BUFFER:
+  				if ( mCount )
+  				{
+  					mIndexCount = atoi(mCount);
+  					if ( mIndexCount > 0 )
+  					{
+  						mIndexBuffer = Asc2Bin(svalue, mIndexCount, "ddd", 0 );
+  					}
+  				}
 
-						if ( mIndexBuffer && mVertexBuffer )
-						{
-							if ( stricmp(mSemantic,"position normal texcoord texcoord blendweights blendindices") == 0 )
-							{
-								MeshVertex *vtx = MEMALLOC_NEW_ARRAY(MeshVertex,mVertexCount)[mVertexCount];
-								GeometryDeformVertex            *source = (GeometryDeformVertex *) mVertexBuffer;
-								MeshVertex *dest = vtx;
+  				if ( mIndexBuffer && mVertices )
+  				{
+              if ( mMeshCollisionConvex )
+              {
+                float *vertices = MEMALLOC_NEW_ARRAY(float,mVertexCount*3)[mVertexCount*3];
+                float *dest = vertices;
+                for (int i=0; i<mVertexCount; i++)
+                {
+                  dest[0] = mVertices[i].mPos[0];
+                  dest[1] = mVertices[i].mPos[1];
+                  dest[2] = mVertices[i].mPos[2];
+                  dest+=3;
+                }
 
-								for (int i=0; i<mVertexCount; i++)
-								{
+                mCallback->importConvexHull(mCollisionRepName.Get(),
+                                            mMeshCollisionConvex->mName,
+                                            mMeshCollisionConvex->mTransform,
+                                            mVertexCount,
+                                            vertices,
+                                            mIndexCount,
+                                            (const unsigned int *)mIndexBuffer);
 
-									dest->mPos[0]     = source->mPos[0];
-									dest->mPos[1]     = source->mPos[1];
-									dest->mPos[2]     = source->mPos[2];
-
-									dest->mNormal[0]  = source->mNormal[0];
-									dest->mNormal[1]  = source->mNormal[1];
-									dest->mNormal[2]  = source->mNormal[2];
-
-									dest->mTexel1[0]  = source->mTexel1[0];
-									dest->mTexel1[1]  = source->mTexel1[1];
-
-									dest->mTexel2[0]  = source->mTexel2[0];
-									dest->mTexel2[1]  = source->mTexel2[1];
-
-									dest->mWeight[0] = source->mWeight[0];
-									dest->mWeight[1] = source->mWeight[1];
-									dest->mWeight[2] = source->mWeight[2];
-									dest->mWeight[3] = source->mWeight[3];
-
-									dest->mBone[0]   = source->mBone[0];
-									dest->mBone[1]   = source->mBone[1];
-									dest->mBone[2]   = source->mBone[2];
-									dest->mBone[3]   = source->mBone[3];
-
-									dest++;
-									source++;
-
-								}
-
-                mCallback->importIndexedTriangleList(mCurrentMesh.Get(),mCurrentMaterial.Get(),MIVF_POSITION | MIVF_NORMAL | MIVF_TEXEL1 | MIVF_TEXEL2 | MIVF_BONE_WEIGHTING,mVertexCount,vtx,mIndexCount,(const unsigned int *)mIndexBuffer );
-
-                MEMALLOC_DELETE_ARRAY(MeshVertex,vtx);
-							}
-							else if ( stricmp(mSemantic,"position blendweights blendindices normal texcoord tangent binormal") == 0 )
-							{
-								MeshVertex *vtx = MEMALLOC_NEW_ARRAY(MeshVertex,mVertexCount)[mVertexCount];
-								MaxVertex            *source = (MaxVertex *) mVertexBuffer;
-								MeshVertex *dest = vtx;
-
-								for (int i=0; i<mVertexCount; i++)
-								{
-
-									dest->mPos[0]     = source->mPos[0];
-									dest->mPos[1]     = source->mPos[1];
-									dest->mPos[2]     = source->mPos[2];
-
-									dest->mNormal[0]  = source->mNormal[0];
-									dest->mNormal[1]  = source->mNormal[1];
-									dest->mNormal[2]  = source->mNormal[2];
-
-									dest->mTangent[0] = source->mTangent[0];
-									dest->mTangent[1] = source->mTangent[1];
-									dest->mTangent[2] = source->mTangent[2];
-
-									dest->mBiNormal[0] = source->mBinormal[0];
-									dest->mBiNormal[1] = source->mBinormal[1];
-									dest->mBiNormal[2] = source->mBinormal[2];
-
-									dest->mTexel1[0]  = source->mTexel[0];
-									dest->mTexel1[1]  = source->mTexel[1];
-
-									dest->mWeight[0] = source->mWeight[0];
-									dest->mWeight[1] = source->mWeight[1];
-									dest->mWeight[2] = source->mWeight[2];
-									dest->mWeight[3] = source->mWeight[3];
-
-									dest->mBone[0]   = (unsigned short) source->mBone[0];
-									dest->mBone[1]   = (unsigned short) source->mBone[1];
-									dest->mBone[2]   = (unsigned short) source->mBone[2];
-									dest->mBone[3]   = (unsigned short) source->mBone[3];
-
-									dest++;
-									source++;
-
-								}
+                MEMALLOC_DELETE_ARRAY(float,vertices);
+                MEMALLOC_DELETE(MeshCollisionConvex,mMeshCollisionConvex);
+                mMeshCollisionConvex = 0;
+              }
+              else
+              {
+                mCallback->importIndexedTriangleList(mCurrentMesh.Get(),mCurrentMaterial.Get(),mVertexFlags,mVertexCount,mVertices,mIndexCount,(const unsigned int *)mIndexBuffer );
+              }
+  					}
 
 
-                mCallback->importIndexedTriangleList(mCurrentMesh.Get(),mCurrentMaterial.Get(),MIVF_POSITION | MIVF_NORMAL | MIVF_TEXEL1 | MIVF_TANGENT | MIVF_BINORMAL | MIVF_BONE_WEIGHTING,mVertexCount,vtx,mIndexCount,(const unsigned int *)mIndexBuffer );
-
-                MEMALLOC_DELETE_ARRAY(MeshVertex,vtx);
-							}
-							else if ( stricmp(mSemantic,"position normal texcoord texcoord") == 0 )
-							{
-								MeshVertex *vtx = MEMALLOC_NEW_ARRAY(MeshVertex,mVertexCount)[mVertexCount];
-								GeometryVertex            *source = (GeometryVertex *) mVertexBuffer;
-								MeshVertex *dest = vtx;
-
-								for (int i=0; i<mVertexCount; i++)
-								{
-
-									dest->mPos[0]     = source->mPos[0];
-									dest->mPos[1]     = source->mPos[1];
-									dest->mPos[2]     = source->mPos[2];
-
-									dest->mNormal[0]  = source->mNormal[0];
-									dest->mNormal[1]  = source->mNormal[1];
-									dest->mNormal[2]  = source->mNormal[2];
-
-
-									dest->mTexel1[0]  = source->mTexel1[0];
-									dest->mTexel1[1]  = source->mTexel1[1];
-
-									dest->mTexel2[0]  = source->mTexel2[0];
-									dest->mTexel2[1]  = source->mTexel2[1];
-
-
-									dest++;
-									source++;
-
-								}
-
-                mCallback->importIndexedTriangleList(mCurrentMesh.Get(),mCurrentMaterial.Get(),MIVF_POSITION | MIVF_NORMAL | MIVF_TEXEL1 | MIVF_TEXEL2,mVertexCount,vtx,mIndexCount,(const unsigned int *)mIndexBuffer );
-
-                MEMALLOC_DELETE_ARRAY(MeshVertex,vtx);
-							}
-						}
-
-						MEMALLOC_FREE( mIndexBuffer);
-			      MEMALLOC_FREE( mVertexBuffer);
-
-						mIndexBuffer = 0;
-						mVertexBuffer = 0;
-						mIndexCount = 0;
-						mVertexCount = 0;
-						break;
-				}
-				break;
-			case TiXmlNode::COMMENT:
-				Display(depth,"Node(COMMENT): %s\n", value);
-				break;
-			case TiXmlNode::DECLARATION:
-				Display(depth,"Node(DECLARATION): %s\n", value);
-				break;
-			case TiXmlNode::UNKNOWN:
-				Display(depth,"Node(UNKNOWN): %s\n", value);
-				break;
-			default:
-				Display(depth,"Node(?????): %s\n", value);
-				break;
+  				MEMALLOC_FREE( mIndexBuffer);
+  				mIndexBuffer = 0;
+  				mIndexCount = 0;
+  				break;
+  		}
 		}
 	}
 
-	void ProcessAttribute(int         /* ntype */,          // enumerated type of the node
-												const char * /* nvalue */, // The node value / key
-												int         depth,          // how deeply nested we are in the XML hierachy
-												const char *aname,  // the name of the attribute
+	void ProcessAttribute(const char *aname,  // the name of the attribute
 												const char *savalue) // the value of the attribute
 	{
-		char avalue[43];
-
-		avalue[39] = '.';
-		avalue[40] = '.';
-		avalue[41] = '.';
-		avalue[42] = 0;
-
-		strncpy(avalue,savalue,39);
-		Display(depth,"  ### Attribute(%s,%s)\n", aname, avalue );
-
 		AttributeType attrib = (AttributeType) mToAttribute.Get(aname);
 		switch ( attrib )
 		{
+      case AT_NONE:
+        assert(0);
+        break;
+      case AT_MESH_SYSTEM_VERSION:
+        mMeshSystemVersion = atoi(savalue);
+        break;
+      case AT_MESH_SYSTEM_ASSET_VERSION:
+        mMeshSystemAssetVersion = atoi(savalue);
+        break;
+      case AT_ASSET_NAME:
+        mAssetName = mStrings.Get(savalue);
+        break;
+      case AT_ASSET_INFO:
+        mAssetInfo = mStrings.Get(savalue);
+        break;
 			case AT_POSITION:
 				if ( mType == NT_BONE && mBone )
 				{
 					Asc2Bin(savalue,1,"fff", mBone->mPosition );
-					mBone->ComposeTransform();
 					mBoneIndex++;
 
 					if ( mBoneIndex == mSkeleton->GetBoneCount() )
@@ -712,7 +879,9 @@ public:
 					Asc2Bin(savalue,1,"ffff", mBone->mOrientation );
 				}
 				break;
-
+      case AT_HAS_SCALE:
+        mHasScale = getBool(savalue);
+        break;
 			case AT_DURATION:
 				mDuration = savalue;
 				break;
@@ -728,12 +897,48 @@ public:
 			case AT_FRAME_COUNT:
 				mFrameCount = savalue;
 				break;
+      case AT_INFO:
+        switch ( mType )
+        {
+          case NT_MESH_COLLISION_REPRESENTATION:
+            assert(mMeshCollisionRepresentation);
+            if ( mMeshCollisionRepresentation )
+            {
+              mMeshCollisionRepresentation->mInfo = mStrings.Get(savalue).Get();
+            }
+            break;
+        }
+        break;
+      case AT_TRANSFORM:
+        if (mType == NT_MESH_COLLISION )
+        {
+          assert( mMeshCollision );
+          if ( mMeshCollision )
+          {
+            Asc2Bin(savalue,4,"ffff", mMeshCollision->mTransform );
+          }
+        }
+        break;
 
 			case AT_NAME:
 				mName = savalue;
 
 				switch ( mType )
 				{
+          case NT_MESH_COLLISION:
+            assert( mMeshCollision );
+            if ( mMeshCollision )
+            {
+              mMeshCollision->mName = mStrings.Get(savalue).Get();
+            }
+            break;
+          case NT_MESH_COLLISION_REPRESENTATION:
+            assert(mMeshCollisionRepresentation);
+            if ( mMeshCollisionRepresentation )
+            {
+              mMeshCollisionRepresentation->mName = mStrings.Get(savalue).Get();
+            }
+            break;
 					case NT_MESH:
             mCurrentMesh = mStrings.Get(savalue);
             mCallback->importMesh(savalue,0);
@@ -741,17 +946,20 @@ public:
 					case NT_SKELETON:
 						if ( mSkeleton )
 						{
-							mSkeleton->SetName(savalue);
+							mSkeleton->SetName(mStrings.Get(savalue).Get());
 						}
 						break;
 					case NT_BONE:
 						if ( mBone )
 						{
-							mBone->SetName(savalue);
+							mBone->SetName(mStrings.Get(savalue).Get());
 						}
 						break;
 				}
 				break;
+      case AT_TRIANGLE_COUNT:
+        mCount = savalue;
+        break;
 			case AT_COUNT:
 				mCount = savalue;
 				if ( mType == NT_SKELETON )
@@ -801,19 +1009,23 @@ public:
 
 	}
 
-	void Display(int /* depth */,const char * /* fmt */,...)
-	{
-#if DEBUG_LOG
-		for (int i=0; i<depth; i++)
-		{
-			SEND_TEXT_MESSAGE(0,"  ");
-		}
-		char wbuff[8192];
-		vsnprintf(wbuff, 8191, fmt, (char *)(&fmt+1));
-		SEND_TEXT_MESSAGE(0,"%s", wbuff);
-#endif
-	}
-
+  virtual bool processElement(const char *elementName,         // name of the element
+                              int         argc,                // number of attributes
+                              const char **argv,               // list of attributes.
+                              const char  *elementData,        // element data, null if none
+                              int         lineno)         // line number in the source XML file
+  {
+    ProcessNode(elementName);
+    int acount = argc/2;
+    for (int i=0; i<acount; i++)
+    {
+      const char *key = argv[i*2];
+      const char *value = argv[i*2+1];
+      ProcessAttribute(key,value);
+    }
+    ProcessData(elementData);
+    return true;
+  }
 
 
 
@@ -821,9 +1033,14 @@ public:
 private:
   MeshImportInterface     *mCallback;
 
+  bool                   mHasScale;
+
 	StringTableInt         mToElement;         // convert string to element enumeration.
 	StringTableInt         mToAttribute;       // convert string to attribute enumeration
 	NodeType               mType;
+
+  InPlaceParser mParser1;
+  InPlaceParser mParser2;
 
 	const char * mName;
 	const char * mCount;
@@ -848,9 +1065,22 @@ private:
 	void       * mVertexBuffer;
 	void       * mIndexBuffer;
 
+  int          mMeshSystemVersion;
+  int          mMeshSystemAssetVersion;
+
   StringRef    mCurrentMesh;
   StringRef    mCurrentMaterial;
   StringDict   mStrings;
+  StringRef    mAssetName;
+  StringRef    mAssetInfo;
+
+  unsigned int mVertexFlags;
+  MeshVertex  *mVertices;
+
+  StringRef                    mCollisionRepName;
+  MeshCollisionRepresentation *mMeshCollisionRepresentation;
+  MeshCollision               *mMeshCollision;
+  MeshCollisionConvex         *mMeshCollisionConvex;
 
 
 };

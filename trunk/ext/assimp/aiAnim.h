@@ -39,7 +39,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ---------------------------------------------------------------------------
 */
 
-/** @file Defines the data structures in which the imported animations are returned. */
+/** @file aiAnim.h
+ *  @brief Defines the data structures in which the imported animations
+ *  are returned.
+ */
 #ifndef AI_ANIM_H_INC
 #define AI_ANIM_H_INC
 
@@ -50,112 +53,241 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 extern "C" {
 #endif
 
+// ---------------------------------------------------------------------------
 /** A time-value pair specifying a certain 3D vector for the given time. */
 struct aiVectorKey
 {
 	double mTime;      ///< The time of this key
 	C_STRUCT aiVector3D mValue; ///< The value of this key
+
+#ifdef __cplusplus
+
+	// time is not compared
+	bool operator == (const aiVectorKey& o) const
+		{return o.mValue == this->mValue;}
+
+	bool operator != (const aiVectorKey& o) const
+		{return o.mValue != this->mValue;}
+
+
+
+	// Only time is compared. This operator is defined
+	// for use with std::sort
+	bool operator < (const aiVectorKey& o) const
+		{return mTime < o.mTime;}
+
+	bool operator > (const aiVectorKey& o) const
+		{return mTime > o.mTime;}
+
+
+#endif
 };
 
-/** A time-value pair specifying a rotation for the given time. For joint animations
- * the rotation is usually expressed using a quaternion.
+
+// ---------------------------------------------------------------------------
+/** A time-value pair specifying a rotation for the given time. For joint 
+ *  animations the rotation is usually expressed using a quaternion.
  */
 struct aiQuatKey
 {
 	double mTime;      ///< The time of this key
 	C_STRUCT aiQuaternion mValue; ///< The value of this key
+
+#ifdef __cplusplus
+
+	// time is not compared
+	bool operator == (const aiQuatKey& o) const
+		{return o.mValue == this->mValue;}
+
+	bool operator != (const aiQuatKey& o) const
+		{return o.mValue != this->mValue;}
+
+
+	// Only time is compared. This operator is defined
+	// for use with std::sort
+	bool operator < (const aiQuatKey& o) const
+		{return mTime < o.mTime;}
+
+	bool operator > (const aiQuatKey& o) const
+		{return mTime < o.mTime;}
+
+
+#endif
 };
 
-/** Describes the animation of a single node. The name specifies the bone/node which is affected by this
- * animation channel. The keyframes are given in three separate series of values, one each for
- * position, rotation and scaling.
- * <br>
- * NOTE: The name "BoneAnim" is misleading. This structure is also used to describe
- * the animation of regular nodes on the node graph. They needn't be nodes.
+// ---------------------------------------------------------------------------
+/** Defines how an animation channel behaves outside the defined time
+ *  range. This corresponds to aiNodeAnim::mPreState and 
+ *  aiNodeAnim::mPostState.
  */
-struct aiBoneAnim
+enum aiAnimBehaviour
 {
-	/** The name of the bone affected by this animation. */
-	C_STRUCT aiString mBoneName;
+	/** The value from the default node transformation is taken
+	 */
+	aiAnimBehaviour_DEFAULT  = 0x0,  
+
+	/** The nearest key value is used without interpolation
+	 */
+	aiAnimBehaviour_CONSTANT = 0x1,
+
+	/** The value of the nearest two keys is linearly
+	 *  extrapolated for the current time value.
+	 */
+	aiAnimBehaviour_LINEAR   = 0x2,
+
+	/** The animation is repeated.
+	 *
+	 *  If the animation key go from n to m and the current
+	 *  time is t, use the value at (t-n) % (|m-n|).
+	 */
+	aiAnimBehaviour_REPEAT   = 0x3,
+
+
+
+	/** This value is not used, it is just here to force the
+	 *  the compiler to map this enum to a 32 Bit integer 
+	 */
+	_aiAnimBehaviour_Force32Bit = 0x8fffffff
+};
+
+// ---------------------------------------------------------------------------
+/** Describes the animation of a single node. The name specifies the 
+ *  bone/node which is affected by this animation channel. The keyframes
+ *  are given in three separate series of values, one each for position, 
+ *  rotation and scaling. The transformation matrix computed from these
+ *  values replaces the node's original transformation matrix at a
+ *  specific time. The order in which the transformations are applied is
+ *  - as usual - scaling, rotation, translation.
+ *
+ *  @note All keys are returned in their correct, chronological order.
+ *  Duplicate keys don't pass the validation step. Most likely there
+ *  will be no negative time keys, but they are not forbidden ...
+ */
+struct aiNodeAnim
+{
+	/** The name of the node affected by this animation. The node 
+	 *  must exist and it must be unique.
+	 */
+	C_STRUCT aiString mNodeName;
 
 	/** The number of position keys */
 	unsigned int mNumPositionKeys;
-	/** The position keys of this animation channel. Positions are specified as 3D vector. 
-	* The array is mNumPositionKeys in size.
-	*/
+
+	/** The position keys of this animation channel. Positions are 
+	 * specified as 3D vector. The array is mNumPositionKeys in size.
+	 *
+	 * If there are position keys, there will also be at least one
+	 * scaling and one rotation key.
+	 */
 	C_STRUCT aiVectorKey* mPositionKeys;
 
 	/** The number of rotation keys */
 	unsigned int mNumRotationKeys;
-	/** The rotation keys of this animation channel. Rotations are given as quaternions, 
-	* which are 4D vectors. The array is mNumRotationKeys in size.
-	*/
+
+	/** The rotation keys of this animation channel. Rotations are 
+	 *  given as quaternions,  which are 4D vectors. The array is 
+	 *  mNumRotationKeys in size.
+	 *
+	 * If there are rotation keys, there will also be at least one
+	 * scaling and one position key.
+	 */
 	C_STRUCT aiQuatKey* mRotationKeys;
+
 
 	/** The number of scaling keys */
 	unsigned int mNumScalingKeys;
-	/** The scaling keys of this animation channel. Scalings are specified as 3D vector. 
-	* The array is mNumScalingKeys in size.
-	*/
+
+	/** The scaling keys of this animation channel. Scalings are 
+	 *  specified as 3D vector. The array is mNumScalingKeys in size.
+	 *
+	 * If there are scaling keys, there will also be at least one
+	 * position and one rotation key.
+	 */
 	C_STRUCT aiVectorKey* mScalingKeys;
 
+
+	/** Defines how the animation behaves before the first
+	 *  key is encountered.
+	 *
+	 *  The default value is aiAnimBehaviour_DEFAULT (the original
+	 *  transformation matrix of the affected node is used).
+	 */
+	C_ENUM aiAnimBehaviour mPreState;
+
+	/** Defines how the animation behaves after the last 
+	 *  key was processed.
+	 *
+	 *  The default value is aiAnimBehaviour_DEFAULT (the original
+	 *  transformation matrix of the affected node is taken).
+	 */
+	C_ENUM aiAnimBehaviour mPostState;
+
 #ifdef __cplusplus
-	aiBoneAnim()
+	aiNodeAnim()
 	{
 		mNumPositionKeys = 0; mPositionKeys = NULL; 
 		mNumRotationKeys= 0; mRotationKeys = NULL; 
 		mNumScalingKeys = 0; mScalingKeys = NULL; 
+
+		mPreState = mPostState = aiAnimBehaviour_DEFAULT;
 	}
 
-	~aiBoneAnim()
+	~aiNodeAnim()
 	{
-		if (mNumPositionKeys)
-			delete [] mPositionKeys;
-		if (mNumRotationKeys)
-			delete [] mRotationKeys;
-		if (mNumScalingKeys)
-			delete [] mScalingKeys;
+		delete [] mPositionKeys;
+		delete [] mRotationKeys;
+		delete [] mScalingKeys;
 	}
 #endif // __cplusplus
 };
 
-/** An animation consists of keyframe data for a number of bones. For each bone affected by the animation
- * a separate series of data is given.
+// ---------------------------------------------------------------------------
+/** An animation consists of keyframe data for a number of nodes. For 
+ *  each node affected by the animation a separate series of data is given.
  */
 struct aiAnimation
 {
-	/** The name of the animation. If the modelling package this data was exported from does support 
-	* only a single animation channel, this name is usually empty (length is zero).
-	*/
+	/** The name of the animation. If the modeling package this data was 
+	 *  exported from does support only a single animation channel, this 
+	 *  name is usually empty (length is zero).
+	 */
 	C_STRUCT aiString mName;
 
-	/** Duration of the animation in ticks. */
+	/** Duration of the animation in ticks. 
+	 */
 	double mDuration;
-	/** Ticks per second. 0 if not specified in the imported file */
+
+	/** Ticks per second. 0 if not specified in the imported file 
+	 */
 	double mTicksPerSecond;
 
-	/** The number of bone animation channels. Each channel affects a single bone. */
-	unsigned int mNumBones;
-	/** The bone animation channels. Each channel affects a single bone. The array
-	* is mNumBones in size.
-	*/
-	C_STRUCT aiBoneAnim** mBones;
+	/** The number of bone animation channels. Each channel affects
+	 *  a single node.
+	 */
+	unsigned int mNumChannels;
+
+	/** The node animation channels. Each channel affects a single node. 
+	 *  The array is mNumChannels in size.
+	 */
+	C_STRUCT aiNodeAnim** mChannels;
 
 #ifdef __cplusplus
 	aiAnimation()
 	{
-		mDuration = 0;
+		mDuration = -1.;
 		mTicksPerSecond = 0;
-		mNumBones = 0; mBones = NULL;
+		mNumChannels = 0; mChannels = NULL;
 	}
 
 	~aiAnimation()
 	{
-		if (mNumBones)
+		// DO NOT REMOVE THIS ADDITIONAL CHECK
+		if (mNumChannels && mChannels)
 		{
-			for( unsigned int a = 0; a < mNumBones; a++)
-				delete mBones[a];
-			delete [] mBones;
+			for( unsigned int a = 0; a < mNumChannels; a++)
+				delete mChannels[a];
+
+		delete [] mChannels;
 		}
 	}
 #endif // __cplusplus
