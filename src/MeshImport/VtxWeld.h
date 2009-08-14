@@ -2,6 +2,8 @@
 
 #define VFX_WELD_H
 
+#include "UserMemAlloc.h"
+
 /*!
 **
 ** Copyright (c) 2007 by John W. Ratcliff mailto:jratcliff@infiniplex.net
@@ -60,8 +62,8 @@
 #include <set>
 #include <vector>
 
-#include "common/snippets/UserMemAlloc.h"
-#include "MeshImport/MeshImport.h"
+#include "UserMemAlloc.h"
+#include "MeshImport.h"
 
 namespace MESHIMPORT
 {
@@ -71,7 +73,7 @@ template <class Type> class VertexLess
 public:
 	typedef USER_STL::vector< Type > VertexVector;
 
-	bool operator()(HeI32 v1,HeI32 v2) const;
+	bool operator()(NxI32 v1,NxI32 v2) const;
 
 	static void SetSearch(const Type& match,VertexVector *list)
 	{
@@ -80,7 +82,7 @@ public:
 	};
 
 private:
-	const Type& Get(HeI32 index) const
+	const Type& Get(NxI32 index) const
 	{
 		if ( index == -1 ) return mFind;
 		VertexVector &vlist = *mList;
@@ -94,13 +96,13 @@ template <class Type> class VertexPool
 {
 public:
 #if HE_USE_MEMORY_TRACKING
-  typedef USER_STL::set<HeI32, USER_STL::GlobalMemoryPool, VertexLess<Type> > VertexSet;
+  typedef USER_STL::set<NxI32, USER_STL::GlobalMemoryPool, VertexLess<Type> > VertexSet;
 #else
-  typedef USER_STL::set<HeI32, VertexLess<Type> > VertexSet;
+  typedef USER_STL::set<NxI32, VertexLess<Type> > VertexSet;
 #endif
 	typedef USER_STL::vector< Type > VertexVector;
 
-	HeI32 GetVertex(const Type& vtx)
+	NxI32 GetVertex(const Type& vtx)
 	{
 		VertexLess<Type>::SetSearch(vtx,&mVtxs);
 		typename VertexSet::iterator found;
@@ -109,30 +111,30 @@ public:
 		{
 			return *found;
 		}
-		HeI32 idx = (HeI32)mVtxs.size();
+		NxI32 idx = (NxI32)mVtxs.size();
 		mVtxs.push_back( vtx );
 		mVertSet.insert( idx );
 		return idx;
 	};
 
-	void GetPos(HeI32 idx,float pos[3]) const
+	void GetPos(NxI32 idx,NxF32 pos[3]) const
 	{
 		pos[0] = mVtxs[idx].mPos[0];
     pos[1] = mVtxs[idx].mPos[1];
     pos[2] = mVtxs[idx].mPos[2];
 	}
 
-	const Type& Get(HeI32 idx) const
+	const Type& Get(NxI32 idx) const
 	{
 		return mVtxs[idx];
 	};
 
-	HeI32 GetSize(void) const
+	NxI32 GetSize(void) const
 	{
-		return (HeI32)mVtxs.size();
+		return (NxI32)mVtxs.size();
 	};
 
-	void Clear(HeI32 reservesize)  // clear the vertice pool.
+	void Clear(NxI32 reservesize)  // clear the vertice pool.
 	{
 		mVertSet.clear();
 		mVtxs.clear();
@@ -146,12 +148,12 @@ public:
 		mVtxs.push_back(vtx);
 	}
 
-	HeI32 GetVertexCount(void) const
+	NxI32 GetVertexCount(void) const
 	{
-		return (HeI32)mVtxs.size();
+		return (NxI32)mVtxs.size();
 	};
 
-	bool GetVertex(HeI32 i,float vect[3]) const
+	bool GetVertex(NxI32 i,NxF32 vect[3]) const
 	{
 		vect[0] = mVtxs[i].mPos[0];
     vect[1] = mVtxs[i].mPos[1];

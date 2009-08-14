@@ -2,11 +2,8 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="8.00"
-	Name="MeshImportPsk"
-	ProjectGUID="{365282D5-8212-907C-DC34-15FF964683A6}"
-	SccProjectName="Perforce Project"
-	SccLocalPath="."
-	SccProvider="MSCCI:Perforce SCM"
+	Name="MeshImportPSK"
+	ProjectGUID="{F65A6A6D-8257-C5DA-9620-9730FA78E23E}"
 	>
 	<Platforms>
 		<Platform
@@ -42,8 +39,8 @@
 				Name="VCCLCompilerTool"
 				AdditionalOptions="/WX /W4 /fp:fast /MDd /Zi "
 				Optimization="4"
-				AdditionalIncludeDirectories="&quot;../../ext/deja_insight&quot;;&quot;../../include&quot;;&quot;../../include/common/snippets&quot;;&quot;../../include/common/binding&quot;;&quot;../../include/common/MemoryServices&quot;;"
-				PreprocessorDefinitions="WIN32;_WINDOWS;UNICODE=1;_UNICODE=1;MESHIMPORTPSK_EXPORTS;_DEBUG;"
+				AdditionalIncludeDirectories="&quot;../../include/common/snippets&quot;;&quot;../../include/MeshImport&quot;;&quot;../../include&quot;;"
+				PreprocessorDefinitions="WIN32;_WINDOWS;UNICODE=1;_UNICODE=1;MESHIMPORTOGRE_EXPORTS;_DEBUG;"
 				ExceptionHandling="1"
 				WarningLevel="3"
 			/>
@@ -60,11 +57,11 @@
 				Name="VCLinkerTool"
 				AdditionalOptions="/NODEFAULTLIB:libcp.lib /DEBUG "
 				AdditionalDependencies=""
-				OutputFile="$(OutDir)/MeshImportPsk.dll"
-				AdditionalLibraryDirectories="&quot;../../lib/win32&quot;;&quot;../../ext/deja_insight/lib/win32&quot;;"
-				ProgramDatabaseFile="$(OutDir)/MeshImportPsk.dll.pdb"
+				OutputFile="$(OutDir)/MeshImportPSK.dll"
+				AdditionalLibraryDirectories="&quot;../../lib/win32&quot;;"
+				ProgramDatabaseFile="$(OutDir)/MeshImportPSK.dll.pdb"
 				GenerateMapFile="true"
-				MapFileName="$(OutDir)/MeshImportPsk.dll.map"
+				MapFileName="$(OutDir)/MeshImportPSK.dll.map"
 				SubSystem="1"
 				ImportLibrary="../../lib/win32/$(TargetName).lib"
 			/>
@@ -117,10 +114,10 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalOptions="/WX /W4 /fp:fast /O2 /MD /Zi "
+				AdditionalOptions="/Zi /WX /W4 /fp:fast /WX /MD /O2 "
 				Optimization="4"
-				AdditionalIncludeDirectories="&quot;../../ext/deja_insight&quot;;&quot;../../include&quot;;&quot;../../include/common/snippets&quot;;&quot;../../include/common/binding&quot;;&quot;../../include/common/MemoryServices&quot;;"
-				PreprocessorDefinitions="WIN32;_WINDOWS;UNICODE=1;_UNICODE=1;MESHIMPORTPSK_EXPORTS;NDEBUG;"
+				AdditionalIncludeDirectories="&quot;../../include/common/snippets&quot;;&quot;../../include/MeshImport&quot;;&quot;../../include&quot;;"
+				PreprocessorDefinitions="WIN32;_WINDOWS;UNICODE=1;_UNICODE=1;MESHIMPORTOGRE_EXPORTS;NDEBUG;"
 				ExceptionHandling="1"
 				WarningLevel="3"
 			/>
@@ -137,11 +134,11 @@
 				Name="VCLinkerTool"
 				AdditionalOptions="/NODEFAULTLIB:libcp.lib /DEBUG "
 				AdditionalDependencies=""
-				OutputFile="$(OutDir)/MeshImportPsk.dll"
-				AdditionalLibraryDirectories="&quot;../../lib/win32&quot;;&quot;../../ext/deja_insight/lib/win32&quot;;"
-				ProgramDatabaseFile="$(OutDir)/MeshImportPsk.dll.pdb"
+				OutputFile="$(OutDir)/MeshImportPSK.dll"
+				AdditionalLibraryDirectories="&quot;../../lib/win32&quot;;"
+				ProgramDatabaseFile="$(OutDir)/MeshImportPSK.dll.pdb"
 				GenerateMapFile="true"
-				MapFileName="$(OutDir)/MeshImportPsk.dll.map"
+				MapFileName="$(OutDir)/MeshImportPSK.dll.map"
 				SubSystem="1"
 				ImportLibrary="../../lib/win32/$(TargetName).lib"
 			/>
@@ -178,30 +175,206 @@
 			Name="Source Files"
 			>
 			<File
-				RelativePath="..\..\src\MeshImportPsk\MeshImportPsk.cpp"
+				RelativePath="..\..\src\MeshImportPSK\ImportPSK.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\MeshImportPSK\MeshImportPSK.cpp"
 				>
 			</File>
 		</Filter>
 		<Filter
-			Name="Public Header Files"
+			Name="Header Files"
 			>
 			<File
-				RelativePath="..\..\include\MeshImportPsk\MeshImportPsk.h"
+				RelativePath="..\..\src\MeshImportPSK\ImportPSK.h"
 				>
 			</File>
+		</Filter>
+		<Filter
+			Name="Plugin Header Files"
+			>
+			<Filter
+				Name="MeshImport"
+				>
+				<File
+					RelativePath="..\..\include\MeshImport\MeshImport.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\include\MeshImport\MeshSystem.h"
+					>
+				</File>
+			</Filter>
 		</Filter>
 		<Filter
 			Name="Common Include-Binding Files"
 			>
 			<Filter
-				Name="MemoryServices"
+				Name="snippets"
 				>
 				<File
-					RelativePath="..\..\include\common\MemoryServices\MemoryContainer.cpp"
+					RelativePath="..\..\include\common\snippets\FloatMath.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\..\include\common\MemoryServices\MemoryContainer.h"
+					RelativePath="..\..\include\common\snippets\FloatMath.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\include\common\snippets\FloatMath.inl"
+					>
+				</File>
+				<File
+					RelativePath="..\..\include\common\snippets\inparser.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\include\common\snippets\inparser.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\include\common\snippets\Nx.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\include\common\snippets\Nx12F32.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\include\common\snippets\Nx16F32.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\include\common\snippets\Nx9F32.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\include\common\snippets\NxAssert.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\include\common\snippets\NxBitField.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\include\common\snippets\NxBounds3.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\include\common\snippets\NxBox.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\include\common\snippets\NxCapsule.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\include\common\snippets\Nxf.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\include\common\snippets\NxFoundation.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\include\common\snippets\NxI16Vec3.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\include\common\snippets\NxMat33.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\include\common\snippets\NxMat34.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\include\common\snippets\nxmat44.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\include\common\snippets\NxMath.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\include\common\snippets\NxPlane.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\include\common\snippets\NxPool.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\include\common\snippets\NxProfiler.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\include\common\snippets\NxQuat.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\include\common\snippets\NxQuickSort.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\include\common\snippets\NxRay.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\include\common\snippets\NxSegment.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\include\common\snippets\NxSimpleTriangleMesh.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\include\common\snippets\NxSimpleTypes.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\include\common\snippets\NxSphere.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\include\common\snippets\NxStream.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\include\common\snippets\NxUtilities.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\include\common\snippets\NxVec3.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\include\common\snippets\NxVec4.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\include\common\snippets\NxVolumeIntegration.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\include\common\snippets\sutil.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\include\common\snippets\sutil.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\include\common\snippets\SystemServices.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\include\common\snippets\SystemServices.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\include\common\snippets\UserMemAlloc.h"
 					>
 				</File>
 			</Filter>

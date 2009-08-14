@@ -6,6 +6,7 @@
 #include "MeshImport.h"
 
 MESHIMPORT::MeshImport *gMeshImport=0; // This is an optional global variable that can be used by the application.  If the application uses it, it should define it somewhere in its codespace.
+MESHIMPORT::CommLayer *gCommLayer=0;
 
 #pragma warning(disable:4996)
 
@@ -18,7 +19,7 @@ MESHIMPORT::MeshImport *gMeshImport=0; // This is an optional global variable th
 #include <windows.h>
 #include <windowsx.h>
 
-void *getBindingInterface(const char *dll,int version_number,SYSTEM_SERVICES::SystemServices *services) // loads the tetra maker DLL and returns the interface pointer.
+void *getBindingInterface(const char *dll,NxI32 version_number,SYSTEM_SERVICES::SystemServices *services) // loads the tetra maker DLL and returns the interface pointer.
 {
   void *ret = 0;
 
@@ -32,7 +33,7 @@ void *getBindingInterface(const char *dll,int version_number,SYSTEM_SERVICES::Sy
     void *proc = GetProcAddress(module,"getInterface");
     if ( proc )
     {
-      typedef void * (__cdecl * NX_GetToolkit)(int version,SYSTEM_SERVICES::SystemServices *services);
+      typedef void * (__cdecl * NX_GetToolkit)(NxI32 version,SYSTEM_SERVICES::SystemServices *services);
       ret = ((NX_GetToolkit)proc)(version_number,services);
     }
   }
@@ -150,7 +151,7 @@ private:
 #ifdef WIN32
   WIN32_FIND_DATAA finddata;
   HANDLE hFindNext;
-  int bFound;
+  NxI32 bFound;
 #endif
 #ifdef LINUX_GENERIC
   DIR      *mDir;

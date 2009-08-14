@@ -130,7 +130,7 @@ public:
 
 	bool SamePrefix(const char *prefix) const
 	{
-		unsigned int len = (unsigned int)strlen(prefix);
+		NxU32 len = (NxU32)strlen(prefix);
 		if ( len && strncmp(mString,prefix,len) == 0 ) return true;
 		return false;
 	}
@@ -139,8 +139,8 @@ public:
 	{
 		const char *source = mString;
 		const char *suffix = suf.mString;
-		unsigned int len1 = (unsigned int)strlen(source);
-		unsigned int len2 = (unsigned int)strlen(suffix);
+		NxU32 len1 = (NxU32)strlen(source);
+		NxU32 len2 = (NxU32)strlen(suffix);
 		if ( len1 < len2 ) return false;
 		const char *compare = &source[(len1-len2)];
 		if ( strcmp(compare,suffix) == 0 ) return true;
@@ -162,13 +162,6 @@ public:
 	~StringDict(void)
 	{
 	}
-
-  StringRef Get(const wchar_t *text)
-  {
-    char scratch[512];
-  	wcstombs(scratch,text,512);
-    return Get(scratch);
-  }
 
 	StringRef Get(const char *text)
 	{
@@ -221,15 +214,6 @@ inline StringRef SGET(const char *foo)
 	return gStringDict->Get(foo);
 }
 
-inline StringRef WSGET(const wchar_t *foo)
-{
-	if ( !gStringDict )
-	{
-		gStringDict = MEMALLOC_NEW(StringDict);
-	}
-	return gStringDict->Get(foo);
-}
-
 inline StringRef::StringRef(const char *str)
 {
 	StringRef ref = SGET(str);
@@ -251,7 +235,7 @@ class StringSortRef
 	 {
 		 const char *str1 = a.Get();
 		 const char *str2 = b.Get();
-		 int r = stricmp(str1,str2);
+		 NxI32 r = stricmp(str1,str2);
 		 return r < 0;
 	 }
 };

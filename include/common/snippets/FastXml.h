@@ -2,6 +2,8 @@
 
 #define FAST_XML_H
 
+#include "UserMemAlloc.h"
+
 /*!
 **
 ** Copyright (c) 2009 by John W. Ratcliff mailto:jratcliff@infiniplex.net
@@ -65,18 +67,19 @@ public:
 
   // return true to continue processing the XML document, false to skip.
   virtual bool processElement(const char *elementName,         // name of the element
-                              int         argc,                // number of attributes
+                              NxI32         argc,                // number of attributes
                               const char **argv,               // list of attributes.
                               const char  *elementData,        // element data, null if none
-                              int         lineno) = 0;         // line number in the source XML file
+                              NxI32         lineno) = 0;         // line number in the source XML file
 
 };
 
 class FastXml
 {
 public:
-  virtual bool processXml(const char *inputData,unsigned int dataLen,FastXmlInterface *iface) = 0;
-  virtual const char * getError(int &lineno) = 0; // report the reason for a parsing error, and the line number where it occurred.
+  virtual bool processXml(const char *inputData,NxU32 dataLen,FastXmlInterface *iface) = 0;
+  virtual bool processXmlFile(const char* filename, FastXmlInterface* iface) = 0;
+  virtual const char * getError(NxI32 &lineno) = 0; // report the reason for a parsing error, and the line number where it occurred.
 };
 
 FastXml * createFastXml(void);

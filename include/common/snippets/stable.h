@@ -79,7 +79,7 @@ class CharPtrLess
 public:
 	bool operator()(const char *v1,const char *v2) const
 	{
-		int v = strcmp(v1,v2);
+		NxI32 v = strcmp(v1,v2);
 		if ( v < 0 ) return true;
 		return false;
 	};
@@ -116,7 +116,7 @@ public:
 		  CharPtrSet::iterator found;
 		  found = mStrings.find( str );
 		  if ( found != mStrings.end() ) return (*found);
-		  unsigned int l = (unsigned int)strlen(str);
+		  NxU32 l = (NxU32)strlen(str);
 		  char *mem = (char *) MEMALLOC_MALLOC(sizeof(char)*(l+1));
 		  strcpy(mem,str);
 		  mStrings.insert( mem );
@@ -135,7 +135,7 @@ public:
 			return (*found);
 		}
 		first = true;
-		unsigned int l = (unsigned int)strlen(str);
+		NxU32 l = (NxU32)strlen(str);
 		char *mem = (char *) MEMALLOC_MALLOC(sizeof(char)*(l+1));
 		strcpy(mem,str);
 		mStrings.insert( mem );
@@ -153,7 +153,7 @@ class CharPtrInt
 {
 public:
 	const char *mString;
-	unsigned int      mId;
+	NxU32      mId;
 };
 
 class CharPtrIntLess1
@@ -161,7 +161,7 @@ class CharPtrIntLess1
 public:
 	bool operator()(const CharPtrInt &v1,const CharPtrInt &v2) const
 	{
-		int v = strcmp(v1.mString,v2.mString);
+		NxI32 v = strcmp(v1.mString,v2.mString);
 		if ( v < 0 ) return true;
 		return false;
 	};
@@ -172,7 +172,7 @@ class CharPtrIntLess2
 public:
 	bool operator()(const CharPtrInt &v1,const CharPtrInt &v2) const
 	{
-		int v = stricmp(v1.mString,v2.mString);
+		NxI32 v = stricmp(v1.mString,v2.mString);
 		if ( v < 0 ) return true;
 		return false;
 	};
@@ -194,9 +194,9 @@ public:
 		mCase = true;
 	}
 
-	unsigned int Get(const char *str) const
+	NxU32 Get(const char *str) const
 	{
-		unsigned int ret = 0;
+		NxU32 ret = 0;
 		if ( mCase )
 		{
 			CharPtrIntSet1::const_iterator found;
@@ -220,7 +220,7 @@ public:
 		return ret;
 	};
 
-	bool Get(const char *str,unsigned int &ret) const
+	bool Get(const char *str,NxU32 &ret) const
 	{
 		bool rfound = false;
 
@@ -253,7 +253,7 @@ public:
 		return rfound;
 	};
 
-	void Add(const char *foo,unsigned int id)
+	void Add(const char *foo,NxU32 id)
 	{
 		CharPtrInt cpi;
 		cpi.mString = foo;
@@ -264,7 +264,7 @@ public:
 			mStrings2.insert(cpi);
 	}
 
-	const char * Get(unsigned int id) const
+	const char * Get(NxU32 id) const
 	{
 		const char *ret = 0;
 		if ( mCase )

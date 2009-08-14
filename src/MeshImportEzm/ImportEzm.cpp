@@ -60,16 +60,16 @@
 #include <string.h>
 #include <assert.h>
 #include <stdarg.h>
-#include "common/snippets/UserMemAlloc.h"
-#include "MeshImport/MeshImport.h"
+#include "UserMemAlloc.h"
+#include "MeshImport.h"
 #include "ImportEZM.h"
-#include "common/snippets/SendTextMessage.h"
-#include "common/snippets/StringDict.h"
-#include "common/snippets/sutil.h"
-#include "common/snippets/stable.h"
-#include "common/snippets/asc2bin.h"
-#include "common/snippets/inparser.h"
-#include "common/snippets/FastXml.h"
+#include "SendTextMessage.h"
+#include "StringDict.h"
+#include "sutil.h"
+#include "stable.h"
+#include "asc2bin.h"
+#include "inparser.h"
+#include "FastXml.h"
 
 #pragma warning(disable:4100)
 #pragma warning(disable:4996)
@@ -232,38 +232,38 @@ public:
 
 	}
 
-  const unsigned char * getVertex(const unsigned char *src,MeshVertex &v,const char **types,int tcount)
+  const NxU8 * getVertex(const NxU8 *src,MeshVertex &v,const char **types,NxI32 tcount)
   {
     bool firstTexel =true;
 
-    for (int i=0; i<tcount; i++)
+    for (NxI32 i=0; i<tcount; i++)
     {
       const char *type = types[i];
       if ( stricmp(type,"position") == 0 )
       {
-        const float * scan = (const float *)src;
+        const NxF32 * scan = (const NxF32 *)src;
         v.mPos[0] = scan[0];
         v.mPos[1] = scan[1];
         v.mPos[2] = scan[2];
-        src+=sizeof(float)*3;
+        src+=sizeof(NxF32)*3;
       }
       else if ( stricmp(type,"normal") == 0 )
       {
-        const float * scan = (const float *)src;
+        const NxF32 * scan = (const NxF32 *)src;
         v.mNormal[0] = scan[0];
         v.mNormal[1] = scan[1];
         v.mNormal[2] = scan[2];
-        src+=sizeof(float)*3;
+        src+=sizeof(NxF32)*3;
       }
       else if ( stricmp(type,"color") == 0 )
       {
-        const unsigned int *scan = (const unsigned int *)src;
+        const NxU32 *scan = (const NxU32 *)src;
         v.mColor = scan[0];
-        src+=sizeof(unsigned int);
+        src+=sizeof(NxU32);
       }
       else if ( stricmp(type,"texcoord") == 0 || stricmp(type,"texcoord1") == 0 || stricmp(type,"texel1") == 0 )
       {
-        const float * scan = (const float *)src;
+        const NxF32 * scan = (const NxF32 *)src;
         if ( firstTexel )
         {
           v.mTexel1[0] = scan[0];
@@ -275,53 +275,53 @@ public:
           v.mTexel2[0] = scan[0];
           v.mTexel2[1] = scan[1];
         }
-        src+=sizeof(float)*2;
+        src+=sizeof(NxF32)*2;
       }
       else if ( stricmp(type,"texcoord2") == 0 || stricmp(type,"texel2") == 0 )
       {
-        const float * scan = (const float *)src;
+        const NxF32 * scan = (const NxF32 *)src;
         v.mTexel2[0] = scan[0];
         v.mTexel2[1] = scan[1];
-        src+=sizeof(float)*2;
+        src+=sizeof(NxF32)*2;
       }
       else if ( stricmp(type,"texcoord3") == 0 || stricmp(type,"texel3") == 0 )
       {
-        const float * scan = (const float *)src;
+        const NxF32 * scan = (const NxF32 *)src;
         v.mTexel3[0] = scan[0];
         v.mTexel3[1] = scan[1];
-        src+=sizeof(float)*2;
+        src+=sizeof(NxF32)*2;
       }
       else if ( stricmp(type,"texcoord4") == 0 || stricmp(type,"texel4") == 0 )
       {
-        const float * scan = (const float *)src;
+        const NxF32 * scan = (const NxF32 *)src;
         v.mTexel4[0] = scan[0];
         v.mTexel4[1] = scan[1];
-        src+=sizeof(float)*2;
+        src+=sizeof(NxF32)*2;
       }
       else if ( stricmp(type,"tangent") == 0 )
       {
-        const float * scan = (const float *)src;
+        const NxF32 * scan = (const NxF32 *)src;
         v.mTangent[0] = scan[0];
         v.mTangent[1] = scan[1];
         v.mTangent[2] = scan[2];
-        src+=sizeof(float)*3;
+        src+=sizeof(NxF32)*3;
       }
       else if ( stricmp(type,"binormal") == 0 )
       {
-        const float * scan = (const float *)src;
+        const NxF32 * scan = (const NxF32 *)src;
         v.mBiNormal[0] = scan[0];
         v.mBiNormal[1] = scan[1];
         v.mBiNormal[2] = scan[2];
-        src+=sizeof(float)*3;
+        src+=sizeof(NxF32)*3;
       }
       else if ( stricmp(type,"blendweights") == 0 || stricmp(type,"blendweighting") == 0 || stricmp(type,"boneweighting") == 0 )
       {
-        const float * scan = (const float *)src;
+        const NxF32 * scan = (const NxF32 *)src;
         v.mWeight[0] = scan[0];
         v.mWeight[1] = scan[1];
         v.mWeight[2] = scan[2];
         v.mWeight[3] = scan[3];
-        src+=sizeof(float)*4;
+        src+=sizeof(NxF32)*4;
       }
       else if ( stricmp(type,"blendindices") == 0 || stricmp(type,"blendindices") == 0 )
       {
@@ -355,9 +355,9 @@ public:
       }
       else if ( stricmp(type,"radius") == 0 )
       {
-        const float *scan = (const float *)src;
+        const NxF32 *scan = (const NxF32 *)src;
         v.mRadius = scan[0];
-        src+=sizeof(float);
+        src+=sizeof(NxF32);
       }
       else
       {
@@ -368,11 +368,11 @@ public:
     return src;
   }
 
-  unsigned int validateSemantics(const char **a1,const char **a2,int count)
+  NxU32 validateSemantics(const char **a1,const char **a2,NxI32 count)
   {
     bool ret = true;
 
-    for (int i=0; i<count; i++)
+    for (NxI32 i=0; i<count; i++)
     {
       const char *p = a1[i];
       const char *t = a2[i];
@@ -438,11 +438,11 @@ public:
       }
     }
 
-    unsigned int flags = 0;
+    NxU32 flags = 0;
 
     if ( ret )
     {
-      for (int i=0; i<count; i++)
+      for (NxI32 i=0; i<count; i++)
       {
         const char *t = a2[i];
 
@@ -478,17 +478,17 @@ public:
   }
 
 
-  virtual const char * getExtension(int index)  // report the default file name extension for this mesh type.
+  virtual const char * getExtension(NxI32 index)  // report the default file name extension for this mesh type.
   {
     return ".ezm";
   }
 
-  virtual const char * getDescription(int index)
+  virtual const char * getDescription(NxI32 index)
   {
     return "PhysX Rocket EZ-Mesh format";
   }
 
-  virtual bool  importMesh(const char *meshName,const void *data,unsigned int dlen,MeshImportInterface *callback,const char *options,MeshImportApplicationResource *appResource)
+  virtual bool  importMesh(const char *meshName,const void *data,NxU32 dlen,MeshImportInterface *callback,const char *options,MeshImportApplicationResource *appResource)
   {
     bool ret = false;
 
@@ -506,7 +506,7 @@ public:
   		if ( mAnimation )
   		{
   			mCallback->importAnimation(*mAnimation);
-        for (int i=0; i<mAnimation->mTrackCount; i++)
+        for (NxI32 i=0; i<mAnimation->mTrackCount; i++)
         {
           MeshAnimTrack *t = mAnimation->mTracks[i];
           MEMALLOC_DELETE_ARRAY(MeshAnimPose,t->mPose);
@@ -585,10 +585,10 @@ public:
 				{
 					if ( mName && mFrameCount && mDuration && mTrackCount && mDtime )
 					{
-						int framecount = atoi( mFrameCount );
-						float duration = (float) atof( mDuration );
-						int trackcount = atoi(mTrackCount);
-						float dtime = (float) atof(mDtime);
+						NxI32 framecount = atoi( mFrameCount );
+						NxF32 duration = (NxF32) atof( mDuration );
+						NxI32 trackcount = atoi(mTrackCount);
+						NxF32 dtime = (NxF32) atof(mDtime);
 						if ( trackcount >= 1 && framecount >= 1 )
 						{
 							mAnimation = MEMALLOC_NEW(MeshAnimation);
@@ -598,7 +598,7 @@ public:
                   mAnimation->mDuration = duration;
                   mAnimation->mDtime = dtime;
                   mAnimation->mTracks = MEMALLOC_NEW_ARRAY(MeshAnimTrack *,mAnimation->mTrackCount)[mAnimation->mTrackCount];
-                  for (int i=0; i<mAnimation->mTrackCount; i++)
+                  for (NxI32 i=0; i<mAnimation->mTrackCount; i++)
                   {
                     MeshAnimTrack *track = MEMALLOC_NEW(MeshAnimTrack);
                     track->mDtime = mAnimation->mDuration;
@@ -639,17 +639,17 @@ public:
   				if ( mAnimTrack )
   				{
   					mAnimTrack->SetName(mStrings.Get(mName).Get());
-  					int count = atoi( mCount );
+  					NxI32 count = atoi( mCount );
   					if ( count == mAnimTrack->GetFrameCount() )
   					{
                 if ( mHasScale )
                 {
-  								float *buff = (float *) MEMALLOC_MALLOC(sizeof(float)*10*count);
+  								NxF32 *buff = (NxF32 *) MEMALLOC_MALLOC(sizeof(NxF32)*10*count);
   								Asc2Bin(svalue, count, "fff ffff fff", buff );
-  								for (int i=0; i<count; i++)
+  								for (NxI32 i=0; i<count; i++)
   								{
   									MeshAnimPose *p = mAnimTrack->GetPose(i);
-  									const float *src = &buff[i*10];
+  									const NxF32 *src = &buff[i*10];
 
   									p->mPos[0]  = src[0];
   									p->mPos[1]  = src[1];
@@ -667,12 +667,12 @@ public:
                 }
                 else
                 {
-  								float *buff = (float *) MEMALLOC_MALLOC(sizeof(float)*7*count);
+  								NxF32 *buff = (NxF32 *) MEMALLOC_MALLOC(sizeof(NxF32)*7*count);
   								Asc2Bin(svalue, count, "fff ffff", buff );
-  								for (int i=0; i<count; i++)
+  								for (NxI32 i=0; i<count; i++)
   								{
   									MeshAnimPose *p = mAnimTrack->GetPose(i);
-  									const float *src = &buff[i*7];
+  									const NxF32 *src = &buff[i*7];
 
   									p->mPos[0]  = src[0];
   									p->mPos[1]  = src[1];
@@ -695,13 +695,13 @@ public:
             #if 0 // TODO TODO
   				if ( mName )
   				{
-  					float transform[4*4];
+  					NxF32 transform[4*4];
   					Asc2Bin(svalue, 4, "ffff", transform );
               MeshBone b;
               b.SetTransform(transform);
-              float pos[3];
-              float quat[3];
-              float scale[3] = { 1, 1, 1 };
+              NxF32 pos[3];
+              NxF32 quat[3];
+              NxF32 scale[3] = { 1, 1, 1 };
               b.ExtractOrientation(quat);
               b.GetPos(pos);
   					mCallback->importMeshInstance(mName,pos,quat,scale);
@@ -712,7 +712,7 @@ public:
   			case NT_NODE_TRIANGLE:
   				if ( mCtype && mSemantic )
   				{
-              HeI32 c1,c2;
+              NxI32 c1,c2;
               char scratch1[2048];
               char scratch2[2048];
               strcpy(scratch1,mCtype);
@@ -725,7 +725,7 @@ public:
                 if ( mVertexFlags )
                 {
   								MeshVertex vtx[3];
-  								const unsigned char *temp = (const unsigned char *)Asc2Bin(svalue, 3, mCtype, 0 );
+  								const NxU8 *temp = (const NxU8 *)Asc2Bin(svalue, 3, mCtype, 0 );
                   temp = getVertex(temp,vtx[0],a2,c2);
                   temp = getVertex(temp,vtx[1],a2,c2);
                   temp = getVertex(temp,vtx[2],a2,c2);
@@ -754,7 +754,7 @@ public:
                 if ( mVertexBuffer )
                 {
 
-                  HeI32 c1,c2;
+                  NxI32 c1,c2;
                   char scratch1[2048];
                   char scratch2[2048];
                   strcpy(scratch1,mCtype);
@@ -769,8 +769,8 @@ public:
                     if ( mVertexFlags )
                     {
                       mVertices = MEMALLOC_NEW_ARRAY(MeshVertex,mVertexCount)[mVertexCount];
-                      const unsigned char *scan = (const unsigned char *)mVertexBuffer;
-                      for (int i=0; i<mVertexCount; i++)
+                      const NxU8 *scan = (const NxU8 *)mVertexBuffer;
+                      for (NxI32 i=0; i<mVertexCount; i++)
                       {
                         scan = getVertex(scan,mVertices[i],a2,c2);
                       }
@@ -799,9 +799,9 @@ public:
   				{
               if ( mMeshCollisionConvex )
               {
-                float *vertices = MEMALLOC_NEW_ARRAY(float,mVertexCount*3)[mVertexCount*3];
-                float *dest = vertices;
-                for (int i=0; i<mVertexCount; i++)
+                NxF32 *vertices = MEMALLOC_NEW_ARRAY(NxF32,mVertexCount*3)[mVertexCount*3];
+                NxF32 *dest = vertices;
+                for (NxI32 i=0; i<mVertexCount; i++)
                 {
                   dest[0] = mVertices[i].mPos[0];
                   dest[1] = mVertices[i].mPos[1];
@@ -815,15 +815,15 @@ public:
                                             mVertexCount,
                                             vertices,
                                             mIndexCount,
-                                            (const unsigned int *)mIndexBuffer);
+                                            (const NxU32 *)mIndexBuffer);
 
-                MEMALLOC_DELETE_ARRAY(float,vertices);
+                MEMALLOC_DELETE_ARRAY(NxF32,vertices);
                 MEMALLOC_DELETE(MeshCollisionConvex,mMeshCollisionConvex);
                 mMeshCollisionConvex = 0;
               }
               else
               {
-                mCallback->importIndexedTriangleList(mCurrentMesh.Get(),mCurrentMaterial.Get(),mVertexFlags,mVertexCount,mVertices,mIndexCount,(const unsigned int *)mIndexBuffer );
+                mCallback->importIndexedTriangleList(mCurrentMesh.Get(),mCurrentMaterial.Get(),mVertexFlags,mVertexCount,mVertices,mIndexCount,(const NxU32 *)mIndexBuffer );
               }
   					}
 
@@ -966,7 +966,7 @@ public:
 				{
 					if ( mSkeleton )
 					{
-						int count = atoi( savalue );
+						NxI32 count = atoi( savalue );
 						if ( count > 0 )
 						{
 							MeshBone *bones;
@@ -981,7 +981,7 @@ public:
 				mParent = savalue;
 				if ( mBone )
 				{
-					for (int i=0; i<mBoneIndex; i++)
+					for (NxI32 i=0; i<mBoneIndex; i++)
 					{
 						const MeshBone &b = mSkeleton->GetBone(i);
 						if ( strcmp(mParent,b.mName) == 0 )
@@ -1010,14 +1010,14 @@ public:
 	}
 
   virtual bool processElement(const char *elementName,         // name of the element
-                              int         argc,                // number of attributes
+                              NxI32         argc,                // number of attributes
                               const char **argv,               // list of attributes.
                               const char  *elementData,        // element data, null if none
-                              int         lineno)         // line number in the source XML file
+                              NxI32         lineno)         // line number in the source XML file
   {
     ProcessNode(elementName);
-    int acount = argc/2;
-    for (int i=0; i<acount; i++)
+    NxI32 acount = argc/2;
+    for (NxI32 i=0; i<acount; i++)
     {
       const char *key = argv[i*2];
       const char *value = argv[i*2+1];
@@ -1053,20 +1053,20 @@ private:
 	const char * mTrackCount;
 	const char * mDtime;
 
-	int          mTrackIndex;
-	int          mBoneIndex;
+	NxI32          mTrackIndex;
+	NxI32          mBoneIndex;
 	MeshBone       * mBone;
 
 	MeshAnimation  * mAnimation;
 	MeshAnimTrack  * mAnimTrack;
 	MeshSkeleton   * mSkeleton;
-	int          mVertexCount;
-	int          mIndexCount;
+	NxI32          mVertexCount;
+	NxI32          mIndexCount;
 	void       * mVertexBuffer;
 	void       * mIndexBuffer;
 
-  int          mMeshSystemVersion;
-  int          mMeshSystemAssetVersion;
+  NxI32          mMeshSystemVersion;
+  NxI32          mMeshSystemAssetVersion;
 
   StringRef    mCurrentMesh;
   StringRef    mCurrentMaterial;
@@ -1074,7 +1074,7 @@ private:
   StringRef    mAssetName;
   StringRef    mAssetInfo;
 
-  unsigned int mVertexFlags;
+  NxU32 mVertexFlags;
   MeshVertex  *mVertices;
 
   StringRef                    mCollisionRepName;

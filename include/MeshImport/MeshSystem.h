@@ -52,16 +52,16 @@ public:
     mWeight[0] = 1; mWeight[1] = 0; mWeight[2] = 0; mWeight[3] = 0;
     mBone[0] = mBone[1] = mBone[2] = mBone[3] = 0;
   }
-  float          mPos[3];
-  float          mNormal[3];
-  unsigned int   mColor;
-  float          mTexel1[2];
-  float          mTexel2[2];
-  float          mTexel3[2];
-  float          mTexel4[2];
-  float          mTangent[3];
-  float          mBiNormal[3];
-  float          mWeight[4];
+  NxF32          mPos[3];
+  NxF32          mNormal[3];
+  NxU32   mColor;
+  NxF32          mTexel1[2];
+  NxF32          mTexel2[2];
+  NxF32          mTexel3[2];
+  NxF32          mTexel4[2];
+  NxF32          mTangent[3];
+  NxF32          mBiNormal[3];
+  NxF32          mWeight[4];
   unsigned short mBone[4];
 };
 
@@ -117,11 +117,11 @@ public:
     strncpy(mName,name,MAXSTRLEN);
 	}
 
-	void Set(const char *name,int parent,const float *transform)
+	void Set(const char *name,NxI32 parent,const NxF32 *transform)
 	{
     strncpy(mName,name,MAXSTRLEN);
 		mParentIndex = parent;
-		memcpy(mElement,transform,sizeof(float)*16);
+		memcpy(mElement,transform,sizeof(NxF32)*16);
 
 		ExtractOrientation(mOrientation);
 
@@ -131,7 +131,7 @@ public:
 
 	}
 
-	void Set(const char *name,int parent,const float *pos,const float *rot)
+	void Set(const char *name,NxI32 parent,const NxF32 *pos,const NxF32 *rot)
 	{
     strncpy(mName,name,MAXSTRLEN);
 		mParentIndex = parent;
@@ -149,7 +149,7 @@ public:
 
 	}
 
-	void GetPos(float *pos) const
+	void GetPos(NxF32 *pos) const
 	{
 		pos[0] = mElement[3][0];
 		pos[1] = mElement[3][1];
@@ -158,14 +158,14 @@ public:
 
 	const char * GetName(void) const { return mName; };
 
-	const float * GetTransform(void) const { return &mElement[0][0]; };
+	const NxF32 * GetTransform(void) const { return &mElement[0][0]; };
 
-	void ExtractOrientation(float *rot)
+	void ExtractOrientation(NxF32 *rot)
 	{
-		float tr = mElement[0][0] + mElement[1][1] + mElement[2][2];
+		NxF32 tr = mElement[0][0] + mElement[1][1] + mElement[2][2];
 		if (tr > 0.0f )
 		{
-			float s = (float) sqrtf( tr + 1.0f);
+			NxF32 s = (NxF32) sqrtf( tr + 1.0f);
 			rot[3] = s * 0.5f;
 			s = 0.5f / s;
 			rot[0] = (mElement[1][2] - mElement[2][1]) * s;
@@ -175,18 +175,18 @@ public:
 		else
 		{
 			// diagonal is negative
-			int nxt[3] = {1, 2, 0};
-			float  qa[4];
+			NxI32 nxt[3] = {1, 2, 0};
+			NxF32  qa[4];
 
-			int i = 0;
+			NxI32 i = 0;
 
 			if (mElement[1][1] > mElement[0][0]) i = 1;
 			if (mElement[2][2] > mElement[i][i]) i = 2;
 
-			int j = nxt[i];
-			int k = nxt[j];
+			NxI32 j = nxt[i];
+			NxI32 k = nxt[j];
 
-			float s = sqrtf ( ((mElement[i][i] - (mElement[j][j] + mElement[k][k])) + 1.0f) );
+			NxF32 s = sqrtf ( ((mElement[i][i] - (mElement[j][j] + mElement[k][k])) + 1.0f) );
 
 			qa[i] = s * 0.5f;
 
@@ -214,17 +214,17 @@ public:
 
 	void ComposeOrientation(void)
 	{
-		float w = mOrientation[3];
+		NxF32 w = mOrientation[3];
 
-		float xx = mOrientation[0]*mOrientation[0];
-		float yy = mOrientation[1]*mOrientation[1];
-		float zz = mOrientation[2]*mOrientation[2];
-		float xy = mOrientation[0]*mOrientation[1];
-		float xz = mOrientation[0]*mOrientation[2];
-		float yz = mOrientation[1]*mOrientation[2];
-		float wx = w*mOrientation[0];
-		float wy = w*mOrientation[1];
-		float wz = w*mOrientation[2];
+		NxF32 xx = mOrientation[0]*mOrientation[0];
+		NxF32 yy = mOrientation[1]*mOrientation[1];
+		NxF32 zz = mOrientation[2]*mOrientation[2];
+		NxF32 xy = mOrientation[0]*mOrientation[1];
+		NxF32 xz = mOrientation[0]*mOrientation[2];
+		NxF32 yz = mOrientation[1]*mOrientation[2];
+		NxF32 wx = w*mOrientation[0];
+		NxF32 wy = w*mOrientation[1];
+		NxF32 wz = w*mOrientation[2];
 
 		mElement[0][0] = 1 - 2 * ( yy + zz );
 		mElement[1][0] =     2 * ( xy - wz );
@@ -240,20 +240,20 @@ public:
 
 	}
 
-	int GetParentIndex(void) const { return mParentIndex; };
-	const float * GetPosition(void) const { return mPosition; };
-	const float * GetOrientation(void) const { return mOrientation; };
+	NxI32 GetParentIndex(void) const { return mParentIndex; };
+	const NxF32 * GetPosition(void) const { return mPosition; };
+	const NxF32 * GetOrientation(void) const { return mOrientation; };
 
-  void SetTransform(const float *transform)
+  void SetTransform(const NxF32 *transform)
   {
     memcpy(mElement,transform,sizeof(mElement));
   }
 
 	char          mName[MAXSTRLEN];
-	int           mParentIndex;          // array index of parent bone
-	float         mPosition[3];
-	float         mOrientation[4];
-	float         mElement[4][4];
+	NxI32           mParentIndex;          // array index of parent bone
+	NxF32         mPosition[3];
+	NxF32         mOrientation[4];
+	NxF32         mElement[4][4];
 };
 
 class MeshEntry
@@ -266,7 +266,7 @@ public:
   }
 private:
   char     mName[MAXSTRLEN];
-	int     mBone;         // bone this mesh is associcated
+	NxI32     mBone;         // bone this mesh is associcated
 };
 
 class MeshSkeleton
@@ -279,7 +279,7 @@ public:
 		mBones = 0;
 	}
 
-	MeshSkeleton(const char *name,int bonecount)
+	MeshSkeleton(const char *name,NxI32 bonecount)
 	{
 		strncpy(mName,name,MAXSTRLEN);
 		mBoneCount = bonecount;
@@ -308,28 +308,28 @@ public:
 		strncpy(mName,name,MAXSTRLEN);
 	}
 
-	void SetBones(int bcount,MeshBone *bones) // memory ownership changes hands here!!!!!!!!!!
+	void SetBones(NxI32 bcount,MeshBone *bones) // memory ownership changes hands here!!!!!!!!!!
 	{
 		mBoneCount = bcount;
 		mBones     = bones;
 	}
 
-	void ComputeDefaultWeighting(const float *pos,float *weight,unsigned short &b1,unsigned short &b2,unsigned short &b3,unsigned short &b4) const
+	void ComputeDefaultWeighting(const NxF32 *pos,NxF32 *weight,unsigned short &b1,unsigned short &b2,unsigned short &b3,unsigned short &b4) const
   {
-  	float closest[4];
-  	int   bones[4];
-  	float furthest;
+  	NxF32 closest[4];
+  	NxI32   bones[4];
+  	NxF32 furthest;
 
   	FindFourClosest(pos,closest,bones,furthest);
 
-  	float recip = 1.0f / furthest;
+  	NxF32 recip = 1.0f / furthest;
 
   	weight[0] = (furthest-closest[0]) * recip;
   	weight[1] = (furthest-closest[1]) * recip;
   	weight[2] = (furthest-closest[2]) * recip;
   	weight[3] = (furthest-closest[3]) * recip;
 
-  	float total = weight[0] + weight[1] + weight[2] + weight[3];
+  	NxF32 total = weight[0] + weight[1] + weight[2] + weight[3];
 
   	recip = 1.0f / total;
 
@@ -347,7 +347,7 @@ public:
 
   }
 
-	void FindFourClosest(const float *pos,float *closest,int *bones,float &fifthbone) const
+	void FindFourClosest(const NxF32 *pos,NxF32 *closest,NxI32 *bones,NxF32 &fifthbone) const
   {
   	closest[0] = FLT_MAX;
   	closest[1] = FLT_MAX;
@@ -362,17 +362,17 @@ public:
   	bones[3]   = 0;
 
   	MeshBone *b = mBones;
-  	for (int i=0; i<mBoneCount; i++,b++)
+  	for (NxI32 i=0; i<mBoneCount; i++,b++)
   	{
-  		float bpos[3];
+  		NxF32 bpos[3];
 
   		b->GetPos(bpos);
 
-  		float dx = bpos[0] - pos[0];
-  		float dy = bpos[1] - pos[1];
-  		float dz = bpos[2] - pos[2];
+  		NxF32 dx = bpos[0] - pos[0];
+  		NxF32 dy = bpos[1] - pos[1];
+  		NxF32 dz = bpos[2] - pos[2];
 
-  		float distance = dx*dx+dy*dy+dz*dz;
+  		NxF32 distance = dx*dx+dy*dy+dz*dz;
 
   		if ( distance < closest[0] )
   		{
@@ -427,19 +427,19 @@ public:
   	fifthbone  = sqrtf(fifthbone);
   }
 
-	int GetBoneCount(void) const { return mBoneCount; };
+	NxI32 GetBoneCount(void) const { return mBoneCount; };
 
-	const MeshBone& GetBone(int index) const { return mBones[index]; };
+	const MeshBone& GetBone(NxI32 index) const { return mBones[index]; };
 
-	MeshBone * GetBonePtr(int index) const { return &mBones[index]; };
+	MeshBone * GetBonePtr(NxI32 index) const { return &mBones[index]; };
 
-	void SetBone(int index,const MeshBone &b) { mBones[index] = b; };
+	void SetBone(NxI32 index,const MeshBone &b) { mBones[index] = b; };
 
 	const char * GetName(void) const { return mName; };
 
 private:
 	char            mName[MAXSTRLEN];
-	int             mBoneCount;
+	NxI32             mBoneCount;
 	MeshBone *mBones;
 };
 
@@ -448,7 +448,7 @@ class MeshAnimPose
 {
 public:
 
-	void SetPose(const float *pos,const float *quat)
+	void SetPose(const NxF32 *pos,const NxF32 *quat)
 	{
 		mPos[0] = pos[0];
 		mPos[1] = pos[1];
@@ -459,7 +459,7 @@ public:
 		mQuat[3] = quat[3];
 	};
 
-	void Sample(float *pos,float *quat) const
+	void Sample(NxF32 *pos,NxF32 *quat) const
 	{
 		pos[0] = mPos[0];
 		pos[1] = mPos[1];
@@ -470,17 +470,17 @@ public:
 		quat[3] = mQuat[3];
 	}
 
-	float mPos[3];
-	float mQuat[4];
+	NxF32 mPos[3];
+	NxF32 mQuat[4];
 };
 
 class MeshAnimTrack
 {
 public:
 
-	MeshAnimTrack(int framecount,
-						float duration,
-						float dtime)
+	MeshAnimTrack(NxI32 framecount,
+						NxF32 duration,
+						NxF32 dtime)
 	{
 		mName[0] = 0;
 		mFrameCount = framecount;
@@ -496,7 +496,7 @@ public:
 		mDuration   = c.mDuration;
 		mDtime      = c.mDtime;
 		mPose = MEMALLOC_NEW_ARRAY(MeshAnimPose,mFrameCount)[mFrameCount];
-		for (int i=0; i<mFrameCount; i++)
+		for (NxI32 i=0; i<mFrameCount; i++)
 		{
 			mPose[i] = c.mPose[i];
 		}
@@ -515,7 +515,7 @@ public:
       mName[0] = 0;
 	}
 
-	void SetPose(int frame,const float *pos,const float *quat)
+	void SetPose(NxI32 frame,const NxF32 *pos,const NxF32 *quat)
 	{
 		if ( frame >= 0 && frame < mFrameCount )
 			mPose[frame].SetPose(pos,quat);
@@ -523,27 +523,27 @@ public:
 
 	const char * GetName(void) const { return mName; };
 
-	void SampleAnimation(int frame,float *pos,float *quat) const
+	void SampleAnimation(NxI32 frame,NxF32 *pos,NxF32 *quat) const
 	{
 		mPose[frame].Sample(pos,quat);
 	}
 
-	int GetFrameCount(void) const { return mFrameCount; };
+	NxI32 GetFrameCount(void) const { return mFrameCount; };
 
-	MeshAnimPose * GetPose(int index) { return &mPose[index]; };
+	MeshAnimPose * GetPose(NxI32 index) { return &mPose[index]; };
 
 private:
 	char      mName[MAXSTRLEN]; // name of the track.
-	int       mFrameCount;
-	float     mDuration;
-	float     mDtime;
+	NxI32       mFrameCount;
+	NxF32     mDuration;
+	NxF32     mDtime;
 	MeshAnimPose *mPose;
 };
 
 class MeshAnimation
 {
 public:
-	MeshAnimation(const char *name,int trackcount,int framecount,float duration,float dtime)
+	MeshAnimation(const char *name,NxI32 trackcount,NxI32 framecount,NxF32 duration,NxF32 dtime)
 	{
 		strncpy(mName,name,MAXSTRLEN);
 		mTrackCount = trackcount;
@@ -551,7 +551,7 @@ public:
 		mTracks = (MeshAnimTrack **)MEMALLOC_MALLOC(sizeof(MeshAnimTrack*)*mTrackCount);
 		mDuration  = duration;
 		mDtime     = dtime;
-		for (int i=0; i<trackcount; i++)
+		for (NxI32 i=0; i<trackcount; i++)
 		{
 			mTracks[i] = MEMALLOC_NEW(MeshAnimTrack)(framecount,duration,dtime);
 		}
@@ -565,7 +565,7 @@ public:
 		mDuration   = c.mDuration;
 		mDtime      = c.mDtime;
 		mTracks     = (MeshAnimTrack **)MEMALLOC_MALLOC(sizeof(MeshAnimTrack*)*mTrackCount);
-		for (int i=0; i<mTrackCount; i++)
+		for (NxI32 i=0; i<mTrackCount; i++)
 		{
 			mTracks[i] = MEMALLOC_NEW(MeshAnimTrack)( *c.mTracks[i] );
 		}
@@ -573,7 +573,7 @@ public:
 
 	~MeshAnimation(void)
 	{
-		for (int i=0; i<mTrackCount; i++)
+		for (NxI32 i=0; i<mTrackCount; i++)
 		{
 			MeshAnimTrack *at = mTracks[i];
 			MEMALLOC_DELETE(MeshAnimTrack,at);
@@ -586,12 +586,12 @@ public:
 		strncpy(mName,name,MAXSTRLEN);
 	}
 
-	void SetTrackName(int track,const char *name)
+	void SetTrackName(NxI32 track,const char *name)
 	{
 		mTracks[track]->SetName(name);
 	}
 
-	void SetTrackPose(int track,int frame,const float *pos,const float *quat)
+	void SetTrackPose(NxI32 track,NxI32 frame,const NxF32 *pos,const NxF32 *quat)
 	{
 		mTracks[track]->SetPose(frame,pos,quat);
 	}
@@ -601,7 +601,7 @@ public:
 	const MeshAnimTrack * LocateTrack(const char *name) const
 	{
 		const MeshAnimTrack *ret = 0;
-		for (int i=0; i<mTrackCount; i++)
+		for (NxI32 i=0; i<mTrackCount; i++)
 		{
 			const MeshAnimTrack *t = mTracks[i];
 			if ( stricmp(t->GetName(),name) == 0 )
@@ -613,17 +613,17 @@ public:
 		return ret;
 	}
 
-	int GetFrameIndex(float t) const
+	NxI32 GetFrameIndex(NxF32 t) const
 	{
 		t = fmodf( t, mDuration );
-		int index = int(t / mDtime);
+		NxI32 index = NxI32(t / mDtime);
 		return index;
 	}
 
-	int GetTrackCount(void) const { return mTrackCount; };
-	float GetDuration(void) const { return mDuration; };
+	NxI32 GetTrackCount(void) const { return mTrackCount; };
+	NxF32 GetDuration(void) const { return mDuration; };
 
-	MeshAnimTrack * GetTrack(int index)
+	MeshAnimTrack * GetTrack(NxI32 index)
 	{
 		MeshAnimTrack *ret = 0;
 		if ( index >= 0 && index < mTrackCount )
@@ -633,15 +633,15 @@ public:
 		return ret;
 	};
 
-	int GetFrameCount(void) const { return mFrameCount; };
-	float GetDtime(void) const { return mDtime; };
+	NxI32 GetFrameCount(void) const { return mFrameCount; };
+	NxF32 GetDtime(void) const { return mDtime; };
 
 private:
 	char        mName[MAXSTRLEN];
-	int         mTrackCount;
-	int         mFrameCount;
-	float       mDuration;
-	float       mDtime;
+	NxI32         mTrackCount;
+	NxI32         mFrameCount;
+	NxF32       mDuration;
+	NxF32       mDtime;
 	MeshAnimTrack **mTracks;
 };
 
@@ -672,7 +672,7 @@ public:
     mMax[2] = FLT_MIN;
   }
 
-  void include(const float pos[3])
+  void include(const NxF32 pos[3])
   {
     if ( pos[0] < mMin[0] ) mMin[0] = pos[0];
     if ( pos[1] < mMin[1] ) mMin[1] = pos[1];
@@ -681,8 +681,8 @@ public:
     if ( pos[1] > mMax[1] ) mMax[1] = pos[1];
     if ( pos[2] > mMax[2] ) mMax[2] = pos[2];
   }
-  float mMin[3];
-  float mMax[3];
+  NxF32 mMin[3];
+  NxF32 mMax[3];
 };
 
 class SubMesh
@@ -703,10 +703,10 @@ public:
   MeshMaterial        *mMaterial;
   MeshAABB             mAABB;
   MeshVertexFlag       mVertexFlags; // defines which vertex components are active.
-  unsigned int         mVertexCount; // number of vertices
+  NxU32         mVertexCount; // number of vertices
   MeshVertex          *mVertices;
-  unsigned int         mTriCount;    // number of triangles.
-  unsigned int        *mIndices;     // indexed triange list
+  NxU32         mTriCount;    // number of triangles.
+  NxU32        *mIndices;     // indexed triange list
 };
 
 class Mesh
@@ -724,7 +724,7 @@ public:
   const char         *mSkeletonName;
   MeshSkeleton       *mSkeleton; // the skeleton used by this mesh system.
   MeshAABB            mAABB;
-  unsigned int        mSubMeshCount;
+  NxU32        mSubMeshCount;
   SubMesh           **mSubMeshes;
 };
 
@@ -739,9 +739,9 @@ public:
     mHeight = 0;
   }
   const char    *mName;
-  unsigned char *mData;
-  unsigned int   mWidth;
-  unsigned int   mHeight;
+  NxU8 *mData;
+  NxU32   mWidth;
+  NxU32   mHeight;
 };
 
 class MeshInstance
@@ -757,9 +757,9 @@ public:
   }
   const char  *mMeshName;
   Mesh        *mMesh;
-  float        mPosition[3];
-  float        mRotation[4]; //quaternion XYZW
-  float        mScale[3];
+  NxF32        mPosition[3];
+  NxF32        mRotation[4]; //quaternion XYZW
+  NxF32        mScale[3];
 };
 
 class MeshUserData
@@ -784,8 +784,8 @@ public:
     mUserLen  = 0;
   }
   const char    *mName;
-  unsigned int   mUserLen;
-  unsigned char *mUserData;
+  NxU32   mUserLen;
+  NxU8 *mUserData;
 };
 
 class MeshTetra
@@ -804,8 +804,8 @@ public:
   const char  *mMeshName;
   MeshAABB     mAABB;
   Mesh        *mMesh;
-  unsigned int mTetraCount; // number of tetrahedrons
-  float       *mTetraData;
+  NxU32 mTetraCount; // number of tetrahedrons
+  NxF32       *mTetraData;
 };
 
 #define MESH_SYSTEM_VERSION 1 // version number of this data structure, used for binary serialization
@@ -842,34 +842,34 @@ public:
 
   const char           *mAssetName;
   const char           *mAssetInfo;
-  int                   mMeshSystemVersion;
-  int                   mAssetVersion;
+  NxI32                   mMeshSystemVersion;
+  NxI32                   mAssetVersion;
   MeshAABB              mAABB;
-  unsigned int          mTextureCount;          // Are textures necessary? [rgd].
+  NxU32          mTextureCount;          // Are textures necessary? [rgd].
   MeshRawTexture       *mTextures;              // Texture storage in mesh data is rare, and the name is simply an attribute of the material
 
-  unsigned int          mTetraMeshCount;        // number of tetrahedral meshes
+  NxU32          mTetraMeshCount;        // number of tetrahedral meshes
   MeshTetra            *mTetraMeshes;           // tetraheadral meshes
 
-  unsigned int          mSkeletonCount;         // number of skeletons
+  NxU32          mSkeletonCount;         // number of skeletons
   MeshSkeleton        **mSkeletons;             // the skeletons.
 
-  unsigned int          mAnimationCount;
+  NxU32          mAnimationCount;
   MeshAnimation       **mAnimations;
 
-  unsigned int          mMaterialCount;         // Materials are owned by this list, merely referenced later.
+  NxU32          mMaterialCount;         // Materials are owned by this list, merely referenced later.
   MeshMaterial         *mMaterials;
 
-  unsigned int          mUserDataCount;
+  NxU32          mUserDataCount;
   MeshUserData        **mUserData;
 
-  unsigned int          mUserBinaryDataCount;
+  NxU32          mUserBinaryDataCount;
   MeshUserBinaryData  **mUserBinaryData;
 
-  unsigned int          mMeshCount;
+  NxU32          mMeshCount;
   Mesh                **mMeshes;
 
-  unsigned int          mMeshInstanceCount;
+  NxU32          mMeshInstanceCount;
   MeshInstance         *mMeshInstances;
 };
 

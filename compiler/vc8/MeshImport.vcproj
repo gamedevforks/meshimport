@@ -4,9 +4,6 @@
 	Version="8.00"
 	Name="MeshImport"
 	ProjectGUID="{082FBBBD-9532-5712-DF18-A054AE91C0F0}"
-	SccProjectName="Perforce Project"
-	SccLocalPath="."
-	SccProvider="MSCCI:Perforce SCM"
 	>
 	<Platforms>
 		<Platform
@@ -42,7 +39,7 @@
 				Name="VCCLCompilerTool"
 				AdditionalOptions="/WX /W4 /fp:fast /MDd /Zi "
 				Optimization="4"
-				AdditionalIncludeDirectories="&quot;../../include&quot;;&quot;../../include/common/snippets&quot;;"
+				AdditionalIncludeDirectories="&quot;../../include&quot;;&quot;../../include/common/snippets&quot;;&quot;../../include/MeshImport&quot;;"
 				PreprocessorDefinitions="WIN32;_WINDOWS;UNICODE=1;_UNICODE=1;MESHIMPORT_EXPORTS;_DEBUG;"
 				ExceptionHandling="1"
 				WarningLevel="3"
@@ -119,7 +116,7 @@
 				Name="VCCLCompilerTool"
 				AdditionalOptions="/Zi /WX /W4 /fp:fast /WX /MD /O2 "
 				Optimization="4"
-				AdditionalIncludeDirectories="&quot;../../include&quot;;&quot;../../include/common/snippets&quot;;"
+				AdditionalIncludeDirectories="&quot;../../include&quot;;&quot;../../include/common/snippets&quot;;&quot;../../include/MeshImport&quot;;"
 				PreprocessorDefinitions="WIN32;_WINDOWS;UNICODE=1;_UNICODE=1;MESHIMPORT_EXPORTS;NDEBUG;"
 				ExceptionHandling="1"
 				WarningLevel="3"
@@ -178,6 +175,14 @@
 			Name="Source Files"
 			>
 			<File
+				RelativePath="..\..\src\MeshImport\CommLayer.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\MeshImport\ImportOgre.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\src\MeshImport\MeshImport.cpp"
 				>
 			</File>
@@ -193,6 +198,14 @@
 		<Filter
 			Name="Header Files"
 			>
+			<File
+				RelativePath="..\..\src\MeshImport\CommLayer.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\MeshImport\ImportOgre.h"
+				>
+			</File>
 			<File
 				RelativePath="..\..\src\MeshImport\MeshImportBuilder.h"
 				>
@@ -221,6 +234,22 @@
 				Name="snippets"
 				>
 				<File
+					RelativePath="..\..\include\common\snippets\FastXml.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\include\common\snippets\FastXml.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\include\common\snippets\FileInterface.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\include\common\snippets\FileInterface.h"
+					>
+				</File>
+				<File
 					RelativePath="..\..\include\common\snippets\FloatMath.cpp"
 					>
 				</File>
@@ -238,6 +267,142 @@
 				</File>
 				<File
 					RelativePath="..\..\include\common\snippets\inparser.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\include\common\snippets\KeyValueIni.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\include\common\snippets\KeyValueIni.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\include\common\snippets\Nx.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\include\common\snippets\Nx12F32.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\include\common\snippets\Nx16F32.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\include\common\snippets\Nx9F32.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\include\common\snippets\NxAssert.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\include\common\snippets\NxBitField.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\include\common\snippets\NxBounds3.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\include\common\snippets\NxBox.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\include\common\snippets\NxCapsule.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\include\common\snippets\Nxf.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\include\common\snippets\NxFoundation.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\include\common\snippets\NxI16Vec3.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\include\common\snippets\NxMat33.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\include\common\snippets\NxMat34.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\include\common\snippets\nxmat44.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\include\common\snippets\NxMath.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\include\common\snippets\NxPlane.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\include\common\snippets\NxPool.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\include\common\snippets\NxProfiler.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\include\common\snippets\NxQuat.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\include\common\snippets\NxQuickSort.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\include\common\snippets\NxRay.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\include\common\snippets\NxSegment.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\include\common\snippets\NxSimpleTriangleMesh.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\include\common\snippets\NxSimpleTypes.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\include\common\snippets\NxSphere.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\include\common\snippets\NxStream.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\include\common\snippets\NxUtilities.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\include\common\snippets\NxVec3.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\include\common\snippets\NxVec4.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\include\common\snippets\NxVolumeIntegration.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\include\common\snippets\SendTextMessage.h"
 					>
 				</File>
 				<File
@@ -269,31 +434,23 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\include\common\snippets\telnet.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\include\common\snippets\telnet.h"
+					>
+				</File>
+				<File
 					RelativePath="..\..\include\common\snippets\UserMemAlloc.h"
 					>
 				</File>
-			</Filter>
-			<Filter
-				Name="FileInterface"
-				>
 				<File
-					RelativePath="..\..\include\common\FileInterface\FileInterface.cpp"
+					RelativePath="..\..\include\common\snippets\winmsg.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\..\include\common\FileInterface\FileInterface.h"
-					>
-				</File>
-			</Filter>
-			<Filter
-				Name="MemoryServices"
-				>
-				<File
-					RelativePath="..\..\include\common\MemoryServices\MemoryContainer.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\include\common\MemoryServices\MemoryContainer.h"
+					RelativePath="..\..\include\common\snippets\winmsg.h"
 					>
 				</File>
 			</Filter>

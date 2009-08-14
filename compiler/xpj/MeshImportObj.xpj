@@ -42,19 +42,15 @@
          snippets/sutil.cpp
          snippets/SystemServices.cpp
          snippets/SystemServices.h
-         MemoryServices/MemoryContainer.cpp
-         MemoryServices/MemoryContainer.h
-         MemoryServices/GlobalNewDelete.cpp
-         MemoryServices/GlobalNewDelete.h
+         snippets/UseMemAlloc.h
+         snippets/Nx*.h
 				</Files>
 				<OutDir>../../bin/win32</OutDir>
 				<ImpDir>../../lib/win32</ImpDir>
 				<SearchPaths type="header">
-          ../../ext/deja_insight
           ../../include
           ../../include/common/snippets
-          ../../include/common/binding
-          ../../include/common/MemoryServices
+                 ../../include/MeshImport
 				</SearchPaths>
 				<SearchPaths type="library">
        ../../lib/win32

@@ -3,6 +3,7 @@
 #define SYSTEM_SERVICES_H
 
 #include <stdlib.h>
+#include "UserMemAlloc.h"
 
 #pragma warning(push)
 #pragma warning(disable:4100)
@@ -39,7 +40,7 @@ public:
   virtual RESOURCE_INTERFACE::ResourceInterface * getResourceInterface(void) { return 0; };  // application provides an optional resource acquistion interface
   virtual JOB_SWARM::JobSwarmContext *            getJobSwarmContext(void)   { return 0; };  // application provides an optional multi-threaded job interface
 
-  virtual void *                                  malloc(size_t size,size_t align,const char *type,const char *file,int lineno,MemoryAllocationType mtype)
+  virtual void *                                  malloc(size_t size,size_t align,const char *type,const char *file,NxI32 lineno,MemoryAllocationType mtype)
   {
     return ::malloc(size);
   }
@@ -49,7 +50,7 @@ public:
     ::free(mem);
   }
 
-  virtual void *        realloc(void *mem,size_t size,const char *file,int lineno)
+  virtual void *        realloc(void *mem,size_t size,const char *file,NxI32 lineno)
   {
     return ::realloc(mem,size);
   }

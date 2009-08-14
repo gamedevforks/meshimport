@@ -1,7 +1,8 @@
 #include <assert.h>
-#include "common/snippets/UserMemAlloc.h"
-#include "MeshImport/MeshImport.h"
+#include "UserMemAlloc.h"
+#include "MeshImport.h"
 #include "ImportEzm.h"
+#include "SystemServices.h"
 
 #ifdef WIN32
 #ifdef MESHIMPORTEZM_EXPORTS
@@ -19,7 +20,7 @@ bool doShutdown(void);
 
 extern "C"
 {
-MESHIMPORTEZM_API MESHIMPORT::MeshImporter * getInterface(int version_number,SYSTEM_SERVICES::SystemServices *services);
+MESHIMPORTEZM_API MESHIMPORT::MeshImporter * getInterface(NxI32 version_number,SYSTEM_SERVICES::SystemServices *services);
 };
 
 namespace MESHIMPORT
@@ -40,18 +41,18 @@ public:
     return doShutdown();
   }
 
-  virtual const char * getExtension(int index)  // report the default file name extension for this mesh type.
+  virtual const char * getExtension(NxI32 index)  // report the default file name extension for this mesh type.
   {
     return ".ezm";
   }
 
-  virtual const char * getDescription(int index)
+  virtual const char * getDescription(NxI32 index)
   {
     return "PhysX Rocket EZ-Mesh format";
   }
 
 
-  virtual bool importMesh(const char *meshName,const void *data,unsigned int dlen,MESHIMPORT::MeshImportInterface *callback,const char *options,MeshImportApplicationResource *appResource)
+  virtual bool importMesh(const char *meshName,const void *data,NxU32 dlen,MESHIMPORT::MeshImportInterface *callback,const char *options,MeshImportApplicationResource *appResource)
   {
     bool ret = false;
 
@@ -81,9 +82,9 @@ static MyMeshImportEzm *gInterface=0;
 extern "C"
 {
 #ifdef PLUGINS_EMBEDDED
-  MeshImporter * getInterfaceMeshImportEzm(int version_number,SYSTEM_SERVICES::SystemServices *services)
+  MeshImporter * getInterfaceMeshImportEzm(NxI32 version_number,SYSTEM_SERVICES::SystemServices *services)
 #else
-MESHIMPORTEZM_API MeshImporter * getInterface(int version_number,SYSTEM_SERVICES::SystemServices *services)
+MESHIMPORTEZM_API MeshImporter * getInterface(NxI32 version_number,SYSTEM_SERVICES::SystemServices *services)
 #endif
 {
   if ( services )
@@ -126,7 +127,7 @@ BOOL APIENTRY DllMain( HANDLE ,
                        DWORD  ul_reason_for_call,
                        LPVOID )
 {
-  int ret = 0;
+  NxI32 ret = 0;
 
   switch (ul_reason_for_call)
 	{

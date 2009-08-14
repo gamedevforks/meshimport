@@ -6,11 +6,11 @@
 #include <vector>
 
 #include "ImportObj.h"
-#include "common/snippets/UserMemAlloc.h"
-#include "common/snippets/inparser.h"
-#include "MeshImport/MeshImport.h"
-#include "common/snippets/stringdict.h"
-#include "common/snippets/sutil.h"
+#include "UserMemAlloc.h"
+#include "inparser.h"
+#include "MeshImport.h"
+#include "stringdict.h"
+#include "sutil.h"
 
 #pragma warning(disable:4100 4505)
 
@@ -24,24 +24,24 @@ public:
   {
     x = y = z = 0;
   }
-  Vec3(const float *f)
+  Vec3(const NxF32 *f)
   {
     x = f[0];
     y = f[1];
     z = f[2];
   }
-  Vec3(float _x,float _y,float _z)
+  Vec3(NxF32 _x,NxF32 _y,NxF32 _z)
   {
     x = _x;
     y = _y;
     z = _z;
   }
 
-  HeF32 ComputeNormal(const Vec3 &A,
+  NxF32 ComputeNormal(const Vec3 &A,
     const Vec3 &B,
     const Vec3 &C)
   {
-    HeF32 vx,vy,vz,wx,wy,wz,vw_x,vw_y,vw_z,mag;
+    NxF32 vx,vy,vz,wx,wy,wz,vw_x,vw_y,vw_z,mag;
 
     vx = (B.x - C.x);
     vy = (B.y - C.y);
@@ -74,11 +74,11 @@ public:
   }
 
 
-  const float * Ptr(void) const { return &x; };
+  const NxF32 * Ptr(void) const { return &x; };
 
-  float x;
-  float y;
-  float z;
+  NxF32 x;
+  NxF32 y;
+  NxF32 z;
 };
 
 class Vec2
@@ -88,8 +88,8 @@ public:
   {
     x = y = 0;
   }
-  float x;
-  float y;
+  NxF32 x;
+  NxF32 y;
 };
 
 typedef USER_STL::vector< Vec2 > Vec2Vector;
@@ -105,7 +105,7 @@ public:
 
 
   StringRef mName; //name of the material
-  float Ns;
+  NxF32 Ns;
   Vec3          Ka;
   Vec3          Kd;
   Vec3          Ks;
@@ -122,12 +122,12 @@ public:
   ~OBJ(void);
 
 
-  const char * getExtension(int index) { return ".obj"; };
-  const char * getDescription(int index) { return "Wavefront OBJ"; };
+  const char * getExtension(NxI32 index) { return ".obj"; };
+  const char * getDescription(NxI32 index) { return "Wavefront OBJ"; };
 
-  bool importMesh(const char *meshName,const void *data,unsigned int len,MeshImportInterface *callback,const char *options,MeshImportApplicationResource *appResource);
+  bool importMesh(const char *meshName,const void *data,NxU32 len,MeshImportInterface *callback,const char *options,MeshImportApplicationResource *appResource);
 
-  int ParseLine(int lineno,int argc,const char **argv);  // return TRUE to continue parsing, return FALSE to abort parsing process
+  NxI32 ParseLine(NxI32 lineno,NxI32 argc,const char **argv);  // return TRUE to continue parsing, return FALSE to abort parsing process
 
   void release(void);
 
@@ -139,6 +139,7 @@ private:
   Vec3Vector  mVerts;
   Vec2Vector  mTexels;
   Vec3Vector  mNormals;
+  NxF32       mPlane[4];
 
   StringRef            mCurrentMesh;
   StringRef            mCurrentMat;
@@ -183,7 +184,7 @@ char * skipDir(char *start)
 
 #pragma warning(disable:4100)
 
-bool OBJ::importMesh(const char *fname,const void *_data,unsigned int len,MeshImportInterface *callback,const char *options,MeshImportApplicationResource *appResource)
+bool OBJ::importMesh(const char *fname,const void *_data,NxU32 len,MeshImportInterface *callback,const char *options,MeshImportApplicationResource *appResource)
 {
   bool ret = false;
 
@@ -205,13 +206,15 @@ bool OBJ::importMesh(const char *fname,const void *_data,unsigned int len,MeshIm
   	  *dot = 0;
     strcat(scratch,".mtl");
 
-    unsigned int len;
+    NxU32 len;
     void *mem = appResource->getApplicationResource(fname,scratch,len);
     if ( mem )
     {
       char *data = (char *)MEMALLOC_MALLOC(len);
       memcpy(data,mem,len);
+
       appResource->releaseApplicationResource(mem);
+
       InPlaceParser ipp(data,len);
       ipp.Parse(this);
 
@@ -261,7 +264,7 @@ bool OBJ::importMesh(const char *fname,const void *_data,unsigned int len,MeshIm
   return ret;
 }
 
-static const char * GetArg(const char **argv,int i,int argc)
+static const char * GetArg(const char **argv,NxI32 i,NxI32 argc)
 {
   const char * ret = 0;
   if ( i < argc ) ret = argv[i];
@@ -284,14 +287,14 @@ void OBJ::GetVertex(MeshVertex &v,const char *face,bool minusIndexing) const
   v.mNormal[1] = 1;
   v.mNormal[2] = 0;
 
-  int index = atoi( face );
+  NxI32 index = atoi( face );
   if ( minusIndexing )
     index--;
 
   if ( index < 0 )
     index = mVerts.size()+index+1;
 
-  if ( index >= 0 && index < (int)mVerts.size() )
+  if ( index >= 0 && index < (NxI32)mVerts.size() )
   {
 
     const Vec3 &p = mVerts[index];
@@ -306,12 +309,12 @@ void OBJ::GetVertex(MeshVertex &v,const char *face,bool minusIndexing) const
 
   if ( texel )
   {
-    int tindex = atoi( texel+1) - 1;
+    NxI32 tindex = atoi( texel+1) - 1;
 
     if ( tindex < 0 )
       tindex = mTexels.size()+tindex+1;
 
-    if ( tindex >=0 && tindex < (int)mTexels.size() )
+    if ( tindex >=0 && tindex < (NxI32)mTexels.size() )
     {
       v.mTexel1[0] = mTexels[tindex].x;
       v.mTexel1[1] = mTexels[tindex].y;
@@ -324,11 +327,11 @@ void OBJ::GetVertex(MeshVertex &v,const char *face,bool minusIndexing) const
     const char *normal = strstr(texel+1,"/");
     if ( normal )
     {
-      int nindex = atoi( normal+1 ) - 1;
+      NxI32 nindex = atoi( normal+1 ) - 1;
       if ( nindex < 0 )
         nindex = mNormals.size()+nindex+1;
 
-      if (nindex >= 0 && nindex < (int)mNormals.size() )
+      if (nindex >= 0 && nindex < (NxI32)mNormals.size() )
       {
         v.mNormal[0] = mNormals[nindex].x;
         v.mNormal[1] = mNormals[nindex].y;
@@ -339,9 +342,9 @@ void OBJ::GetVertex(MeshVertex &v,const char *face,bool minusIndexing) const
 
 }
 
-int OBJ::ParseLine(int lineno,int argc,const char **argv)  // return TRUE to continue parsing, return FALSE to abort parsing process
+NxI32 OBJ::ParseLine(NxI32 lineno,NxI32 argc,const char **argv)  // return TRUE to continue parsing, return FALSE to abort parsing process
 {
-  int ret = 0;
+  NxI32 ret = 0;
 
   if ( argc >= 1 )
   {
@@ -360,25 +363,25 @@ int OBJ::ParseLine(int lineno,int argc,const char **argv)  // return TRUE to con
         }
         else if ( mCurrentMaterial && stricmp(foo,"Ns") == 0 && argc >= 2 )
         {
-          mCurrentMaterial->Ns = (float)atof(argv[1]);
+          mCurrentMaterial->Ns = (NxF32)atof(argv[1]);
         }
         else if ( mCurrentMaterial && stricmp(foo,"Ka") == 0 && argc >= 4 )
         {
-          mCurrentMaterial->Ka.x = (float)atof(argv[1]);
-          mCurrentMaterial->Ka.y = (float)atof(argv[2]);
-          mCurrentMaterial->Ka.z = (float)atof(argv[3]);
+          mCurrentMaterial->Ka.x = (NxF32)atof(argv[1]);
+          mCurrentMaterial->Ka.y = (NxF32)atof(argv[2]);
+          mCurrentMaterial->Ka.z = (NxF32)atof(argv[3]);
         }
         else if ( mCurrentMaterial && stricmp(foo,"Kd") == 0 && argc >= 4 )
         {
-          mCurrentMaterial->Kd.x = (float)atof(argv[1]);
-          mCurrentMaterial->Kd.y = (float)atof(argv[2]);
-          mCurrentMaterial->Kd.z = (float)atof(argv[3]);
+          mCurrentMaterial->Kd.x = (NxF32)atof(argv[1]);
+          mCurrentMaterial->Kd.y = (NxF32)atof(argv[2]);
+          mCurrentMaterial->Kd.z = (NxF32)atof(argv[3]);
         }
         else if ( mCurrentMaterial && stricmp(foo,"Ks") == 0 && argc >= 4 )
         {
-          mCurrentMaterial->Ks.x = (float)atof(argv[1]);
-          mCurrentMaterial->Ks.y = (float)atof(argv[2]);
-          mCurrentMaterial->Ks.z = (float)atof(argv[3]);
+          mCurrentMaterial->Ks.x = (NxF32)atof(argv[1]);
+          mCurrentMaterial->Ks.y = (NxF32)atof(argv[2]);
+          mCurrentMaterial->Ks.z = (NxF32)atof(argv[3]);
         }
         else if ( mCurrentMaterial && stricmp(foo,"map_kd") == 0 && argc >= 2 )
         {
@@ -411,17 +414,26 @@ int OBJ::ParseLine(int lineno,int argc,const char **argv)  // return TRUE to con
         else if ( stricmp(argv[0],"v") == 0 && argc == 4 )
         {
           Vec3 v;
-          v.x = (float) atof( argv[1] );
-          v.y = (float) atof( argv[2] );
-          v.z = (float) atof( argv[3] );
+          v.x = (NxF32) atof( argv[1] );
+          v.y = (NxF32) atof( argv[2] );
+          v.z = (NxF32) atof( argv[3] );
 
           mVerts.push_back(v);
         }
+		else if ( stricmp(argv[0],"p") == 0 && argc == 5 )
+		{
+			mPlane[0] = (NxF32) atof( argv[1] );
+			mPlane[1] = (NxF32) atof( argv[2] );
+			mPlane[2] = (NxF32) atof( argv[3] );
+			mPlane[3] = (NxF32) atof( argv[4] );
+			mCallback->importPlane(mPlane);
+		}
+
         else if ( stricmp(argv[0],"vt") == 0 && argc >= 3 )
         {
           Vec2 t;
-          t.x = (float)atof( argv[1] );
-          t.y = (float)atof( argv[2] );
+          t.x = (NxF32)atof( argv[1] );
+          t.y = (NxF32)atof( argv[2] );
 					t.x = t.x;
 					t.y = t.y;
           mTexels.push_back(t);
@@ -429,9 +441,9 @@ int OBJ::ParseLine(int lineno,int argc,const char **argv)  // return TRUE to con
         else if ( stricmp(argv[0],"vn") == 0 && argc == 4 )
         {
           Vec3 normal;
-          normal.x = (float) atof(argv[1]);
-          normal.y = (float) atof(argv[2]);
-          normal.z = (float) atof(argv[3]);
+          normal.x = (NxF32) atof(argv[1]);
+          normal.y = (NxF32) atof(argv[2]);
+          normal.z = (NxF32) atof(argv[3]);
           mNormals.push_back(normal);
         }
         else if ( stricmp(argv[0],"t") == 0 && argc == 5 )
@@ -451,9 +463,9 @@ int OBJ::ParseLine(int lineno,int argc,const char **argv)  // return TRUE to con
         {
           MeshVertex v[32];
 
-          int vcount = argc-1;
+          NxI32 vcount = argc-1;
 
-          for (int i=1; i<argc; i++)
+          for (NxI32 i=1; i<argc; i++)
           {
             GetVertex(v[i-1],argv[i] );
           }
@@ -468,7 +480,7 @@ int OBJ::ParseLine(int lineno,int argc,const char **argv)  // return TRUE to con
             Vec3 n;
             n.ComputeNormal(p3,p2,p1);
 
-            for (int i=0; i<vcount; i++)
+            for (NxI32 i=0; i<vcount; i++)
             {
               v[i].mNormal[0] = n.x;
               v[i].mNormal[1] = n.y;
@@ -481,7 +493,7 @@ int OBJ::ParseLine(int lineno,int argc,const char **argv)  // return TRUE to con
 
           if ( vcount >=3 ) // do the fan
           {
-            for (int i=2; i<(vcount-1); i++)
+            for (NxI32 i=2; i<(vcount-1); i++)
             {
               sendTri(v[0],v[i],v[i+1]);
             }
@@ -521,7 +533,7 @@ void OBJ::release(void)
 }
 
 
-static void set(float *d,const Vec3 &t)
+static void set(NxF32 *d,const Vec3 &t)
 {
   d[0] = t.x;
   d[1] = t.y;
@@ -553,16 +565,16 @@ void OBJ::sendTri(const MeshVertex &tv1,const MeshVertex &tv2,const MeshVertex &
   {
   	#define TSCALE1 (1.0f/4.0f)
 
-  	const float *tp1 = p1.Ptr();
-  	const float *tp2 = p2.Ptr();
-  	const float *tp3 = p3.Ptr();
+  	const NxF32 *tp1 = p1.Ptr();
+  	const NxF32 *tp2 = p2.Ptr();
+  	const NxF32 *tp3 = p3.Ptr();
 
-  	int i1 = 0;
-	  int i2 = 0;
+  	NxI32 i1 = 0;
+	  NxI32 i2 = 0;
 
-  	float nx = fabsf(v1.mNormal[0]);
-  	float ny = fabsf(v1.mNormal[1]);
-  	float nz = fabsf(v1.mNormal[2]);
+  	NxF32 nx = fabsf(v1.mNormal[0]);
+  	NxF32 ny = fabsf(v1.mNormal[1]);
+  	NxF32 nz = fabsf(v1.mNormal[2]);
 
   	if ( nx <= ny && nx <= nz )
   		i1 = 0;

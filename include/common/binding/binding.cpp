@@ -3,7 +3,7 @@
 #endif
 
 #include "binding.h"
-#include "../snippets/UserMemAlloc.h"
+#include "UserMemAlloc.h"
 #include <hash_map>
 #include <string>
 

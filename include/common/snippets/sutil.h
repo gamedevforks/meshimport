@@ -2,6 +2,8 @@
 
 #define SUTIL_H
 
+#include "UserMemAlloc.h"
+
 /*!
 **
 ** Copyright (c) 2007 by John W. Ratcliff mailto:jratcliff@infiniplex.net
@@ -57,26 +59,26 @@
 */
 
 
-#include "../../common/snippets/UserMemAlloc.h"
+#include "UserMemAlloc.h"
 
 
 char *         stristr(const char *str,const char *key);       // case insensitive str str
 bool           isstristr(const char *str,const char *key);     // bool true/false based on case insenstive strstr
-HeU32   GetHEX(const char *foo,const char **next=0);
-HeU8  GetHEX1(const char *foo,const char **next=0);
-HeU16 GetHEX2(const char *foo,const char **next=0);
-HeU32   GetHEX4(const char *foo,const char **next=0);
-HeF32          GetFloatValue(const char *str,const char **next=0);
-HeI32            GetIntValue(const char *str,const char **next=0);
+NxU32   GetHEX(const char *foo,const char **next=0);
+NxU8  GetHEX1(const char *foo,const char **next=0);
+NxU16 GetHEX2(const char *foo,const char **next=0);
+NxU32   GetHEX4(const char *foo,const char **next=0);
+NxF32          GetFloatValue(const char *str,const char **next=0);
+NxI32            GetIntValue(const char *str,const char **next=0);
 const char *   SkipWhitespace(const char *str);
 bool           IsWhitespace(char c);
-const char *   FloatString(HeF32 v,bool binary=false);
-const char *   GetTrueFalse(HeU32 state);
-bool           CharToWide(const char *source,wchar_t *dest,HeI32 maxlen);
-bool           WideToChar(const wchar_t *source,char *dest,HeI32 maxlen);
-const char **  GetArgs(char *str,HeI32 &count); // destructable parser, stomps EOS markers on the input string!
-HeI32            GetUserArgs(const char *us,const char *key,const char **args);
-bool           GetUserSetting(const char *us,const char *key,HeI32 &v);
+const char *   FloatString(NxF32 v,bool binary=false);
+const char *   GetTrueFalse(NxU32 state);
+bool           CharToWide(const char *source,wchar_t *dest,NxI32 maxlen);
+bool           WideToChar(const wchar_t *source,char *dest,NxI32 maxlen);
+const char **  GetArgs(char *str,NxI32 &count); // destructable parser, stomps EOS markers on the input string!
+NxI32            GetUserArgs(const char *us,const char *key,const char **args);
+bool           GetUserSetting(const char *us,const char *key,NxI32 &v);
 bool           GetUserSetting(const char *us,const char *key,const char * &v);
 const char *   GetRootName(const char *fname); // strip off everything but the 'root' file name.
 bool           IsTrueFalse(const char *c);
@@ -85,8 +87,8 @@ bool           hasSpace(const char *str); // true if the string contains a space
 const char *   lastDot(const char *src);
 const char *   lastSlash(const char *src); // last forward or backward slash character, null if none found.
 const char *   lastChar(const char *src,char c);
-const char  	*fstring(HeF32 v);
-const char *   formatNumber(HeI32 number); // JWR  format this integer into a fancy comma delimited string
+const char  	*fstring(NxF32 v);
+const char *   formatNumber(NxI32 number); // JWR  format this integer into a fancy comma delimited string
 bool           fqnMatch(const char *n1,const char *n2); // returns true if two fully specified file names are 'the same' but ignores case sensitivty and treats either a forward or backslash as the same character.
 bool           getBool(const char *str);
 bool           needsQuote(const char *str); // if this string needs quotes around it (spaces, commas, #, etc)

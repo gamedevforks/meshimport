@@ -52,7 +52,7 @@
 
 // types:
 //
-//          f   : 4 byte float
+//          f   : 4 byte NxF32
 //          d   : 4 byte integer
 //          c   : 1 byte character
 //          b   : 1 byte integer
@@ -65,7 +65,7 @@
 //
 //    Asc2Bin("1 2 3 4 5 6",1,"fffff",0);
 
-void * Asc2Bin(const char *source,const int count,const char *ctype,void *dest=0);
+void * Asc2Bin(const char *source,const NxI32 count,const char *ctype,void *dest=0);
 
 
 #endif

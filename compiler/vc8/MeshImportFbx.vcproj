@@ -4,9 +4,6 @@
 	Version="8.00"
 	Name="MeshImportFbx"
 	ProjectGUID="{285507B1-ED5C-5646-8C30-665A8583D9F8}"
-	SccProjectName="Perforce Project"
-	SccLocalPath="."
-	SccProvider="MSCCI:Perforce SCM"
 	>
 	<Platforms>
 		<Platform
@@ -40,10 +37,10 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalOptions="/WX /W4 /fp:fast /MDd /Zi "
+				AdditionalOptions="/W3 /fp:fast /MDd /Zi "
 				Optimization="4"
-				AdditionalIncludeDirectories="&quot;../../ext/deja_insight&quot;;&quot;../../include&quot;;&quot;../../include/common/snippets&quot;;&quot;../../include/common/binding&quot;;&quot;../../include/common/MemoryServices&quot;;"
-				PreprocessorDefinitions="WIN32;_WINDOWS;UNICODE=1;_UNICODE=1;MESHIMPORTFBX_EXPORTS;_DEBUG;"
+				AdditionalIncludeDirectories="&quot;../../include&quot;;&quot;../../include/common/snippets&quot;;&quot;../../include/MeshImport&quot;;&quot;../../ext/fbx&quot;;"
+				PreprocessorDefinitions="WIN32;_WINDOWS;_CONSOLE;UNICODE=1;_UNICODE=1;K_PLUGIN;K_FBXSDK;K_NODLL;_CRT_SECURET_NO_DEPRECATE;FBXIMPORTER_EXPORTS;MESHIMPORTFBX_EXPORTS;_DEBUG;"
 				ExceptionHandling="1"
 				WarningLevel="3"
 			/>
@@ -59,9 +56,9 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalOptions="/NODEFAULTLIB:libcp.lib /DEBUG "
-				AdditionalDependencies=""
+				AdditionalDependencies="&quot;fbxsdk_md2005.lib&quot; &quot;wininet.lib&quot; "
 				OutputFile="$(OutDir)/MeshImportFbx.dll"
-				AdditionalLibraryDirectories="&quot;../../lib/win32&quot;;&quot;../../ext/deja_insight/lib/win32&quot;;"
+				AdditionalLibraryDirectories="&quot;../../lib/win32&quot;;&quot;../../ext/fbx&quot;;"
 				ProgramDatabaseFile="$(OutDir)/MeshImportFbx.dll.pdb"
 				GenerateMapFile="true"
 				MapFileName="$(OutDir)/MeshImportFbx.dll.map"
@@ -117,10 +114,10 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalOptions="/WX /W4 /fp:fast /O2 /MD /Zi "
+				AdditionalOptions="/Zi /W3 /fp:fast /WX /MD /O2 "
 				Optimization="4"
-				AdditionalIncludeDirectories="&quot;../../ext/deja_insight&quot;;&quot;../../include&quot;;&quot;../../include/common/snippets&quot;;&quot;../../include/common/binding&quot;;&quot;../../include/common/MemoryServices&quot;;"
-				PreprocessorDefinitions="WIN32;_WINDOWS;UNICODE=1;_UNICODE=1;MESHIMPORTFBX_EXPORTS;NDEBUG;"
+				AdditionalIncludeDirectories="&quot;../../include&quot;;&quot;../../include/common/snippets&quot;;&quot;../../include/MeshImport&quot;;&quot;../../ext/fbx&quot;;"
+				PreprocessorDefinitions="WIN32;_WINDOWS;_CONSOLE;UNICODE=1;_UNICODE=1;K_PLUGIN;K_FBXSDK;K_NODLL;_CRT_SECURET_NO_DEPRECATE;FBXIMPORTER_EXPORTS;MESHIMPORTFBX_EXPORTS;NDEBUG;"
 				ExceptionHandling="1"
 				WarningLevel="3"
 			/>
@@ -136,9 +133,9 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalOptions="/NODEFAULTLIB:libcp.lib /DEBUG "
-				AdditionalDependencies=""
+				AdditionalDependencies="&quot;fbxsdk_md2005.lib&quot; &quot;wininet.lib&quot; "
 				OutputFile="$(OutDir)/MeshImportFbx.dll"
-				AdditionalLibraryDirectories="&quot;../../lib/win32&quot;;&quot;../../ext/deja_insight/lib/win32&quot;;"
+				AdditionalLibraryDirectories="&quot;../../lib/win32&quot;;&quot;../../ext/fbx&quot;;"
 				ProgramDatabaseFile="$(OutDir)/MeshImportFbx.dll.pdb"
 				GenerateMapFile="true"
 				MapFileName="$(OutDir)/MeshImportFbx.dll.map"
@@ -178,7 +175,43 @@
 			Name="Source Files"
 			>
 			<File
+				RelativePath="..\..\src\MeshImportFbx\FBXReader.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\MeshImportFbx\FBXSceneFuncs.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\MeshImportFbx\ImportFBX.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\src\MeshImportFbx\MeshImportFbx.cpp"
+				>
+			</File>
+		</Filter>
+		<Filter
+			Name="Header Files"
+			>
+			<File
+				RelativePath="..\..\src\MeshImportFbx\FBXReader.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\MeshImportFbx\fmi_math.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\MeshImportFbx\ImportFBX.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\MeshImportFbx\MeshImportFbx.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\MeshImportFbx\Texture.h"
 				>
 			</File>
 		</Filter>
@@ -194,14 +227,214 @@
 			Name="Common Include-Binding Files"
 			>
 			<Filter
-				Name="MemoryServices"
+				Name="snippets"
 				>
 				<File
-					RelativePath="..\..\include\common\MemoryServices\MemoryContainer.cpp"
+					RelativePath="..\..\include\common\snippets\asc2bin.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\..\include\common\MemoryServices\MemoryContainer.h"
+					RelativePath="..\..\include\common\snippets\asc2bin.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\include\common\snippets\FastXml.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\include\common\snippets\FastXml.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\include\common\snippets\FileInterface.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\include\common\snippets\FileInterface.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\include\common\snippets\filesystem.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\include\common\snippets\FloatMath.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\include\common\snippets\FloatMath.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\include\common\snippets\FloatMath.inl"
+					>
+				</File>
+				<File
+					RelativePath="..\..\include\common\snippets\inparser.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\include\common\snippets\inparser.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\include\common\snippets\Nx.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\include\common\snippets\Nx12F32.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\include\common\snippets\Nx16F32.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\include\common\snippets\Nx9F32.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\include\common\snippets\NxAssert.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\include\common\snippets\NxBitField.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\include\common\snippets\NxBounds3.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\include\common\snippets\NxBox.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\include\common\snippets\NxCapsule.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\include\common\snippets\Nxf.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\include\common\snippets\NxFoundation.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\include\common\snippets\NxI16Vec3.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\include\common\snippets\NxMat33.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\include\common\snippets\NxMat34.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\include\common\snippets\nxmat44.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\include\common\snippets\NxMath.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\include\common\snippets\NxPlane.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\include\common\snippets\NxPool.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\include\common\snippets\NxProfiler.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\include\common\snippets\NxQuat.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\include\common\snippets\NxQuickSort.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\include\common\snippets\NxRay.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\include\common\snippets\NxSegment.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\include\common\snippets\NxSimpleTriangleMesh.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\include\common\snippets\NxSimpleTypes.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\include\common\snippets\NxSphere.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\include\common\snippets\NxStream.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\include\common\snippets\NxUtilities.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\include\common\snippets\NxVec3.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\include\common\snippets\NxVec4.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\include\common\snippets\NxVolumeIntegration.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\include\common\snippets\SendTextMessage.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\include\common\snippets\stable.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\include\common\snippets\stringdict.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\include\common\snippets\stringdict.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\include\common\snippets\sutil.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\include\common\snippets\sutil.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\include\common\snippets\SystemServices.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\include\common\snippets\SystemServices.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\include\common\snippets\UserMemAlloc.h"
 					>
 				</File>
 			</Filter>

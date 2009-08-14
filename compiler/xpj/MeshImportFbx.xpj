@@ -14,8 +14,14 @@
 				<Preprocessor type="define">
 					WIN32
 					_WINDOWS
+                    _CONSOLE
 					UNICODE=1
 					_UNICODE=1
+                    K_PLUGIN
+                    K_FBXSDK
+                    K_NODLL
+                    _CRT_SECURET_NO_DEPRECATE
+                    FBXIMPORTER_EXPORTS
           MESHIMPORTFBX_EXPORTS
 				</Preprocessor>
 				<Files name="Source Files" root="../../src/MeshImportFbx" type="source">
@@ -33,31 +39,65 @@
 				<Files name="Plugin Header Files" root="../../include" type="header">
 				</Files>
 				<Files name="Common Include-Binding Files" root="../../include/common" type="header">
-         MemoryServices/*.cpp
-         MemoryServices/*.h
+                snippets/asc2bin.cpp
+                snippets/AutoGeometry.cpp
+                snippets/FastXml.cpp
+                snippets/FileInterface.cpp
+                snippets/filesystem.cpp
+                snippets/FloatMath.cpp
+                snippets/FloatMath.inl
+                snippets/inparser.cpp
+                snippets/KeyValueIni.cpp
+                snippets/StanHull.cpp
+                snippets/stringdict.cpp
+                snippets/sutil.cpp
+                snippets/SystemServices.cpp
+                snippets/telnet.cpp
+                snippets/VtxWeld.cpp
+                snippets/winmsg.cpp
+                snippets/asc2bin.h
+                snippets/AutoGeometry.h
+                snippets/FastXml.h
+                snippets/FileInterface.h
+                snippets/filesystem.h
+                snippets/FloatMath.h
+                snippets/inparser.h
+                snippets/KeyValueIni.h
+                snippets/stable.h
+                snippets/StanHull.h
+                snippets/SystemServices.h
+                snippets/SendTextMessage.h
+                snippets/stringdict.h
+                snippets/sutil.h
+                snippets/telnet.h
+                snippets/UserMemAlloc.h
+                snippets/VtxWeld.h
+                snippets/winmsg.h
+                snippets/Nx*.h
 				</Files>
 				<OutDir>../../bin/win32</OutDir>
 				<ImpDir>../../lib/win32</ImpDir>
 				<SearchPaths type="header">
-          ../../ext/deja_insight
-          ../../include
-          ../../include/common/snippets
-          ../../include/common/binding
-          ../../include/common/MemoryServices
+                 ../../include
+                 ../../include/common/snippets
+                 ../../include/MeshImport
+                 ../../ext/fbx
 				</SearchPaths>
 				<SearchPaths type="library">
-       ../../lib/win32
-       ../../ext/deja_insight/lib/win32
+                ../../lib/win32
+                ../../ext/fbx
 				</SearchPaths>
 				<Dependencies>
 				</Dependencies>
 				<Libraries>
+                fbxsdk_md2005.lib
+				wininet.lib
 				</Libraries>
  				<LFlags tool="vc8">/NODEFAULTLIB:libcp.lib</LFlags>
 			</Configuration>
 
 			<Configuration name="debug">
-				<CFlags>/WX /W4 /fp:fast /MDd /Zi</CFlags>
+				<CFlags>/W3 /fp:fast /MDd /Zi</CFlags>
 				<LFlags>/DEBUG</LFlags>
 				<Preprocessor type="define">
 					_DEBUG
@@ -67,7 +107,7 @@
 			</Configuration>
 
 			<Configuration name="release">
-				<CFlags>/WX /W4 /fp:fast /O2 /MD /Zi</CFlags>
+				<CFlags>/Zi /W3 /fp:fast /WX /MD /O2</CFlags>
 				<LFlags>/DEBUG</LFlags>
 				<Preprocessor type="define">
 					NDEBUG

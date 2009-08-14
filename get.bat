@@ -1,22 +1,22 @@
 @echo off
 rem This batch file is used privately by the original author John W. Ratcliff to copy source between
 rem a Perforce depot to the SourceForge SVN depot.
+
 md bin
 cd bin
 md win32
 cd win32
 
-rem copy g:\p4\depot\HeroEngine\CLOTH-MAIN\he_plugins\bin\win32\TestMeshImport.exe
-rem copy g:\p4\depot\HeroEngine\CLOTH-MAIN\he_plugins\bin\win32\TestMeshImport.exe.manifest
-rem copy g:\p4\depot\HeroEngine\CLOTH-MAIN\he_plugins\bin\win32\Assimp32.dll
-rem copy g:\p4\depot\HeroEngine\CLOTH-MAIN\he_plugins\bin\win32\MeshImport.dll
-rem copy g:\p4\depot\HeroEngine\CLOTH-MAIN\he_plugins\bin\win32\MeshImportAssimp.dll
-rem copy g:\p4\depot\HeroEngine\CLOTH-MAIN\he_plugins\bin\win32\MeshImportEzm.dll
-rem copy g:\p4\depot\HeroEngine\CLOTH-MAIN\he_plugins\bin\win32\MeshImportLeveller.dll
-rem copy g:\p4\depot\HeroEngine\CLOTH-MAIN\he_plugins\bin\win32\MeshImportObj.dll
-rem copy g:\p4\depot\HeroEngine\CLOTH-MAIN\he_plugins\bin\win32\MeshImportOgre.dll
-rem copy g:\p4\depot\HeroEngine\CLOTH-MAIN\he_plugins\bin\win32\MSVCP80.dll
-rem copy g:\p4\depot\HeroEngine\CLOTH-MAIN\he_plugins\bin\win32\MSVCR80.dll
+copy \GoogleCode\CodeSuppository\bin\win32\MeshConvert.exe
+copy \GoogleCode\CodeSuppository\bin\win32\MeshConvert.exe.manifest
+copy \GoogleCode\CodeSuppository\bin\win32\MeshImport.dll
+copy \GoogleCode\CodeSuppository\bin\win32\MeshImportEzm.dll
+copy \GoogleCode\CodeSuppository\bin\win32\MeshImportObj.dll
+copy \GoogleCode\CodeSuppository\bin\win32\MeshImportOgre.dll
+copy \GoogleCode\CodeSuppository\bin\win32\MeshImportPSK.dll
+copy \GoogleCode\CodeSuppository\bin\win32\MeshImportFBX.dll
+copy \GoogleCode\CodeSuppository\bin\win32\MSVCP80.dll
+copy \GoogleCode\CodeSuppository\bin\win32\MSVCR80.dll
 
 
 cd ..
@@ -24,9 +24,9 @@ cd ..
 
 md ext
 cd ext
-md assimp
-cd assimp
-xcopy g:\p4\depot\HeroEngine\CLOTH-MAIN\he_plugins\ext\assimp\*.* /s
+md fbx
+cd fbx
+xcopy c:\p4\experimental\CodeSuppository\ext\fbx\*.* /s
 cd ..
 cd ..
 
@@ -34,7 +34,7 @@ md media
 cd media
 md MeshImport
 cd MeshImport
-copy g:\p4\depot\HeroEngine\CLOTH-MAIN\he_plugins\media\MeshImport\*.*"
+copy \GoogleCode\CodeSuppository\media\MeshImport\*.*"
 cd ..
 cd ..
 
@@ -43,34 +43,34 @@ cd include
 
 md MeshImport
 cd MeshImport
-copy g:\p4\depot\HeroEngine\CLOTH-MAIN\he_plugins\include\MeshImport\*.h
-copy g:\p4\depot\HeroEngine\CLOTH-MAIN\he_plugins\include\MeshImport\*.cpp
+copy \GoogleCode\CodeSuppository\include\MeshImport\*.h
+copy \GoogleCode\CodeSuppository\include\MeshImport\*.cpp
 cd ..
 
-md MeshImportAssimp
-cd MeshImportAssimp
-copy g:\p4\depot\HeroEngine\CLOTH-MAIN\he_plugins\include\MeshImportAssimp\*.h
+md MeshImportPSK
+cd MeshImportPSK
+copy \GoogleCode\CodeSuppository\include\MeshImportPSK\*.h
+cd ..
+
+md MeshImportFBX
+cd MeshImportFBX
+copy \GoogleCode\CodeSuppository\include\MeshImportFBX\*.h
 cd ..
 
 md MeshImportEzm
 cd MeshImportEzm
-copy g:\p4\depot\HeroEngine\CLOTH-MAIN\he_plugins\include\MeshImportEzm\*.h
+copy \GoogleCode\CodeSuppository\include\MeshImportEzm\*.h
 cd ..
 
-
-md MeshImportLeveller
-cd MeshImportLeveller
-copy g:\p4\depot\HeroEngine\CLOTH-MAIN\he_plugins\include\MeshImportLeveller\*.h
-cd ..
 
 md MeshImportObj
 cd MeshImportObj
-copy g:\p4\depot\HeroEngine\CLOTH-MAIN\he_plugins\include\MeshImportObj\*.h
+copy \GoogleCode\CodeSuppository\include\MeshImportObj\*.h
 cd ..
 
 md MeshImportOgre
 cd MeshImportOgre
-copy g:\p4\depot\HeroEngine\CLOTH-MAIN\he_plugins\include\MeshImportOgre\*.h
+copy \GoogleCode\CodeSuppository\include\MeshImportOgre\*.h
 cd ..
 
 md common
@@ -78,47 +78,46 @@ cd common
 
 md binding
 cd binding
-copy g:\p4\depot\HeroEngine\CLOTH-MAIN\he_plugins\include\common\binding\binding.h
-copy g:\p4\depot\HeroEngine\CLOTH-MAIN\he_plugins\include\common\binding\binding.cpp
-cd ..
-
-md MemoryServices
-cd MemoryServices
-copy g:\p4\depot\HeroEngine\CLOTH-MAIN\he_plugins\include\common\MemoryServices\MemoryContainer.cpp
-copy g:\p4\depot\HeroEngine\CLOTH-MAIN\he_plugins\include\common\MemoryServices\MemoryContainer.h
+copy \GoogleCode\CodeSuppository\include\common\binding\binding.h
+copy \GoogleCode\CodeSuppository\include\common\binding\binding.cpp
 cd ..
 
 md snippets
 cd snippets
-copy g:\p4\depot\HeroEngine\CLOTH-MAIN\he_plugins\include\common\snippets\FileSystem.h
-copy g:\p4\depot\HeroEngine\CLOTH-MAIN\he_plugins\include\common\snippets\SystemServices.cpp
-copy g:\p4\depot\HeroEngine\CLOTH-MAIN\he_plugins\include\common\snippets\SystemServices.h
-copy g:\p4\depot\HeroEngine\CLOTH-MAIN\he_plugins\include\common\snippets\inparser.h
-copy g:\p4\depot\HeroEngine\CLOTH-MAIN\he_plugins\include\common\snippets\inparser.cpp
-copy g:\p4\depot\HeroEngine\CLOTH-MAIN\he_plugins\include\common\snippets\asc2bin.cpp
-copy g:\p4\depot\HeroEngine\CLOTH-MAIN\he_plugins\include\common\snippets\asc2bin.h
-copy g:\p4\depot\HeroEngine\CLOTH-MAIN\he_plugins\include\common\snippets\fmem.h
-copy g:\p4\depot\HeroEngine\CLOTH-MAIN\he_plugins\include\common\snippets\stable.h
-copy g:\p4\depot\HeroEngine\CLOTH-MAIN\he_plugins\include\common\snippets\StringDict.cpp
-copy g:\p4\depot\HeroEngine\CLOTH-MAIN\he_plugins\include\common\snippets\StringDict.h
-copy g:\p4\depot\HeroEngine\CLOTH-MAIN\he_plugins\include\common\snippets\SendTextMessage.h
-copy g:\p4\depot\HeroEngine\CLOTH-MAIN\he_plugins\include\common\snippets\HeSimpleTypes.h
-copy g:\p4\depot\HeroEngine\CLOTH-MAIN\he_plugins\include\common\snippets\He.h
-copy g:\p4\depot\HeroEngine\CLOTH-MAIN\he_plugins\include\common\snippets\FastXml.h
-copy g:\p4\depot\HeroEngine\CLOTH-MAIN\he_plugins\include\common\snippets\FastXml.cpp
-copy g:\p4\depot\HeroEngine\CLOTH-MAIN\he_plugins\include\common\snippets\FloatMath.inl
-copy g:\p4\depot\HeroEngine\CLOTH-MAIN\he_plugins\include\common\snippets\FloatMath.cpp
-copy g:\p4\depot\HeroEngine\CLOTH-MAIN\he_plugins\include\common\snippets\FloatMath.h
-copy g:\p4\depot\HeroEngine\CLOTH-MAIN\he_plugins\include\common\snippets\sutil.h
-copy g:\p4\depot\HeroEngine\CLOTH-MAIN\he_plugins\include\common\snippets\sutil.cpp
+copy \GoogleCode\CodeSuppository\include\common\snippets\UserMemAlloc.h
+copy \GoogleCode\CodeSuppository\include\common\snippets\KeyValue.h
+copy \GoogleCode\CodeSuppository\include\common\snippets\KeyValue.cpp
+copy \GoogleCode\CodeSuppository\include\common\snippets\KeyValueIni.h
+copy \GoogleCode\CodeSuppository\include\common\snippets\KeyValueIni.cpp
+copy \GoogleCode\CodeSuppository\include\common\snippets\winmsg.h
+copy \GoogleCode\CodeSuppository\include\common\snippets\winmsg.cpp
+copy \GoogleCode\CodeSuppository\include\common\snippets\telnet.h
+copy \GoogleCode\CodeSuppository\include\common\snippets\telnet.cpp
+copy \GoogleCode\CodeSuppository\include\common\snippets\FileInterface.h
+copy \GoogleCode\CodeSuppository\include\common\snippets\FileInterface.cpp
+copy \GoogleCode\CodeSuppository\include\common\snippets\FileSystem.h
+copy \GoogleCode\CodeSuppository\include\common\snippets\SystemServices.cpp
+copy \GoogleCode\CodeSuppository\include\common\snippets\SystemServices.h
+copy \GoogleCode\CodeSuppository\include\common\snippets\inparser.h
+copy \GoogleCode\CodeSuppository\include\common\snippets\inparser.cpp
+copy \GoogleCode\CodeSuppository\include\common\snippets\asc2bin.cpp
+copy \GoogleCode\CodeSuppository\include\common\snippets\asc2bin.h
+copy \GoogleCode\CodeSuppository\include\common\snippets\fmem.h
+copy \GoogleCode\CodeSuppository\include\common\snippets\stable.h
+copy \GoogleCode\CodeSuppository\include\common\snippets\StringDict.cpp
+copy \GoogleCode\CodeSuppository\include\common\snippets\StringDict.h
+copy \GoogleCode\CodeSuppository\include\common\snippets\SendTextMessage.h
+copy \GoogleCode\CodeSuppository\include\common\snippets\NxSimpleTypes.h
+copy \GoogleCode\CodeSuppository\include\common\snippets\NxAssert.h
+copy \GoogleCode\CodeSuppository\include\common\snippets\Nx.h
+copy \GoogleCode\CodeSuppository\include\common\snippets\FastXml.h
+copy \GoogleCode\CodeSuppository\include\common\snippets\FastXml.cpp
+copy \GoogleCode\CodeSuppository\include\common\snippets\FloatMath.inl
+copy \GoogleCode\CodeSuppository\include\common\snippets\FloatMath.cpp
+copy \GoogleCode\CodeSuppository\include\common\snippets\FloatMath.h
+copy \GoogleCode\CodeSuppository\include\common\snippets\sutil.h
+copy \GoogleCode\CodeSuppository\include\common\snippets\sutil.cpp
 cd ..
-
-md FileInterface
-cd FileInterface
-copy g:\p4\depot\HeroEngine\CLOTH-MAIN\he_plugins\include\common\FileInterface\*.cpp
-copy g:\p4\depot\HeroEngine\CLOTH-MAIN\he_plugins\include\common\FileInterface\*.h
-cd ..
-
 
 cd ..
 cd ..
@@ -127,43 +126,41 @@ md compiler
 cd compiler
 md vc8
 cd vc8
-rem copy g:\p4\depot\HeroEngine\CLOTH-MAIN\he_plugins\compiler\vc8\TestMeshImport.sln
-rem copy g:\p4\depot\HeroEngine\CLOTH-MAIN\he_plugins\compiler\vc8\TestMeshImport.vcproj
-rem copy g:\p4\depot\HeroEngine\CLOTH-MAIN\he_plugins\compiler\vc8\MeshImport.sln
-rem copy g:\p4\depot\HeroEngine\CLOTH-MAIN\he_plugins\compiler\vc8\MeshImport.vcproj
-rem copy g:\p4\depot\HeroEngine\CLOTH-MAIN\he_plugins\compiler\vc8\MeshImportAssimp.sln
-rem copy g:\p4\depot\HeroEngine\CLOTH-MAIN\he_plugins\compiler\vc8\MeshImportAssimp.vcproj
-rem copy g:\p4\depot\HeroEngine\CLOTH-MAIN\he_plugins\compiler\vc8\MeshImportEzm.sln
-rem copy g:\p4\depot\HeroEngine\CLOTH-MAIN\he_plugins\compiler\vc8\MeshImportEzm.vcproj
-rem copy g:\p4\depot\HeroEngine\CLOTH-MAIN\he_plugins\compiler\vc8\MeshImportFbx.vcproj
-rem copy g:\p4\depot\HeroEngine\CLOTH-MAIN\he_plugins\compiler\vc8\MeshImportLeveller.sln
-rem copy g:\p4\depot\HeroEngine\CLOTH-MAIN\he_plugins\compiler\vc8\MeshImportLeveller.vcproj
-rem copy g:\p4\depot\HeroEngine\CLOTH-MAIN\he_plugins\compiler\vc8\MeshImportObj.sln
-rem copy g:\p4\depot\HeroEngine\CLOTH-MAIN\he_plugins\compiler\vc8\MeshImportObj.vcproj
-rem copy g:\p4\depot\HeroEngine\CLOTH-MAIN\he_plugins\compiler\vc8\MeshImportOgre.sln
-rem copy g:\p4\depot\HeroEngine\CLOTH-MAIN\he_plugins\compiler\vc8\MeshImportOgre.vcproj
+REM copy \GoogleCode\CodeSuppository\compiler\vc8\MeshConvert.sln
+REM copy \GoogleCode\CodeSuppository\compiler\vc8\MeshConvert.vcproj
+REM copy \GoogleCode\CodeSuppository\compiler\vc8\MeshImport.sln
+REM copy \GoogleCode\CodeSuppository\compiler\vc8\MeshImport.vcproj
+REM copy \GoogleCode\CodeSuppository\compiler\vc8\MeshImportEzm.sln
+REM copy \GoogleCode\CodeSuppository\compiler\vc8\MeshImportEzm.vcproj
+REM copy \GoogleCode\CodeSuppository\compiler\vc8\MeshImportFbx.vcproj
+REM copy \GoogleCode\CodeSuppository\compiler\vc8\MeshImportPSK.sln
+REM copy \GoogleCode\CodeSuppository\compiler\vc8\MeshImportPSK.vcproj
+REM copy \GoogleCode\CodeSuppository\compiler\vc8\MeshImportObj.sln
+REM copy \GoogleCode\CodeSuppository\compiler\vc8\MeshImportObj.vcproj
+REM copy \GoogleCode\CodeSuppository\compiler\vc8\MeshImportOgre.sln
+REM copy \GoogleCode\CodeSuppository\compiler\vc8\MeshImportOgre.vcproj
 cd ..
 md xpj
 cd xpj
-copy g:\p4\depot\HeroEngine\CLOTH-MAIN\he_plugins\compiler\xpj\TestMeshImport.xpj
-copy g:\p4\depot\HeroEngine\CLOTH-MAIN\he_plugins\compiler\xpj\MeshImport.xpj
-copy g:\p4\depot\HeroEngine\CLOTH-MAIN\he_plugins\compiler\xpj\MeshImportAssimp.xpj
-copy g:\p4\depot\HeroEngine\CLOTH-MAIN\he_plugins\compiler\xpj\MeshImportEzm.xpj
-copy g:\p4\depot\HeroEngine\CLOTH-MAIN\he_plugins\compiler\xpj\MeshImportLeveller.xpj
-copy g:\p4\depot\HeroEngine\CLOTH-MAIN\he_plugins\compiler\xpj\MeshImportObj.xpj
-copy g:\p4\depot\HeroEngine\CLOTH-MAIN\he_plugins\compiler\xpj\MeshImportOgre.xpj
-copy g:\p4\depot\HeroEngine\CLOTH-MAIN\he_plugins\compiler\xpj\xpj.exe
-copy g:\p4\depot\HeroEngine\CLOTH-MAIN\he_plugins\compiler\xpj\build1.bat
+copy \GoogleCode\CodeSuppository\compiler\xpj\MeshConvert.xpj
+copy \GoogleCode\CodeSuppository\compiler\xpj\MeshImport.xpj
+copy \GoogleCode\CodeSuppository\compiler\xpj\MeshImportFBX.xpj
+copy \GoogleCode\CodeSuppository\compiler\xpj\MeshImportEzm.xpj
+copy \GoogleCode\CodeSuppository\compiler\xpj\MeshImportPSK.xpj
+copy \GoogleCode\CodeSuppository\compiler\xpj\MeshImportObj.xpj
+copy \GoogleCode\CodeSuppository\compiler\xpj\MeshImportOgre.xpj
+copy \GoogleCode\CodeSuppository\compiler\xpj\xpj.exe
+copy \GoogleCode\CodeSuppository\compiler\xpj\build1.bat
 cd ..
 cd ..
 
 md app
 cd app
-md TestMeshImport
-cd TestMeshImport
-copy g:\p4\depot\HeroEngine\CLOTH-MAIN\he_plugins\app\TestMeshImport\*.cpp
-copy g:\p4\depot\HeroEngine\CLOTH-MAIN\he_plugins\app\TestMeshImport\*.c
-copy g:\p4\depot\HeroEngine\CLOTH-MAIN\he_plugins\app\TestMeshImport\*.h
+md MeshConvert
+cd MeshConvert
+copy \GoogleCode\CodeSuppository\app\MeshConvert\*.cpp
+copy \GoogleCode\CodeSuppository\app\MeshConvert\*.c
+copy \GoogleCode\CodeSuppository\app\MeshConvert\*.h
 cd ..
 cd ..
 
@@ -171,17 +168,7 @@ md docs
 cd docs
 md MeshImport
 cd MeshImport
-copy g:\p4\depot\HeroEngine\CLOTH-MAIN\he_plugins\docs\MeshImport\MeshImport.txt
-cd ..
-cd ..
-
-md installer
-cd installer
-md MeshImport
-cd MeshImport
-copy g:\p4\depot\HeroEngine\CLOTH-MAIN\he_plugins\installer\MeshImport\license.txt
-copy g:\p4\depot\HeroEngine\CLOTH-MAIN\he_plugins\installer\MeshImport\MeshImport.nsi
-copy g:\p4\depot\HeroEngine\CLOTH-MAIN\he_plugins\installer\MeshImport\rocket.ico
+copy \GoogleCode\CodeSuppository\docs\MeshImport\MeshImport.txt
 cd ..
 cd ..
 
@@ -191,45 +178,45 @@ cd src
 
 md MeshImport
 cd MeshImport
-copy g:\p4\depot\HeroEngine\CLOTH-MAIN\he_plugins\src\MeshImport\*.h
-copy g:\p4\depot\HeroEngine\CLOTH-MAIN\he_plugins\src\MeshImport\*.cpp
-copy g:\p4\depot\HeroEngine\CLOTH-MAIN\he_plugins\src\MeshImport\*.c
+copy \GoogleCode\CodeSuppository\src\MeshImport\*.h
+copy \GoogleCode\CodeSuppository\src\MeshImport\*.cpp
+copy \GoogleCode\CodeSuppository\src\MeshImport\*.c
 cd ..
 
-md MeshImportAssimp
-cd MeshImportAssimp
-copy g:\p4\depot\HeroEngine\CLOTH-MAIN\he_plugins\src\MeshImportAssimp\*.h
-copy g:\p4\depot\HeroEngine\CLOTH-MAIN\he_plugins\src\MeshImportAssimp\*.cpp
-copy g:\p4\depot\HeroEngine\CLOTH-MAIN\he_plugins\src\MeshImportAssimp\*.c
+md MeshImportFBX
+cd MeshImportFBX
+copy \GoogleCode\CodeSuppository\src\MeshImportFBX\*.h
+copy \GoogleCode\CodeSuppository\src\MeshImportFBX\*.cpp
+copy \GoogleCode\CodeSuppository\src\MeshImportFBX\*.c
 cd ..
 
 md MeshImportEzm
 cd MeshImportEzm
-copy g:\p4\depot\HeroEngine\CLOTH-MAIN\he_plugins\src\MeshImportEzm\*.h
-copy g:\p4\depot\HeroEngine\CLOTH-MAIN\he_plugins\src\MeshImportEzm\*.cpp
-copy g:\p4\depot\HeroEngine\CLOTH-MAIN\he_plugins\src\MeshImportEzm\*.c
+copy \GoogleCode\CodeSuppository\src\MeshImportEzm\*.h
+copy \GoogleCode\CodeSuppository\src\MeshImportEzm\*.cpp
+copy \GoogleCode\CodeSuppository\src\MeshImportEzm\*.c
 cd ..
 
 
-md MeshImportLeveller
-cd MeshImportLeveller
-copy g:\p4\depot\HeroEngine\CLOTH-MAIN\he_plugins\src\MeshImportLeveller\*.h
-copy g:\p4\depot\HeroEngine\CLOTH-MAIN\he_plugins\src\MeshImportLeveller\*.cpp
-copy g:\p4\depot\HeroEngine\CLOTH-MAIN\he_plugins\src\MeshImportLeveller\*.c
+md MeshImportPSK
+cd MeshImportPSk
+copy \GoogleCode\CodeSuppository\src\MeshImportPSK\*.h
+copy \GoogleCode\CodeSuppository\src\MeshImportPSK\*.cpp
+copy \GoogleCode\CodeSuppository\src\MeshImportPSK\*.c
 cd ..
 
 md MeshImportObj
 cd MeshImportObj
-copy g:\p4\depot\HeroEngine\CLOTH-MAIN\he_plugins\src\MeshImportObj\*.h
-copy g:\p4\depot\HeroEngine\CLOTH-MAIN\he_plugins\src\MeshImportObj\*.cpp
-copy g:\p4\depot\HeroEngine\CLOTH-MAIN\he_plugins\src\MeshImportObj\*.c
+copy \GoogleCode\CodeSuppository\src\MeshImportObj\*.h
+copy \GoogleCode\CodeSuppository\src\MeshImportObj\*.cpp
+copy \GoogleCode\CodeSuppository\src\MeshImportObj\*.c
 cd ..
 
 md MeshImportOgre
 cd MeshImportOgre
-copy g:\p4\depot\HeroEngine\CLOTH-MAIN\he_plugins\src\MeshImportOgre\*.h
-copy g:\p4\depot\HeroEngine\CLOTH-MAIN\he_plugins\src\MeshImportOgre\*.cpp
-copy g:\p4\depot\HeroEngine\CLOTH-MAIN\he_plugins\src\MeshImportOgre\*.c
+copy \GoogleCode\CodeSuppository\src\MeshImportOgre\*.h
+copy \GoogleCode\CodeSuppository\src\MeshImportOgre\*.cpp
+copy \GoogleCode\CodeSuppository\src\MeshImportOgre\*.c
 cd ..
 
 cd ..
