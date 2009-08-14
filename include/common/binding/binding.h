@@ -18,6 +18,8 @@
 
 #define BINDING_H
 
+#include "UserMemAlloc.h"
+
 
 namespace SYSTEM_SERVICES
 {
@@ -28,7 +30,7 @@ class SystemServices;
 * \brief
 * function type used by interface registration
 */
-typedef void * (__cdecl * PLUGIN_INTERFACE_FUNC)     (int version,SYSTEM_SERVICES::SystemServices *services);
+typedef void * (__cdecl * PLUGIN_INTERFACE_FUNC)     (NxI32 version,SYSTEM_SERVICES::SystemServices *services);
 
 /*!
 * \brief
@@ -40,7 +42,7 @@ struct INTERFACE_EXPORT
   PLUGIN_INTERFACE_FUNC func;
 };
 
-typedef int    (__cdecl * PLUGIN_INTERFACE_LIST_FUNC)(const INTERFACE_EXPORT **);
+typedef NxI32    (__cdecl * PLUGIN_INTERFACE_LIST_FUNC)(const INTERFACE_EXPORT **);
 
 
 
@@ -73,14 +75,14 @@ extern "C"
  * Separate items with the '|' character.
  */
 void       loadModuleInterfaces(const char *dll, void **rmodule = 0);
-void *     getBindingInterface(const char *dll, const char *name, int version_number, SYSTEM_SERVICES::SystemServices *services, void **rmodule = 0); 
+void *     getBindingInterface(const char *dll, const char *name, NxI32 version_number, SYSTEM_SERVICES::SystemServices *services, void **rmodule = 0); 
 bool       unloadModule(void *module);
 
 
 void       setSuppressLoadError(bool state); // whether or not to suppress load error dialog boxes under windows.
 
-void * aaGetBindingInterface(const char *dll,int version_number,void *(&module));
-void *  reGetBindingInterface(const char *dll,int version_number,void *(&module));
+void * aaGetBindingInterface(const char *dll,NxI32 version_number,void *(&module));
+void *  reGetBindingInterface(const char *dll,NxI32 version_number,void *(&module));
 };
 
 

@@ -2,6 +2,7 @@
 
 #define WIN_MSG_H
 
+#include "UserMemAlloc.h"
 
 /*!
 **

@@ -2,6 +2,8 @@
 
 #define FMEM_H
 
+#include "UserMemAlloc.h"
+
 /*!
 **
 ** Copyright (c) 2007 by John W. Ratcliff mailto:jratcliff@infiniplex.net
@@ -59,17 +61,17 @@
 #pragma warning(push)
 #pragma warning(disable:4996)
 
-inline unsigned char *getLocalFile(const char *filename,unsigned int &len)
+inline NxU8 *getLocalFile(const char *filename,NxU32 &len)
 {
-  unsigned char * ret = 0;
+  NxU8 * ret = 0;
   FILE *fph = fopen(filename,"rb");
   if ( fph )
   {
     fseek(fph,0L,SEEK_END);
     len = ftell(fph);
     fseek(fph,0L,SEEK_SET);
-    unsigned char *mem = MEMALLOC_NEW_ARRAY(unsigned char,len)[len];
-    unsigned int l = fread(mem,len,1,fph);
+    NxU8 *mem = MEMALLOC_NEW_ARRAY(NxU8,len)[len];
+    NxU32 l = fread(mem,len,1,fph);
     if ( l == 0 )
     {
       delete mem;
@@ -83,12 +85,12 @@ inline unsigned char *getLocalFile(const char *filename,unsigned int &len)
   return ret;
 }
 
-inline void releaseFmem(unsigned char *mem)
+inline void releaseFmem(NxU8 *mem)
 {
   delete []mem;
 }
 
-inline bool putLocalFile(const char *filename,const void *mem,unsigned int len)
+inline bool putLocalFile(const char *filename,const void *mem,NxU32 len)
 {
   bool ret = false;
 

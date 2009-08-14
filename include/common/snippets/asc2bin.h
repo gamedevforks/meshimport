@@ -1,6 +1,8 @@
 #ifndef ASC2BIN_H
 
 #define ASC2BIN_H
+
+#include "UserMemAlloc.h"
 /*!
 **
 ** Copyright (c) 2007 by John W. Ratcliff mailto:jratcliff@infiniplex.net

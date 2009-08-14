@@ -2,6 +2,8 @@
 
 #define TELNET_H
 
+#include "UserMemAlloc.h"
+
 /*!
 **
 ** Copyright (c) 2009 by John W. Ratcliff mailto:jratcliffscarab@gmail.com
