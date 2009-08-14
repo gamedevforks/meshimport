@@ -1,6 +1,8 @@
 #ifndef STRINGDICT_H
 #define STRINGDICT_H
 
+#include "UserMemAlloc.h"
+
 /*!
 **
 ** Copyright (c) 2007 by John W. Ratcliff mailto:jratcliff@infiniplex.net

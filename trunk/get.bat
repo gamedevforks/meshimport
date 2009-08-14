@@ -7,16 +7,16 @@ cd bin
 md win32
 cd win32
 
-copy \GoogleCode\CodeSuppository\bin\win32\MeshConvert.exe
-copy \GoogleCode\CodeSuppository\bin\win32\MeshConvert.exe.manifest
-copy \GoogleCode\CodeSuppository\bin\win32\MeshImport.dll
-copy \GoogleCode\CodeSuppository\bin\win32\MeshImportEzm.dll
-copy \GoogleCode\CodeSuppository\bin\win32\MeshImportObj.dll
-copy \GoogleCode\CodeSuppository\bin\win32\MeshImportOgre.dll
-copy \GoogleCode\CodeSuppository\bin\win32\MeshImportPSK.dll
-copy \GoogleCode\CodeSuppository\bin\win32\MeshImportFBX.dll
-copy \GoogleCode\CodeSuppository\bin\win32\MSVCP80.dll
-copy \GoogleCode\CodeSuppository\bin\win32\MSVCR80.dll
+REM copy \GoogleCode\CodeSuppository\bin\win32\MeshConvert.exe
+REM copy \GoogleCode\CodeSuppository\bin\win32\MeshConvert.exe.manifest
+REM copy \GoogleCode\CodeSuppository\bin\win32\MeshImport.dll
+REM copy \GoogleCode\CodeSuppository\bin\win32\MeshImportEzm.dll
+REM copy \GoogleCode\CodeSuppository\bin\win32\MeshImportObj.dll
+REM copy \GoogleCode\CodeSuppository\bin\win32\MeshImportOgre.dll
+REM copy \GoogleCode\CodeSuppository\bin\win32\MeshImportPSK.dll
+REM copy \GoogleCode\CodeSuppository\bin\win32\MeshImportFBX.dll
+REM copy \GoogleCode\CodeSuppository\bin\win32\MSVCP80.dll
+REM copy \GoogleCode\CodeSuppository\bin\win32\MSVCR80.dll
 
 
 cd ..
