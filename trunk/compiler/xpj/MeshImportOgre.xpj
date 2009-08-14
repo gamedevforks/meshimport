@@ -45,15 +45,15 @@
           snippets/SystemServices.h
           snippets/FastXml.h
           snippets/FastXml.cpp
-          MemoryServices/MemoryContainer.cpp
-          MemoryServices/MemoryContainer.h
-         MemoryServices/GlobalNewDelete.cpp
-         MemoryServices/GlobalNewDelete.h
+          snippets/UserMemAlloc.h
+          snippets/Nx*.h
 				</Files>
 				<OutDir>../../bin/win32</OutDir>
 				<ImpDir>../../lib/win32</ImpDir>
 				<SearchPaths type="header">
-          ../../include
+                 ../../include/common/snippets
+                 ../../include/MeshImport
+                 ../../include
 				</SearchPaths>
 				<SearchPaths type="library">
          ../../lib/win32

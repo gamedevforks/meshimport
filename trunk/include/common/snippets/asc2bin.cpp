@@ -52,8 +52,8 @@
 #include <float.h>
 #include <assert.h>
 
-#include "common/snippets/UserMemAlloc.h"
-#include "common/snippets/asc2bin.h"
+#include "UserMemAlloc.h"
+#include "asc2bin.h"
 
 
 static inline bool         IsWhitespace(char c)
@@ -79,9 +79,9 @@ static char ToLower(char c)
 	return c;
 }
 
-static inline unsigned int GetHex(unsigned char c)
+static inline NxU32 GetHex(NxU8 c)
 {
-	unsigned int v = 0;
+	NxU32 v = 0;
 	c = ToLower(c);
 	if ( c >= '0' && c <= '9' )
 		v = c-'0';
@@ -95,9 +95,9 @@ static inline unsigned int GetHex(unsigned char c)
 	return v;
 }
 
-static inline unsigned char GetHEX1(const char *foo,const char **endptr)
+static inline NxU8 GetHEX1(const char *foo,const char **endptr)
 {
-	unsigned int ret = 0;
+	NxU32 ret = 0;
 
 	ret = (GetHex(foo[0])<<4) | GetHex(foo[1]);
 
@@ -106,13 +106,13 @@ static inline unsigned char GetHEX1(const char *foo,const char **endptr)
 		*endptr = foo+2;
 	}
 
-	return (unsigned char) ret;
+	return (NxU8) ret;
 }
 
 
 static inline unsigned short GetHEX2(const char *foo,const char **endptr)
 {
-	unsigned int ret = 0;
+	NxU32 ret = 0;
 
 	ret = (GetHex(foo[0])<<12) | (GetHex(foo[1])<<8) | (GetHex(foo[2])<<4) | GetHex(foo[3]);
 
@@ -124,11 +124,11 @@ static inline unsigned short GetHEX2(const char *foo,const char **endptr)
 	return (unsigned short) ret;
 }
 
-static inline unsigned int GetHEX4(const char *foo,const char **endptr)
+static inline NxU32 GetHEX4(const char *foo,const char **endptr)
 {
-	unsigned int ret = 0;
+	NxU32 ret = 0;
 
-	for (int i=0; i<8; i++)
+	for (NxI32 i=0; i<8; i++)
 	{
 		ret = (ret<<4) | GetHex(foo[i]);
 	}
@@ -141,14 +141,14 @@ static inline unsigned int GetHEX4(const char *foo,const char **endptr)
 	return ret;
 }
 
-static inline unsigned int GetHEX(const char *foo,const char **endptr)
+static inline NxU32 GetHEX(const char *foo,const char **endptr)
 {
-	unsigned int ret = 0;
+	NxU32 ret = 0;
 
 	while ( *foo )
 	{
-		unsigned char c = ToLower( *foo );
-		unsigned int v = 0;
+		NxU8 c = ToLower( *foo );
+		NxU32 v = 0;
 		if ( c >= '0' && c <= '9' )
 			v = c-'0';
 		else
@@ -174,9 +174,9 @@ static inline unsigned int GetHEX(const char *foo,const char **endptr)
 
 #define MAXNUM 32
 
-static inline float        GetFloatValue(const char *str,const char **next)
+static inline NxF32        GetFloatValue(const char *str,const char **next)
 {
-	float ret = 0;
+	NxF32 ret = 0;
 
 	if ( next ) *next = 0;
 
@@ -186,7 +186,7 @@ static inline float        GetFloatValue(const char *str,const char **next)
 	char *dst = dest;
 	const char *hex = 0;
 
-	for (int i=0; i<(MAXNUM-1); i++)
+	for (NxI32 i=0; i<(MAXNUM-1); i++)
 	{
 		char c = *str;
 		if ( c == 0 || IsWhitespace(c) )
@@ -206,8 +206,8 @@ static inline float        GetFloatValue(const char *str,const char **next)
 
 	if ( hex )
 	{
-		unsigned int iv = GetHEX(hex,0);
-		float *v = (float *)&iv;
+		NxU32 iv = GetHEX(hex,0);
+		NxF32 *v = (NxF32 *)&iv;
 		ret = *v;
 	}
 	else if ( dest[0] == 'f' )
@@ -227,14 +227,14 @@ static inline float        GetFloatValue(const char *str,const char **next)
 	}
 	else
 	{
-		ret = (float)atof(dest);
+		ret = (NxF32)atof(dest);
 	}
 	return ret;
 }
 
-static inline int          GetIntValue(const char *str,const char **next)
+static inline NxI32          GetIntValue(const char *str,const char **next)
 {
-	int ret = 0;
+	NxI32 ret = 0;
 
 	if ( next ) *next = 0;
 
@@ -243,7 +243,7 @@ static inline int          GetIntValue(const char *str,const char **next)
 	char dest[MAXNUM];
 	char *dst = dest;
 
-	for (int i=0; i<(MAXNUM-1); i++)
+	for (NxI32 i=0; i<(MAXNUM-1); i++)
 	{
 		char c = *str;
 		if ( c == 0 || IsWhitespace(c) )
@@ -279,11 +279,11 @@ void TestAsc2bin(void)
 }
 #endif
 
-void * Asc2Bin(const char *source,const int count,const char *spec,void *dest)
+void * Asc2Bin(const char *source,const NxI32 count,const char *spec,void *dest)
 {
 
-	int   cnt = 0;
-	int   size  = 0;
+	NxI32   cnt = 0;
+	NxI32   size  = 0;
 
 	Atype types[MAXARG];
 
@@ -293,8 +293,8 @@ void * Asc2Bin(const char *source,const int count,const char *spec,void *dest)
 	{
 		switch ( ToLower(*ctype) )
 		{
-			case 'f': size+= sizeof(float); types[cnt] = AT_FLOAT; cnt++;  break;
-			case 'd': size+= sizeof(int);   types[cnt] = AT_INT;   cnt++;  break;
+			case 'f': size+= sizeof(NxF32); types[cnt] = AT_FLOAT; cnt++;  break;
+			case 'd': size+= sizeof(NxI32);   types[cnt] = AT_INT;   cnt++;  break;
 			case 'c': size+=sizeof(char);   types[cnt] = AT_CHAR;  cnt++;  break;
 			case 'b': size+=sizeof(char);   types[cnt] = AT_BYTE;  cnt++;  break;
 			case 'h': size+=sizeof(short);  types[cnt] = AT_SHORT; cnt++;  break;
@@ -302,7 +302,7 @@ void * Asc2Bin(const char *source,const int count,const char *spec,void *dest)
 			case 'x':
 				{
 					Atype type = AT_HEX4;
-					int sz = 4;
+					NxI32 sz = 4;
 					switch ( ctype[1] )
 					{
 						case '1':  type = AT_HEX1; sz   = 1; ctype++;  break;
@@ -331,9 +331,9 @@ void * Asc2Bin(const char *source,const int count,const char *spec,void *dest)
 	memset(dest,0,count*size); // zero out memory
 
 	char *dst = (char *) dest; // where we are storing the results
-	for (int i=0; i<count; i++)
+	for (NxI32 i=0; i<count; i++)
 	{
-		for (int j=0; j<cnt; j++)
+		for (NxI32 j=0; j<cnt; j++)
 		{
 			source = SkipWhitespace(source); // skip white spaces.
 
@@ -350,16 +350,16 @@ void * Asc2Bin(const char *source,const int count,const char *spec,void *dest)
 			{
 				case AT_FLOAT:
 					{
-						float *v = (float *) dst;
+						NxF32 *v = (NxF32 *) dst;
 						*v = GetFloatValue(source,&source);
-						dst+=sizeof(float);
+						dst+=sizeof(NxF32);
 					}
 					break;
 				case AT_INT:
 					{
-						int *v = (int *) dst;
+						NxI32 *v = (NxI32 *) dst;
 						*v = GetIntValue( source, &source );
-						dst+=sizeof(int);
+						dst+=sizeof(NxI32);
 					}
 					break;
 				case AT_CHAR:
@@ -391,15 +391,15 @@ void * Asc2Bin(const char *source,const int count,const char *spec,void *dest)
 					break;
 				case AT_HEX1:
 					{
-						unsigned int hex = GetHEX1(source,&source);
-						unsigned char *v = (unsigned char *) dst;
-						*v = (unsigned char)hex;
-						dst+=sizeof(unsigned char);
+						NxU32 hex = GetHEX1(source,&source);
+						NxU8 *v = (NxU8 *) dst;
+						*v = (NxU8)hex;
+						dst+=sizeof(NxU8);
 					}
 					break;
 				case AT_HEX2:
 					{
-						unsigned int hex = GetHEX2(source,&source);
+						NxU32 hex = GetHEX2(source,&source);
 						unsigned short *v = (unsigned short *) dst;
 						*v = (unsigned short)hex;
 						dst+=sizeof(unsigned short);
@@ -407,10 +407,10 @@ void * Asc2Bin(const char *source,const int count,const char *spec,void *dest)
 					break;
 				case AT_HEX4:
 					{
-						unsigned int hex = GetHEX4(source,&source);
-						unsigned int *v = (unsigned int *) dst;
+						NxU32 hex = GetHEX4(source,&source);
+						NxU32 *v = (NxU32 *) dst;
 						*v = hex;
-						dst+=sizeof(unsigned int);
+						dst+=sizeof(NxU32);
 					}
 					break;
 			}

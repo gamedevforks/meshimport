@@ -2,7 +2,7 @@
 
 #define SEND_TEXT_MESSAGE_H
 
-#include "HeSimpleTypes.h"
+#include "UserMemAlloc.h"
 
 enum TextMessageChannel
 {
@@ -13,7 +13,7 @@ enum TextMessageChannel
 class SendTextMessage
 {
 public:
-	virtual bool         sendTextMessage(HeU32 /**priority**/,const char * /* fmt */,...) { return false; };
+	virtual bool         sendTextMessage(NxU32 /**priority**/,const char * /* fmt */,...) { return false; };
 
 };
 

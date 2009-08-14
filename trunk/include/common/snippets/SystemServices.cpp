@@ -1,4 +1,5 @@
 #include "SystemServices.h"
+#include "SendTextMessage.h"
 #include "UserMemAlloc.h"
 #include <new>
 

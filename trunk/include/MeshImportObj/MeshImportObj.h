@@ -1,7 +1,7 @@
 #ifndef MESHIMPORTOBJ_H
 #define MESHIMPORTOBJ_H
 
-#include "../MeshImport/MeshImport.h"
+#include "MeshImport.h"
 
 namespace MESHIMPORTOBJ
 {

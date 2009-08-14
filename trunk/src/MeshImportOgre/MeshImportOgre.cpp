@@ -1,7 +1,8 @@
 #include <assert.h>
-#include "common/snippets/UserMemAlloc.h"
-#include "MeshImport/MeshImport.h"
+#include "UserMemAlloc.h"
+#include "MeshImport.h"
 #include "ImportOgre.h"
+#include "SystemServices.h"
 
 #ifdef WIN32
 #ifdef MESHIMPORTOGRE_EXPORTS
@@ -19,7 +20,7 @@ bool doShutdown(void);
 
 extern "C"
 {
-MESHIMPORTOGRE_API MESHIMPORT::MeshImporter * getInterface(int version_number,SYSTEM_SERVICES::SystemServices *services);
+MESHIMPORTOGRE_API MESHIMPORT::MeshImporter * getInterface(NxI32 version_number,SYSTEM_SERVICES::SystemServices *services);
 };
 
 namespace MESHIMPORT
@@ -40,9 +41,9 @@ public:
     return doShutdown();
   }
 
-  virtual int              getExtensionCount(void) { return 1; }; // most importers support just one file name extension.
+  virtual NxI32              getExtensionCount(void) { return 1; }; // most importers support just one file name extension.
 
-  virtual const char * getExtension(int index)  // report the default file name extension for this mesh type.
+  virtual const char * getExtension(NxI32 index)  // report the default file name extension for this mesh type.
   {
     return ".xml";
 //    if ( index == 0 )
@@ -51,7 +52,7 @@ public:
 //      return ".skeleton.xml";
   }
 
-  virtual const char * getDescription(int index)  // report the default file name extension for this mesh type.
+  virtual const char * getDescription(NxI32 index)  // report the default file name extension for this mesh type.
   {
 //    if ( index == 0 )
       return "Ogre3d XML Mesh Files";
@@ -59,7 +60,7 @@ public:
 //      return "Ogre3d XML Skeleton Files";
   }
 
-  virtual bool importMesh(const char *meshName,const void *data,unsigned int dlen,MESHIMPORT::MeshImportInterface *callback,const char *options,MeshImportApplicationResource *appResource)
+  virtual bool importMesh(const char *meshName,const void *data,NxU32 dlen,MESHIMPORT::MeshImportInterface *callback,const char *options,MeshImportApplicationResource *appResource)
   {
     bool ret = false;
 
@@ -95,9 +96,9 @@ static MyMeshImportOgre *gInterface=0;
 extern "C"
 {
 #ifdef PLUGINS_EMBEDDED
-  MeshImporter * getInterfaceMeshImportOgre(int version_number,SYSTEM_SERVICES::SystemServices *services)
+  MeshImporter * getInterfaceMeshImportOgre(NxI32 version_number,SYSTEM_SERVICES::SystemServices *services)
 #else
-MESHIMPORTOGRE_API MeshImporter * getInterface(int version_number,SYSTEM_SERVICES::SystemServices *services)
+MESHIMPORTOGRE_API MeshImporter * getInterface(NxI32 version_number,SYSTEM_SERVICES::SystemServices *services)
 #endif
 {
   if ( services )
@@ -140,7 +141,7 @@ BOOL APIENTRY DllMain( HANDLE ,
                        DWORD  ul_reason_for_call,
                        LPVOID )
 {
-  int ret = 0;
+  NxI32 ret = 0;
 
   switch (ul_reason_for_call)
 	{

@@ -1,0 +1,77 @@
+Microsoft Visual Studio Solution File, Format Version 9.00
+# Visual Studio 2005
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MeshConvert", "MeshConvert.vcproj", "{6E37CFC1-CCA2-832E-A166-9103C14A8FFA}"
+	ProjectSection(ProjectDependencies) = postProject
+		{082FBBBD-9532-5712-DF18-A054AE91C0F0} = {082FBBBD-9532-5712-DF18-A054AE91C0F0}
+		{3454184B-5C28-0EE8-A994-F7B09BF0879C} = {3454184B-5C28-0EE8-A994-F7B09BF0879C}
+		{23550C12-8028-7C24-92CC-C9BAD660CFD0} = {23550C12-8028-7C24-92CC-C9BAD660CFD0}
+		{95616A0F-1651-8B98-68B7-3678C9EA5ACB} = {95616A0F-1651-8B98-68B7-3678C9EA5ACB}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MeshImport", ".\/../vc8/MeshImport.vcproj", "{082FBBBD-9532-5712-DF18-A054AE91C0F0}"
+	ProjectSection(ProjectDependencies) = postProject
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MeshImportPSK", ".\/../vc8/MeshImportPSK.vcproj", "{F65A6A6D-8257-C5DA-9620-9730FA78E23E}"
+	ProjectSection(ProjectDependencies) = postProject
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MeshImportEzm", ".\/../vc8/MeshImportEzm.vcproj", "{3454184B-5C28-0EE8-A994-F7B09BF0879C}"
+	ProjectSection(ProjectDependencies) = postProject
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MeshImportObj", ".\/../vc8/MeshImportObj.vcproj", "{23550C12-8028-7C24-92CC-C9BAD660CFD0}"
+	ProjectSection(ProjectDependencies) = postProject
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MeshImportOgre", ".\/../vc8/MeshImportOgre.vcproj", "{95616A0F-1651-8B98-68B7-3678C9EA5ACB}"
+	ProjectSection(ProjectDependencies) = postProject
+	EndProjectSection
+EndProject
+Global
+GlobalSection(SourceCodeControl) = preSolution
+  SccNumberOfProjects = 2
+  SccLocalPath0 = .
+  SccProjectUniqueName0 = debug.vcproj
+  SccLocalPath1 = .
+  SccProjectUniqueName1 = release.vcproj
+  SccLocalPath2 = .
+  EndGlobalSection
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		debug|Win32 = debug|Win32
+		release|Win32 = release|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{6E37CFC1-CCA2-832E-A166-9103C14A8FFA}.debug|Win32.ActiveCfg = debug|Win32
+		{6E37CFC1-CCA2-832E-A166-9103C14A8FFA}.debug|Win32.Build.0 = debug|Win32
+		{6E37CFC1-CCA2-832E-A166-9103C14A8FFA}.release|Win32.ActiveCfg = release|Win32
+		{6E37CFC1-CCA2-832E-A166-9103C14A8FFA}.release|Win32.Build.0 = release|Win32
+		{082FBBBD-9532-5712-DF18-A054AE91C0F0}.debug|Win32.ActiveCfg = debug|Win32
+		{082FBBBD-9532-5712-DF18-A054AE91C0F0}.debug|Win32.Build.0 = debug|Win32
+		{082FBBBD-9532-5712-DF18-A054AE91C0F0}.release|Win32.ActiveCfg = release|Win32
+		{082FBBBD-9532-5712-DF18-A054AE91C0F0}.release|Win32.Build.0 = release|Win32
+		{F65A6A6D-8257-C5DA-9620-9730FA78E23E}.debug|Win32.ActiveCfg = debug|Win32
+		{F65A6A6D-8257-C5DA-9620-9730FA78E23E}.debug|Win32.Build.0 = debug|Win32
+		{F65A6A6D-8257-C5DA-9620-9730FA78E23E}.release|Win32.ActiveCfg = release|Win32
+		{F65A6A6D-8257-C5DA-9620-9730FA78E23E}.release|Win32.Build.0 = release|Win32
+		{3454184B-5C28-0EE8-A994-F7B09BF0879C}.debug|Win32.ActiveCfg = debug|Win32
+		{3454184B-5C28-0EE8-A994-F7B09BF0879C}.debug|Win32.Build.0 = debug|Win32
+		{3454184B-5C28-0EE8-A994-F7B09BF0879C}.release|Win32.ActiveCfg = release|Win32
+		{3454184B-5C28-0EE8-A994-F7B09BF0879C}.release|Win32.Build.0 = release|Win32
+		{23550C12-8028-7C24-92CC-C9BAD660CFD0}.debug|Win32.ActiveCfg = debug|Win32
+		{23550C12-8028-7C24-92CC-C9BAD660CFD0}.debug|Win32.Build.0 = debug|Win32
+		{23550C12-8028-7C24-92CC-C9BAD660CFD0}.release|Win32.ActiveCfg = release|Win32
+		{23550C12-8028-7C24-92CC-C9BAD660CFD0}.release|Win32.Build.0 = release|Win32
+		{95616A0F-1651-8B98-68B7-3678C9EA5ACB}.debug|Win32.ActiveCfg = debug|Win32
+		{95616A0F-1651-8B98-68B7-3678C9EA5ACB}.debug|Win32.Build.0 = debug|Win32
+		{95616A0F-1651-8B98-68B7-3678C9EA5ACB}.release|Win32.ActiveCfg = release|Win32
+		{95616A0F-1651-8B98-68B7-3678C9EA5ACB}.release|Win32.Build.0 = release|Win32
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+	EndGlobalSection
+	GlobalSection(ExtensibilityAddins) = postSolution
+	EndGlobalSection
+GlobalSection(SolutionProperties) = preSolution
+  HideSolutionNode = FALSE
+  EndGlobalSection
+EndGlobal

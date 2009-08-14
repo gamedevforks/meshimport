@@ -55,7 +55,7 @@
 
 #pragma warning(disable:4996)
 
-#include "../../common/snippets/UserMemAlloc.h"
+#include "UserMemAlloc.h"
 #include "inparser.h"
 #include "filesystem.h"
 
@@ -128,7 +128,7 @@ void InPlaceParser::SetFile(const char *fname,FileSystem *fsystem)
 		if ( mLen )
 		{
 			mData = (char *) MEMALLOC_MALLOC(sizeof(char)*(mLen+1));
-			HeI32 read = (HeI32)fread(mData,mLen,1,fph);
+			NxI32 read = (NxI32)fread(mData,mLen,1,fph);
 			if ( !read )
 			{
 				MEMALLOC_FREE(mData);
@@ -160,7 +160,7 @@ bool InPlaceParser::IsHard(char c)
 }
 
 //==================================================================================
-char * InPlaceParser::AddHard(HeI32 &argc,const char **argv,char *foo)
+char * InPlaceParser::AddHard(NxI32 &argc,const char **argv,char *foo)
 {
 	while ( IsHard(*foo) )
 	{
@@ -195,12 +195,12 @@ bool InPlaceParser::IsNonSeparator(char c)
 }
 
 //==================================================================================
-HeI32 InPlaceParser::ProcessLine(HeI32 lineno,char *line,InPlaceParserInterface *callback)
+NxI32 InPlaceParser::ProcessLine(NxI32 lineno,char *line,InPlaceParserInterface *callback)
 {
-	HeI32 ret = 0;
+	NxI32 ret = 0;
 
 	const char *argv[MAXARGS];
-	HeI32 argc = 0;
+	NxI32 argc = 0;
 
 	char *foo = line;
 
@@ -287,11 +287,11 @@ HeI32 InPlaceParser::ProcessLine(HeI32 lineno,char *line,InPlaceParserInterface 
 }
 
 
-HeI32  InPlaceParser::Parse(const char *str,InPlaceParserInterface *callback) // returns true if entire file was parsed, false if it aborted for some reason
+NxI32  InPlaceParser::Parse(const char *str,InPlaceParserInterface *callback) // returns true if entire file was parsed, false if it aborted for some reason
 {
-  HeI32 ret = 0;
+  NxI32 ret = 0;
 
-  mLen = (HeI32)strlen(str);
+  mLen = (NxI32)strlen(str);
   if ( mLen )
   {
     mData = (char *)MEMALLOC_MALLOC(mLen+1);
@@ -305,13 +305,13 @@ HeI32  InPlaceParser::Parse(const char *str,InPlaceParserInterface *callback) //
 //==================================================================================
 // returns true if entire file was parsed, false if it aborted for some reason
 //==================================================================================
-HeI32  InPlaceParser::Parse(InPlaceParserInterface *callback)
+NxI32  InPlaceParser::Parse(InPlaceParserInterface *callback)
 {
-	HeI32 ret = 0;
-	HE_ASSERT( callback );
+	NxI32 ret = 0;
+	assert( callback );
 	if ( mData )
 	{
-		HeI32 lineno = 0;
+		NxI32 lineno = 0;
 
 		char *foo   = mData;
 		char *begin = foo;
@@ -327,7 +327,7 @@ HeI32  InPlaceParser::Parse(InPlaceParserInterface *callback)
           bool snarfed = callback->preParseLine(lineno,begin);
           if ( !snarfed )
           {
-  					HeI32 v = ProcessLine(lineno,begin,callback);
+  					NxI32 v = ProcessLine(lineno,begin,callback);
   					if ( v )
   						ret = v;
           }
@@ -346,7 +346,7 @@ HeI32  InPlaceParser::Parse(InPlaceParserInterface *callback)
 
 		lineno++; // lasst line.
 
-		HeI32 v = ProcessLine(lineno,begin,callback);
+		NxI32 v = ProcessLine(lineno,begin,callback);
 		if ( v )
 			ret = v;
 	}
@@ -370,11 +370,11 @@ void InPlaceParser::DefaultSymbols(void)
 //==================================================================================
 // convert source string into an arg list, this is a destructive parse.
 //==================================================================================
-const char ** InPlaceParser::GetArglist(char *line,HeI32 &count)
+const char ** InPlaceParser::GetArglist(char *line,NxI32 &count)
 {
 	const char **ret = 0;
 
-	HeI32 argc = 0;
+	NxI32 argc = 0;
 
 	char *foo = line;
 

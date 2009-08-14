@@ -1,11 +1,28 @@
 #ifndef MESHIMPORT_H
 #define MESHIMPORT_H
 
+#ifdef WIN32
+
+  #if FINAL_RELEASE
+  #define USE_MESH_IMPORT 0
+  #else
+  #define USE_MESH_IMPORT 1
+  #endif
+
+#else
+
+#define USE_MESH_IMPORT 0
+
+#endif
+
+
+
 #include <stdio.h>
 #include <string.h>
 #include <float.h>
 #include <malloc.h>
 #include <math.h>
+#include "UserMemAlloc.h"
 
 #pragma warning(push)
 #pragma warning(disable:4996)
@@ -27,21 +44,37 @@ class MemoryServices;
 namespace MESHIMPORT
 {
 
-inline float fmi_computePlane(const float *A,const float *B,const float *C,float *n) // returns D
+class CommLayer
 {
-	float vx = (B[0] - C[0]);
-	float vy = (B[1] - C[1]);
-	float vz = (B[2] - C[2]);
+public:
+  virtual bool          sendMessage(NxU32 client,const char *fmt,...) = 0; // send a message to the server, all clients (client=0) or just a specific client.
+  virtual const char *  receiveMessage(NxU32 &client) = 0; // receive an incoming message (client=0) means it came from the server, otherwise it designates a specific client.
+  virtual const char ** getArgs(const char *input,NxU32 &argc) = 0; // parse string into a series of arguments.
 
-	float wx = (A[0] - B[0]);
-	float wy = (A[1] - B[1]);
-	float wz = (A[2] - B[2]);
+  virtual bool          sendBlob(NxU32 client,const char *blobType,const void *data,NxU32 dlen) = 0;
+  virtual const char *  receiveBlob(NxU32 &client,const void *&data,NxU32 &dlen) = 0;
 
-	float vw_x = vy * wz - vz * wy;
-	float vw_y = vz * wx - vx * wz;
-	float vw_z = vx * wy - vy * wx;
+protected:
+  virtual ~CommLayer(void) { };
+};
 
-	float mag = sqrt((vw_x * vw_x) + (vw_y * vw_y) + (vw_z * vw_z));
+
+
+inline NxF32 fmi_computePlane(const NxF32 *A,const NxF32 *B,const NxF32 *C,NxF32 *n) // returns D
+{
+	NxF32 vx = (B[0] - C[0]);
+	NxF32 vy = (B[1] - C[1]);
+	NxF32 vz = (B[2] - C[2]);
+
+	NxF32 wx = (A[0] - B[0]);
+	NxF32 wy = (A[1] - B[1]);
+	NxF32 wz = (A[2] - B[2]);
+
+	NxF32 vw_x = vy * wz - vz * wy;
+	NxF32 vw_y = vz * wx - vx * wz;
+	NxF32 vw_z = vx * wy - vy * wx;
+
+	NxF32 mag = sqrt((vw_x * vw_x) + (vw_y * vw_y) + (vw_z * vw_z));
 
 	if ( mag < 0.000001f )
 	{
@@ -52,12 +85,12 @@ inline float fmi_computePlane(const float *A,const float *B,const float *C,float
 		mag = 1.0f/mag;
 	}
 
-	float x = vw_x * mag;
-	float y = vw_y * mag;
-	float z = vw_z * mag;
+	NxF32 x = vw_x * mag;
+	NxF32 y = vw_y * mag;
+	NxF32 z = vw_z * mag;
 
 
-	float D = 0.0f - ((x*A[0])+(y*A[1])+(z*A[2]));
+	NxF32 D = 0.0f - ((x*A[0])+(y*A[1])+(z*A[2]));
 
   n[0] = x;
   n[1] = y;
@@ -66,13 +99,13 @@ inline float fmi_computePlane(const float *A,const float *B,const float *C,float
 	return D;
 }
 
-inline void  fmi_transform(const float matrix[16],const float v[3],float t[3]) // rotate and translate this point
+inline void  fmi_transform(const NxF32 matrix[16],const NxF32 v[3],NxF32 t[3]) // rotate and translate this point
 {
   if ( matrix )
   {
-    float tx = (matrix[0*4+0] * v[0]) +  (matrix[1*4+0] * v[1]) + (matrix[2*4+0] * v[2]) + matrix[3*4+0];
-    float ty = (matrix[0*4+1] * v[0]) +  (matrix[1*4+1] * v[1]) + (matrix[2*4+1] * v[2]) + matrix[3*4+1];
-    float tz = (matrix[0*4+2] * v[0]) +  (matrix[1*4+2] * v[1]) + (matrix[2*4+2] * v[2]) + matrix[3*4+2];
+    NxF32 tx = (matrix[0*4+0] * v[0]) +  (matrix[1*4+0] * v[1]) + (matrix[2*4+0] * v[2]) + matrix[3*4+0];
+    NxF32 ty = (matrix[0*4+1] * v[0]) +  (matrix[1*4+1] * v[1]) + (matrix[2*4+1] * v[2]) + matrix[3*4+1];
+    NxF32 tz = (matrix[0*4+2] * v[0]) +  (matrix[1*4+2] * v[1]) + (matrix[2*4+2] * v[2]) + matrix[3*4+2];
     t[0] = tx;
     t[1] = ty;
     t[2] = tz;
@@ -85,13 +118,13 @@ inline void  fmi_transform(const float matrix[16],const float v[3],float t[3]) /
   }
 }
 
-inline void  fmi_transformRotate(const float matrix[16],const float v[3],float t[3]) // rotate only
+inline void  fmi_transformRotate(const NxF32 matrix[16],const NxF32 v[3],NxF32 t[3]) // rotate only
 {
   if ( matrix )
   {
-    float tx = (matrix[0*4+0] * v[0]) +  (matrix[1*4+0] * v[1]) + (matrix[2*4+0] * v[2]);
-    float ty = (matrix[0*4+1] * v[0]) +  (matrix[1*4+1] * v[1]) + (matrix[2*4+1] * v[2]);
-    float tz = (matrix[0*4+2] * v[0]) +  (matrix[1*4+2] * v[1]) + (matrix[2*4+2] * v[2]);
+    NxF32 tx = (matrix[0*4+0] * v[0]) +  (matrix[1*4+0] * v[1]) + (matrix[2*4+0] * v[2]);
+    NxF32 ty = (matrix[0*4+1] * v[0]) +  (matrix[1*4+1] * v[1]) + (matrix[2*4+1] * v[2]);
+    NxF32 tz = (matrix[0*4+2] * v[0]) +  (matrix[1*4+2] * v[1]) + (matrix[2*4+2] * v[2]);
     t[0] = tx;
     t[1] = ty;
     t[2] = tz;
@@ -104,12 +137,12 @@ inline void  fmi_transformRotate(const float matrix[16],const float v[3],float t
   }
 }
 
-inline float fmi_normalize(float *n) // normalize this vector
+inline NxF32 fmi_normalize(NxF32 *n) // normalize this vector
 {
-  float dist = (float)sqrt(n[0]*n[0] + n[1]*n[1] + n[2]*n[2]);
+  NxF32 dist = (NxF32)sqrt(n[0]*n[0] + n[1]*n[1] + n[2]*n[2]);
   if ( dist > 0.0000001f )
   {
-    float mag = 1.0f / dist;
+    NxF32 mag = 1.0f / dist;
     n[0]*=mag;
     n[1]*=mag;
     n[2]*=mag;
@@ -125,18 +158,18 @@ inline float fmi_normalize(float *n) // normalize this vector
 }
 
 
-inline void fmi_quatToMatrix(const float *quat,float *matrix) // convert quaterinion rotation to matrix, zeros out the translation component.
+inline void fmi_quatToMatrix(const NxF32 *quat,NxF32 *matrix) // convert quaterinion rotation to matrix, zeros out the translation component.
 {
 
-  float xx = quat[0]*quat[0];
-  float yy = quat[1]*quat[1];
-  float zz = quat[2]*quat[2];
-  float xy = quat[0]*quat[1];
-  float xz = quat[0]*quat[2];
-  float yz = quat[1]*quat[2];
-  float wx = quat[3]*quat[0];
-  float wy = quat[3]*quat[1];
-  float wz = quat[3]*quat[2];
+  NxF32 xx = quat[0]*quat[0];
+  NxF32 yy = quat[1]*quat[1];
+  NxF32 zz = quat[2]*quat[2];
+  NxF32 xy = quat[0]*quat[1];
+  NxF32 xz = quat[0]*quat[2];
+  NxF32 yz = quat[1]*quat[2];
+  NxF32 wx = quat[3]*quat[0];
+  NxF32 wy = quat[3]*quat[1];
+  NxF32 wz = quat[3]*quat[2];
 
   matrix[0*4+0] = 1 - 2 * ( yy + zz );
   matrix[1*4+0] =     2 * ( xy - wz );
@@ -150,9 +183,9 @@ inline void fmi_quatToMatrix(const float *quat,float *matrix) // convert quateri
   matrix[1*4+2] =     2 * ( yz + wx );
   matrix[2*4+2] = 1 - 2 * ( xx + yy );
 
-  matrix[3*4+0] = matrix[3*4+1] = matrix[3*4+2] = (float) 0.0f;
-  matrix[0*4+3] = matrix[1*4+3] = matrix[2*4+3] = (float) 0.0f;
-  matrix[3*4+3] =(float) 1.0f;
+  matrix[3*4+0] = matrix[3*4+1] = matrix[3*4+2] = (NxF32) 0.0f;
+  matrix[0*4+3] = matrix[1*4+3] = matrix[2*4+3] = (NxF32) 0.0f;
+  matrix[3*4+3] =(NxF32) 1.0f;
 
 }
 
@@ -160,16 +193,16 @@ inline void fmi_quatToMatrix(const float *quat,float *matrix) // convert quateri
 
 // minimal support math routines
 // *** Support math routines
-inline void fmi_getAngleAxis(float &angle,float *axis,const float *quat)
+inline void fmi_getAngleAxis(NxF32 &angle,NxF32 *axis,const NxF32 *quat)
 {
   //return axis and angle of rotation of quaternion
-  float x = quat[0];
-  float y = quat[1];
-  float z = quat[2];
-  float w = quat[3];
+  NxF32 x = quat[0];
+  NxF32 y = quat[1];
+  NxF32 z = quat[2];
+  NxF32 w = quat[3];
 
   angle = acosf(w) * 2.0f;		//this is getAngle()
-  float sa = sqrtf(1.0f - w*w);
+  NxF32 sa = sqrtf(1.0f - w*w);
   if (sa)
   {
     axis[0] = x/sa;
@@ -184,9 +217,9 @@ inline void fmi_getAngleAxis(float &angle,float *axis,const float *quat)
   }
 }
 
-inline void fmi_setOrientationFromAxisAngle(const float axis[3],float angle,float *quat)
+inline void fmi_setOrientationFromAxisAngle(const NxF32 axis[3],NxF32 angle,NxF32 *quat)
 {
-  float x,y,z,w;
+  NxF32 x,y,z,w;
 
   x = axis[0];
   y = axis[1];
@@ -194,17 +227,17 @@ inline void fmi_setOrientationFromAxisAngle(const float axis[3],float angle,floa
 
   // required: Normalize the axis
 
-  const float i_length =  float(1.0f) / sqrtf( x*x + y*y + z*z );
+  const NxF32 i_length =  NxF32(1.0f) / sqrtf( x*x + y*y + z*z );
 
   x = x * i_length;
   y = y * i_length;
   z = z * i_length;
 
   // now make a clQuaternionernion out of it
-  float Half = angle * float(0.5);
+  NxF32 Half = angle * NxF32(0.5);
 
   w = cosf(Half);//this used to be w/o deg to rad.
-  const float sin_theta_over_two = sinf(Half);
+  const NxF32 sin_theta_over_two = sinf(Half);
 
   x = x * sin_theta_over_two;
   y = y * sin_theta_over_two;
@@ -217,7 +250,7 @@ inline void fmi_setOrientationFromAxisAngle(const float axis[3],float angle,floa
 }
 
 
-inline void fmi_identity(float *matrix)
+inline void fmi_identity(NxF32 *matrix)
 {
   matrix[0*4+0] = 1;    matrix[1*4+1] = 1;    matrix[2*4+2] = 1;    matrix[3*4+3] = 1;
   matrix[1*4+0] = 0;    matrix[2*4+0] = 0;    matrix[3*4+0] = 0;
@@ -227,19 +260,19 @@ inline void fmi_identity(float *matrix)
 }
 
 
-inline void fmi_fromQuat(float *matrix,const float quat[4])
+inline void fmi_fromQuat(NxF32 *matrix,const NxF32 quat[4])
 {
   fmi_identity(matrix);
 
-  float xx = quat[0]*quat[0];
-  float yy = quat[1]*quat[1];
-  float zz = quat[2]*quat[2];
-  float xy = quat[0]*quat[1];
-  float xz = quat[0]*quat[2];
-  float yz = quat[1]*quat[2];
-  float wx = quat[3]*quat[0];
-  float wy = quat[3]*quat[1];
-  float wz = quat[3]*quat[2];
+  NxF32 xx = quat[0]*quat[0];
+  NxF32 yy = quat[1]*quat[1];
+  NxF32 zz = quat[2]*quat[2];
+  NxF32 xy = quat[0]*quat[1];
+  NxF32 xz = quat[0]*quat[2];
+  NxF32 yz = quat[1]*quat[2];
+  NxF32 wx = quat[3]*quat[0];
+  NxF32 wy = quat[3]*quat[1];
+  NxF32 wz = quat[3]*quat[2];
 
   matrix[0*4+0] = 1 - 2 * ( yy + zz );
   matrix[1*4+0] =     2 * ( xy - wz );
@@ -253,23 +286,23 @@ inline void fmi_fromQuat(float *matrix,const float quat[4])
   matrix[1*4+2] =     2 * ( yz + wx );
   matrix[2*4+2] = 1 - 2 * ( xx + yy );
 
-  matrix[3*4+0] = matrix[3*4+1] = matrix[3*4+2] = (float) 0.0f;
-  matrix[0*4+3] = matrix[1*4+3] = matrix[2*4+3] = (float) 0.0f;
-  matrix[3*4+3] =(float) 1.0f;
+  matrix[3*4+0] = matrix[3*4+1] = matrix[3*4+2] = (NxF32) 0.0f;
+  matrix[0*4+3] = matrix[1*4+3] = matrix[2*4+3] = (NxF32) 0.0f;
+  matrix[3*4+3] =(NxF32) 1.0f;
 
 
 }
 
-inline void fmi_matrixToQuat(const float *matrix,float *quat) // convert the 3x3 portion of a 4x4 matrix into a quaterion as x,y,z,w
+inline void fmi_matrixToQuat(const NxF32 *matrix,NxF32 *quat) // convert the 3x3 portion of a 4x4 matrix into a quaterion as x,y,z,w
 {
 
-  float tr = matrix[0*4+0] + matrix[1*4+1] + matrix[2*4+2];
+  NxF32 tr = matrix[0*4+0] + matrix[1*4+1] + matrix[2*4+2];
 
   // check the diagonal
 
   if (tr > 0.0f )
   {
-    float s = sqrtf((tr + 1.0f) );
+    NxF32 s = sqrtf((tr + 1.0f) );
     quat[3] = s * 0.5f;
     s = 0.5f / s;
     quat[0] = (matrix[1*4+2] - matrix[2*4+1]) * s;
@@ -280,18 +313,18 @@ inline void fmi_matrixToQuat(const float *matrix,float *quat) // convert the 3x3
   else
   {
     // diagonal is negative
-    int nxt[3] = {1, 2, 0};
-    float  qa[4];
+    NxI32 nxt[3] = {1, 2, 0};
+    NxF32  qa[4];
 
-    int i = 0;
+    NxI32 i = 0;
 
     if (matrix[1*4+1] > matrix[0*4+0]) i = 1;
     if (matrix[2*4+2] > matrix[i*4+i]) i = 2;
 
-    int j = nxt[i];
-    int k = nxt[j];
+    NxI32 j = nxt[i];
+    NxI32 k = nxt[j];
 
-    float s = sqrtf( ((matrix[i*4+i] - (matrix[j*4+j] + matrix[k*4+k])) + 1.0f) );
+    NxF32 s = sqrtf( ((matrix[i*4+i] - (matrix[j*4+j] + matrix[k*4+k])) + 1.0f) );
 
     qa[i] = s * 0.5f;
 
@@ -311,9 +344,9 @@ inline void fmi_matrixToQuat(const float *matrix,float *quat) // convert the 3x3
 }
 
 
-inline float fmi_squared(float x) { return x*x; };
+inline NxF32 fmi_squared(NxF32 x) { return x*x; };
 
-inline void fmi_decomposeTransform(const float local_transform[16],float trans[3],float rot[4],float scale[3])
+inline void fmi_decomposeTransform(const NxF32 local_transform[16],NxF32 trans[3],NxF32 rot[4],NxF32 scale[3])
 {
 
   trans[0] = local_transform[12];
@@ -324,12 +357,12 @@ inline void fmi_decomposeTransform(const float local_transform[16],float trans[3
   scale[1] = sqrtf(fmi_squared(local_transform[1*4+0]) + fmi_squared(local_transform[1*4+1]) + fmi_squared(local_transform[1*4+2]));
   scale[2] = sqrtf(fmi_squared(local_transform[2*4+0]) + fmi_squared(local_transform[2*4+1]) + fmi_squared(local_transform[2*4+2]));
 
-  float m[16];
-  memcpy(m,local_transform,sizeof(float)*16);
+  NxF32 m[16];
+  memcpy(m,local_transform,sizeof(NxF32)*16);
 
-  float sx = 1.0f / scale[0];
-  float sy = 1.0f / scale[1];
-  float sz = 1.0f / scale[2];
+  NxF32 sx = 1.0f / scale[0];
+  NxF32 sy = 1.0f / scale[1];
+  NxF32 sz = 1.0f / scale[2];
 
   m[0*4+0]*=sx;
   m[0*4+1]*=sx;
@@ -347,7 +380,7 @@ inline void fmi_decomposeTransform(const float local_transform[16],float trans[3
 
 }
 
-inline void fmi_fromScale(float *matrix,const float scale[3])
+inline void fmi_fromScale(NxF32 *matrix,const NxF32 scale[3])
 {
   fmi_identity(matrix);
   matrix[0*4+0] = scale[0];
@@ -356,28 +389,28 @@ inline void fmi_fromScale(float *matrix,const float scale[3])
 
 }
 
-inline void  fmi_multiply(const float *pA,const float *pB,float *pM)
+inline void  fmi_multiply(const NxF32 *pA,const NxF32 *pB,NxF32 *pM)
 {
 
-  float a = pA[0*4+0] * pB[0*4+0] + pA[0*4+1] * pB[1*4+0] + pA[0*4+2] * pB[2*4+0] + pA[0*4+3] * pB[3*4+0];
-  float b = pA[0*4+0] * pB[0*4+1] + pA[0*4+1] * pB[1*4+1] + pA[0*4+2] * pB[2*4+1] + pA[0*4+3] * pB[3*4+1];
-  float c = pA[0*4+0] * pB[0*4+2] + pA[0*4+1] * pB[1*4+2] + pA[0*4+2] * pB[2*4+2] + pA[0*4+3] * pB[3*4+2];
-  float d = pA[0*4+0] * pB[0*4+3] + pA[0*4+1] * pB[1*4+3] + pA[0*4+2] * pB[2*4+3] + pA[0*4+3] * pB[3*4+3];
+  NxF32 a = pA[0*4+0] * pB[0*4+0] + pA[0*4+1] * pB[1*4+0] + pA[0*4+2] * pB[2*4+0] + pA[0*4+3] * pB[3*4+0];
+  NxF32 b = pA[0*4+0] * pB[0*4+1] + pA[0*4+1] * pB[1*4+1] + pA[0*4+2] * pB[2*4+1] + pA[0*4+3] * pB[3*4+1];
+  NxF32 c = pA[0*4+0] * pB[0*4+2] + pA[0*4+1] * pB[1*4+2] + pA[0*4+2] * pB[2*4+2] + pA[0*4+3] * pB[3*4+2];
+  NxF32 d = pA[0*4+0] * pB[0*4+3] + pA[0*4+1] * pB[1*4+3] + pA[0*4+2] * pB[2*4+3] + pA[0*4+3] * pB[3*4+3];
 
-  float e = pA[1*4+0] * pB[0*4+0] + pA[1*4+1] * pB[1*4+0] + pA[1*4+2] * pB[2*4+0] + pA[1*4+3] * pB[3*4+0];
-  float f = pA[1*4+0] * pB[0*4+1] + pA[1*4+1] * pB[1*4+1] + pA[1*4+2] * pB[2*4+1] + pA[1*4+3] * pB[3*4+1];
-  float g = pA[1*4+0] * pB[0*4+2] + pA[1*4+1] * pB[1*4+2] + pA[1*4+2] * pB[2*4+2] + pA[1*4+3] * pB[3*4+2];
-  float h = pA[1*4+0] * pB[0*4+3] + pA[1*4+1] * pB[1*4+3] + pA[1*4+2] * pB[2*4+3] + pA[1*4+3] * pB[3*4+3];
+  NxF32 e = pA[1*4+0] * pB[0*4+0] + pA[1*4+1] * pB[1*4+0] + pA[1*4+2] * pB[2*4+0] + pA[1*4+3] * pB[3*4+0];
+  NxF32 f = pA[1*4+0] * pB[0*4+1] + pA[1*4+1] * pB[1*4+1] + pA[1*4+2] * pB[2*4+1] + pA[1*4+3] * pB[3*4+1];
+  NxF32 g = pA[1*4+0] * pB[0*4+2] + pA[1*4+1] * pB[1*4+2] + pA[1*4+2] * pB[2*4+2] + pA[1*4+3] * pB[3*4+2];
+  NxF32 h = pA[1*4+0] * pB[0*4+3] + pA[1*4+1] * pB[1*4+3] + pA[1*4+2] * pB[2*4+3] + pA[1*4+3] * pB[3*4+3];
 
-  float i = pA[2*4+0] * pB[0*4+0] + pA[2*4+1] * pB[1*4+0] + pA[2*4+2] * pB[2*4+0] + pA[2*4+3] * pB[3*4+0];
-  float j = pA[2*4+0] * pB[0*4+1] + pA[2*4+1] * pB[1*4+1] + pA[2*4+2] * pB[2*4+1] + pA[2*4+3] * pB[3*4+1];
-  float k = pA[2*4+0] * pB[0*4+2] + pA[2*4+1] * pB[1*4+2] + pA[2*4+2] * pB[2*4+2] + pA[2*4+3] * pB[3*4+2];
-  float l = pA[2*4+0] * pB[0*4+3] + pA[2*4+1] * pB[1*4+3] + pA[2*4+2] * pB[2*4+3] + pA[2*4+3] * pB[3*4+3];
+  NxF32 i = pA[2*4+0] * pB[0*4+0] + pA[2*4+1] * pB[1*4+0] + pA[2*4+2] * pB[2*4+0] + pA[2*4+3] * pB[3*4+0];
+  NxF32 j = pA[2*4+0] * pB[0*4+1] + pA[2*4+1] * pB[1*4+1] + pA[2*4+2] * pB[2*4+1] + pA[2*4+3] * pB[3*4+1];
+  NxF32 k = pA[2*4+0] * pB[0*4+2] + pA[2*4+1] * pB[1*4+2] + pA[2*4+2] * pB[2*4+2] + pA[2*4+3] * pB[3*4+2];
+  NxF32 l = pA[2*4+0] * pB[0*4+3] + pA[2*4+1] * pB[1*4+3] + pA[2*4+2] * pB[2*4+3] + pA[2*4+3] * pB[3*4+3];
 
-  float m = pA[3*4+0] * pB[0*4+0] + pA[3*4+1] * pB[1*4+0] + pA[3*4+2] * pB[2*4+0] + pA[3*4+3] * pB[3*4+0];
-  float n = pA[3*4+0] * pB[0*4+1] + pA[3*4+1] * pB[1*4+1] + pA[3*4+2] * pB[2*4+1] + pA[3*4+3] * pB[3*4+1];
-  float o = pA[3*4+0] * pB[0*4+2] + pA[3*4+1] * pB[1*4+2] + pA[3*4+2] * pB[2*4+2] + pA[3*4+3] * pB[3*4+2];
-  float p = pA[3*4+0] * pB[0*4+3] + pA[3*4+1] * pB[1*4+3] + pA[3*4+2] * pB[2*4+3] + pA[3*4+3] * pB[3*4+3];
+  NxF32 m = pA[3*4+0] * pB[0*4+0] + pA[3*4+1] * pB[1*4+0] + pA[3*4+2] * pB[2*4+0] + pA[3*4+3] * pB[3*4+0];
+  NxF32 n = pA[3*4+0] * pB[0*4+1] + pA[3*4+1] * pB[1*4+1] + pA[3*4+2] * pB[2*4+1] + pA[3*4+3] * pB[3*4+1];
+  NxF32 o = pA[3*4+0] * pB[0*4+2] + pA[3*4+1] * pB[1*4+2] + pA[3*4+2] * pB[2*4+2] + pA[3*4+3] * pB[3*4+2];
+  NxF32 p = pA[3*4+0] * pB[0*4+3] + pA[3*4+1] * pB[1*4+3] + pA[3*4+2] * pB[2*4+3] + pA[3*4+3] * pB[3*4+3];
 
   pM[0] = a;  pM[1] = b;  pM[2] = c;  pM[3] = d;
 
@@ -389,29 +422,29 @@ inline void  fmi_multiply(const float *pA,const float *pB,float *pM)
 }
 
 
-inline void fmi_setTranslation(float *matrix,const float pos[3])
+inline void fmi_setTranslation(NxF32 *matrix,const NxF32 pos[3])
 {
   matrix[12] = pos[0];  matrix[13] = pos[1];  matrix[14] = pos[2];
 }
 
 
 // compose this transform
-inline void fmi_composeTransform(const float pos[3],const float quat[4],const float scale[3],float matrix[16])
+inline void fmi_composeTransform(const NxF32 pos[3],const NxF32 quat[4],const NxF32 scale[3],NxF32 matrix[16])
 {
-  float mscale[16];
-  float mrot[16];
+  NxF32 mscale[16];
+  NxF32 mrot[16];
   fmi_fromQuat(mrot,quat);
   fmi_fromScale(mscale,scale);
   fmi_multiply(mscale,mrot,matrix);
   fmi_setTranslation(matrix,pos);
 }
 
-inline float fmi_dot(const float *p1,const float *p2)
+inline NxF32 fmi_dot(const NxF32 *p1,const NxF32 *p2)
 {
   return p1[0]*p2[0]+p1[1]*p2[1]+p1[2]*p2[2];
 }
 
-inline void fmi_cross(float *cross,const float *a,const float *b)
+inline void fmi_cross(NxF32 *cross,const NxF32 *a,const NxF32 *b)
 {
   cross[0] = a[1]*b[2] - a[2]*b[1];
   cross[1] = a[2]*b[0] - a[0]*b[2];
@@ -419,12 +452,12 @@ inline void fmi_cross(float *cross,const float *a,const float *b)
 }
 
 
-inline float fmi_getDeterminant(const float matrix[16])
+inline NxF32 fmi_getDeterminant(const NxF32 matrix[16])
 {
-  float tempv[3];
-  float p0[3];
-  float p1[3];
-  float p2[3];
+  NxF32 tempv[3];
+  NxF32 p0[3];
+  NxF32 p1[3];
+  NxF32 p2[3];
 
   p0[0] = matrix[0*4+0];
   p0[1] = matrix[0*4+1];
@@ -444,10 +477,10 @@ inline float fmi_getDeterminant(const float matrix[16])
 
 }
 
-inline void fmi_getSubMatrix(int ki,int kj,float pDst[16],const float matrix[16])
+inline void fmi_getSubMatrix(NxI32 ki,NxI32 kj,NxF32 pDst[16],const NxF32 matrix[16])
 {
-  int row, col;
-  int dstCol = 0, dstRow = 0;
+  NxI32 row, col;
+  NxI32 dstCol = 0, dstRow = 0;
 
   for ( col = 0; col < 4; col++ )
   {
@@ -468,19 +501,19 @@ inline void fmi_getSubMatrix(int ki,int kj,float pDst[16],const float matrix[16]
   }
 }
 
-inline void fmi_inverseTransform(const float matrix[16],float inverse_matrix[16])
+inline void fmi_inverseTransform(const NxF32 matrix[16],NxF32 inverse_matrix[16])
 {
-  float determinant = fmi_getDeterminant(matrix);
+  NxF32 determinant = fmi_getDeterminant(matrix);
   determinant = 1.0f / determinant;
-  for (int i = 0; i < 4; i++ )
+  for (NxI32 i = 0; i < 4; i++ )
   {
-    for (int j = 0; j < 4; j++ )
+    for (NxI32 j = 0; j < 4; j++ )
     {
-      int sign = 1 - ( ( i + j ) % 2 ) * 2;
-      float subMat[16];
+      NxI32 sign = 1 - ( ( i + j ) % 2 ) * 2;
+      NxF32 subMat[16];
       fmi_identity(subMat);
       fmi_getSubMatrix( i, j, subMat, matrix );
-      float subDeterminant = fmi_getDeterminant(subMat);
+      NxF32 subDeterminant = fmi_getDeterminant(subMat);
       inverse_matrix[i*4+j] = ( subDeterminant * sign ) * determinant;
     }
   }
@@ -532,18 +565,18 @@ public:
     return ret;
   }
 
-  float          mPos[3];
-  float          mNormal[3];
-  unsigned int   mColor;
-  float          mTexel1[2];
-  float          mTexel2[2];
-  float          mTexel3[2];
-  float          mTexel4[2];
-  float          mTangent[3];
-  float          mBiNormal[3];
-  float          mWeight[4];
+  NxF32          mPos[3];
+  NxF32          mNormal[3];
+  NxU32   mColor;
+  NxF32          mTexel1[2];
+  NxF32          mTexel2[2];
+  NxF32          mTexel3[2];
+  NxF32          mTexel4[2];
+  NxF32          mTangent[3];
+  NxF32          mBiNormal[3];
+  NxF32          mWeight[4];
   unsigned short mBone[4];
-  float          mRadius;
+  NxF32          mRadius;
 };
 
 class MeshBone
@@ -552,11 +585,11 @@ public:
 	MeshBone(void)
 	{
 		mParentIndex = -1;
-    mName = "";
+		mName = "";
 		Identity();
 	}
 
-  void Set(const char *name,int parentIndex,const float pos[3],const float rot[4],const float scale[3])
+  void Set(const char *name,NxI32 parentIndex,const NxF32 pos[3],const NxF32 rot[4],const NxF32 scale[3])
   {
     mName = name;
     mParentIndex = parentIndex;
@@ -596,27 +629,27 @@ public:
 
 	const char * GetName(void) const { return mName; };
 
-	int GetParentIndex(void) const { return mParentIndex; };
+	NxI32 GetParentIndex(void) const { return mParentIndex; };
 
-	const float * GetPosition(void) const { return mPosition; };
-	const float * GetOrientation(void) const { return mOrientation; };
-  const float * GetScale(void) const { return mScale; };
+	const NxF32 * GetPosition(void) const { return mPosition; };
+	const NxF32 * GetOrientation(void) const { return mOrientation; };
+  const NxF32 * GetScale(void) const { return mScale; };
 
-  void getAngleAxis(float &angle,float *axis) const
+  void getAngleAxis(NxF32 &angle,NxF32 *axis) const
   {
     fmi_getAngleAxis(angle,axis,mOrientation);
   }
 
-  void setOrientationFromAxisAngle(const float axis[3],float angle)
+  void setOrientationFromAxisAngle(const NxF32 axis[3],NxF32 angle)
   {
     fmi_setOrientationFromAxisAngle(axis,angle,mOrientation);
   }
 
 	const char   *mName;
-	int           mParentIndex;          // array index of parent bone
-	float         mPosition[3];
-	float         mOrientation[4];
-  float         mScale[3];
+	NxI32           mParentIndex;          // array index of parent bone
+	NxF32         mPosition[3];
+	NxF32         mOrientation[4];
+	NxF32         mScale[3];
 };
 
 class MeshEntry
@@ -628,7 +661,7 @@ public:
     mBone = 0;
   }
   const char *mName;
-	int         mBone;         // bone this mesh is associcated
+	NxI32         mBone;         // bone this mesh is associcated
 };
 
 class MeshSkeleton
@@ -646,24 +679,24 @@ public:
     mName = name;
 	}
 
-	void SetBones(int bcount,MeshBone *bones) // memory ownership changes hands here!!!!!!!!!!
+	void SetBones(NxI32 bcount,MeshBone *bones) // memory ownership changes hands here!!!!!!!!!!
 	{
 		mBoneCount = bcount;
 		mBones     = bones;
 	}
 
-	int GetBoneCount(void) const { return mBoneCount; };
+	NxI32 GetBoneCount(void) const { return mBoneCount; };
 
-	const MeshBone& GetBone(int index) const { return mBones[index]; };
+	const MeshBone& GetBone(NxI32 index) const { return mBones[index]; };
 
-	MeshBone * GetBonePtr(int index) const { return &mBones[index]; };
+	MeshBone * GetBonePtr(NxI32 index) const { return &mBones[index]; };
 
-	void SetBone(int index,const MeshBone &b) { mBones[index] = b; };
+	void SetBone(NxI32 index,const MeshBone &b) { mBones[index] = b; };
 
 	const char * GetName(void) const { return mName; };
 
 	const char     *mName;
-	int             mBoneCount;
+	NxI32             mBoneCount;
 	MeshBone       *mBones;
 };
 
@@ -685,7 +718,7 @@ public:
     mScale[2] = 1;
   }
 
-	void SetPose(const float *pos,const float *quat,const float *scale)
+	void SetPose(const NxF32 *pos,const NxF32 *quat,const NxF32 *scale)
 	{
 		mPos[0] = pos[0];
 		mPos[1] = pos[1];
@@ -699,7 +732,7 @@ public:
     mScale[2] = scale[2];
 	};
 
-	void Sample(float *pos,float *quat,float *scale) const
+	void Sample(NxF32 *pos,NxF32 *quat,NxF32 *scale) const
 	{
 		pos[0] = mPos[0];
 		pos[1] = mPos[1];
@@ -713,14 +746,14 @@ public:
     scale[2] = mScale[2];
 	}
 
-  void getAngleAxis(float &angle,float *axis) const
+  void getAngleAxis(NxF32 &angle,NxF32 *axis) const
   {
     fmi_getAngleAxis(angle,axis,mQuat);
   }
 
-	float mPos[3];
-	float mQuat[4];
-  float mScale[3];
+	NxF32 mPos[3];
+	NxF32 mQuat[4];
+  NxF32 mScale[3];
 };
 
 class MeshAnimTrack
@@ -740,7 +773,7 @@ public:
     mName = name;
 	}
 
-	void SetPose(int frame,const float *pos,const float *quat,const float *scale)
+	void SetPose(NxI32 frame,const NxF32 *pos,const NxF32 *quat,const NxF32 *scale)
 	{
 		if ( frame >= 0 && frame < mFrameCount )
 			mPose[frame].SetPose(pos,quat,scale);
@@ -748,19 +781,19 @@ public:
 
 	const char * GetName(void) const { return mName; };
 
-	void SampleAnimation(int frame,float *pos,float *quat,float *scale) const
+	void SampleAnimation(NxI32 frame,NxF32 *pos,NxF32 *quat,NxF32 *scale) const
 	{
 		mPose[frame].Sample(pos,quat,scale);
 	}
 
-	int GetFrameCount(void) const { return mFrameCount; };
+	NxI32 GetFrameCount(void) const { return mFrameCount; };
 
-	MeshAnimPose * GetPose(int index) { return &mPose[index]; };
+	MeshAnimPose * GetPose(NxI32 index) { return &mPose[index]; };
 
 	const char *mName;
-	int       mFrameCount;
-	float     mDuration;
-	float     mDtime;
+	NxI32       mFrameCount;
+	NxF32     mDuration;
+	NxF32     mDtime;
 	MeshAnimPose *mPose;
 };
 
@@ -783,12 +816,12 @@ public:
     mName = name;
 	}
 
-	void SetTrackName(int track,const char *name)
+	void SetTrackName(NxI32 track,const char *name)
 	{
 		mTracks[track]->SetName(name);
 	}
 
-	void SetTrackPose(int track,int frame,const float *pos,const float *quat,const float *scale)
+	void SetTrackPose(NxI32 track,NxI32 frame,const NxF32 *pos,const NxF32 *quat,const NxF32 *scale)
 	{
 		mTracks[track]->SetPose(frame,pos,quat,scale);
 	}
@@ -798,7 +831,7 @@ public:
 	const MeshAnimTrack * LocateTrack(const char *name) const
 	{
 		const MeshAnimTrack *ret = 0;
-		for (int i=0; i<mTrackCount; i++)
+		for (NxI32 i=0; i<mTrackCount; i++)
 		{
 			const MeshAnimTrack *t = mTracks[i];
 			if ( stricmp(t->GetName(),name) == 0 )
@@ -810,17 +843,17 @@ public:
 		return ret;
 	}
 
-	int GetFrameIndex(float t) const
+	NxI32 GetFrameIndex(NxF32 t) const
 	{
 		t = fmodf( t, mDuration );
-		int index = int(t / mDtime);
+		NxI32 index = NxI32(t / mDtime);
 		return index;
 	}
 
-	int GetTrackCount(void) const { return mTrackCount; };
-	float GetDuration(void) const { return mDuration; };
+	NxI32 GetTrackCount(void) const { return mTrackCount; };
+	NxF32 GetDuration(void) const { return mDuration; };
 
-	MeshAnimTrack * GetTrack(int index)
+	MeshAnimTrack * GetTrack(NxI32 index)
 	{
 		MeshAnimTrack *ret = 0;
 		if ( index >= 0 && index < mTrackCount )
@@ -830,14 +863,14 @@ public:
 		return ret;
 	};
 
-	int GetFrameCount(void) const { return mFrameCount; };
-	float GetDtime(void) const { return mDtime; };
+	NxI32 GetFrameCount(void) const { return mFrameCount; };
+	NxF32 GetDtime(void) const { return mDtime; };
 
   const char *mName;
-	int         mTrackCount;
-	int         mFrameCount;
-	float       mDuration;
-	float       mDtime;
+	NxI32         mTrackCount;
+	NxI32         mFrameCount;
+	NxF32       mDuration;
+	NxF32       mDtime;
 	MeshAnimTrack **mTracks;
 };
 
@@ -868,7 +901,7 @@ public:
     mMax[2] = FLT_MIN;
   }
 
-  void include(const float pos[3])
+  void include(const NxF32 pos[3])
   {
     if ( pos[0] < mMin[0] ) mMin[0] = pos[0];
     if ( pos[1] < mMin[1] ) mMin[1] = pos[1];
@@ -877,8 +910,8 @@ public:
     if ( pos[1] > mMax[1] ) mMax[1] = pos[1];
     if ( pos[2] > mMax[2] ) mMax[2] = pos[2];
   }
-  float mMin[3];
-  float mMax[3];
+  NxF32 mMin[3];
+  NxF32 mMax[3];
 };
 
 class SubMesh
@@ -896,9 +929,9 @@ public:
   const char          *mMaterialName;
   MeshMaterial        *mMaterial;
   MeshAABB             mAABB;
-  unsigned int         mVertexFlags; // defines which vertex components are active.
-  unsigned int         mTriCount;    // number of triangles.
-  unsigned int        *mIndices;     // indexed triange list
+  NxU32         mVertexFlags; // defines which vertex components are active.
+  NxU32         mTriCount;    // number of triangles.
+  NxU32        *mIndices;     // indexed triange list
 };
 
 class Mesh
@@ -919,11 +952,11 @@ public:
   const char         *mSkeletonName;
   MeshSkeleton       *mSkeleton; // the skeleton used by this mesh system.
   MeshAABB            mAABB;
-  unsigned int        mSubMeshCount;
+  NxU32        mSubMeshCount;
   SubMesh           **mSubMeshes;
 
-  unsigned int       mVertexFlags;  // combined vertex usage flags for all sub-meshes
-  unsigned int       mVertexCount;
+  NxU32       mVertexFlags;  // combined vertex usage flags for all sub-meshes
+  NxU32       mVertexCount;
   MeshVertex        *mVertices;
 
 };
@@ -939,9 +972,9 @@ public:
     mHeight = 0;
   }
   const char    *mName;
-  unsigned char *mData;
-  unsigned int   mWidth;
-  unsigned int   mHeight;
+  NxU8 *mData;
+  NxU32   mWidth;
+  NxU32   mHeight;
 };
 
 class MeshInstance
@@ -957,9 +990,9 @@ public:
   }
   const char  *mMeshName;
   Mesh        *mMesh;
-  float        mPosition[3];
-  float        mRotation[4]; //quaternion XYZW
-  float        mScale[3];
+  NxF32        mPosition[3];
+  NxF32        mRotation[4]; //quaternion XYZW
+  NxF32        mScale[3];
 };
 
 class MeshUserData
@@ -984,8 +1017,8 @@ public:
     mUserLen  = 0;
   }
   const char    *mName;
-  unsigned int   mUserLen;
-  unsigned char *mUserData;
+  NxU32   mUserLen;
+  NxU8 *mUserData;
 };
 
 class MeshTetra
@@ -1004,8 +1037,8 @@ public:
   const char  *mMeshName;
   MeshAABB     mAABB;
   Mesh        *mMesh;
-  unsigned int mTetraCount; // number of tetrahedrons
-  float       *mTetraData;
+  NxU32 mTetraCount; // number of tetrahedrons
+  NxF32       *mTetraData;
 };
 
 #define MESH_SYSTEM_VERSION 1 // version number of this data structure, used for binary serialization
@@ -1033,7 +1066,7 @@ public:
 
   MeshCollisionType mType;
   const char       *mName;  // the bone this collision geometry is associated with.
-  float             mTransform[16];   // local transform.
+  NxF32             mTransform[16];   // local transform.
 };
 
 class MeshCollisionBox : public MeshCollision
@@ -1044,7 +1077,7 @@ public:
     mType = MCT_BOX;
     mSides[0] = mSides[1] = mSides[2] = 1;
   }
-  float mSides[3];
+  NxF32 mSides[3];
 };
 
 class MeshCollisionSphere : public MeshCollision
@@ -1055,7 +1088,7 @@ public:
     mType = MCT_SPHERE;
     mRadius = 1;
   }
-  float mRadius;
+  NxF32 mRadius;
 };
 
 class MeshCollisionCapsule : public MeshCollision
@@ -1067,8 +1100,8 @@ public:
     mRadius = 1;
     mHeight = 1;
   }
-  float  mRadius;
-  float  mHeight;
+  NxF32  mRadius;
+  NxF32  mHeight;
 };
 
 class MeshConvex
@@ -1081,10 +1114,10 @@ public:
     mTriCount = 0;
     mIndices = 0;
   }
-  unsigned int  mVertexCount;
-  float        *mVertices;
-  unsigned int  mTriCount;
-  unsigned int *mIndices;
+  NxU32  mVertexCount;
+  NxF32        *mVertices;
+  NxU32  mTriCount;
+  NxU32 *mIndices;
 };
 
 class MeshCollisionConvex : public MeshCollision, public MeshConvex
@@ -1110,7 +1143,7 @@ public:
   }
   const char     *mName;
   const char     *mInfo;
-  unsigned int    mCollisionCount;
+  NxU32    mCollisionCount;
   MeshCollision **mCollisionGeometry;
 };
 
@@ -1143,43 +1176,49 @@ public:
     mAssetVersion        = 0;
     mMeshCollisionCount  = 0;
     mMeshCollisionRepresentations = 0;
+	mPlane[0] = 1;
+	mPlane[1] = 0;
+	mPlane[2] = 0;
+	mPlane[3] = 0;
   }
 
 
   const char           *mAssetName;
   const char           *mAssetInfo;
-  int                   mMeshSystemVersion;
-  int                   mAssetVersion;
+  NxI32                   mMeshSystemVersion;
+  NxI32                   mAssetVersion;
   MeshAABB              mAABB;
-  unsigned int          mTextureCount;          // Are textures necessary? [rgd].
+  NxU32          mTextureCount;          // Are textures necessary? [rgd].
   MeshRawTexture      **mTextures;              // Texture storage in mesh data is rare, and the name is simply an attribute of the material
 
-  unsigned int          mTetraMeshCount;        // number of tetrahedral meshes
+  NxU32          mTetraMeshCount;        // number of tetrahedral meshes
   MeshTetra           **mTetraMeshes;           // tetraheadral meshes
 
-  unsigned int          mSkeletonCount;         // number of skeletons
+  NxU32          mSkeletonCount;         // number of skeletons
   MeshSkeleton        **mSkeletons;             // the skeletons.
 
-  unsigned int          mAnimationCount;
+  NxU32          mAnimationCount;
   MeshAnimation       **mAnimations;
 
-  unsigned int          mMaterialCount;         // Materials are owned by this list, merely referenced later.
+  NxU32          mMaterialCount;         // Materials are owned by this list, merely referenced later.
   MeshMaterial         *mMaterials;
 
-  unsigned int          mUserDataCount;
+  NxU32          mUserDataCount;
   MeshUserData        **mUserData;
 
-  unsigned int          mUserBinaryDataCount;
+  NxU32          mUserBinaryDataCount;
   MeshUserBinaryData  **mUserBinaryData;
 
-  unsigned int          mMeshCount;
+  NxU32          mMeshCount;
   Mesh                **mMeshes;
 
-  unsigned int          mMeshInstanceCount;
+  NxU32          mMeshInstanceCount;
   MeshInstance         *mMeshInstances;
 
-  unsigned int          mMeshCollisionCount;
+  NxU32          mMeshCollisionCount;
   MeshCollisionRepresentation **mMeshCollisionRepresentations;
+
+  NxF32                 mPlane[4];
 
 };
 
@@ -1189,43 +1228,62 @@ class MeshImportInterface
 public:
   virtual void        importMaterial(const char *matName,const char *metaData) = 0;        // one material
   virtual void        importUserData(const char *userKey,const char *userValue) = 0;       // carry along raw user data as ASCII strings only..
-  virtual void        importUserBinaryData(const char *name,unsigned int len,const unsigned char *data) = 0;
-  virtual void        importTetraMesh(const char *tetraName,const char *meshName,unsigned int tcount,const float *tetraData) = 0;
+  virtual void        importUserBinaryData(const char *name,NxU32 len,const NxU8 *data) = 0;
+  virtual void        importTetraMesh(const char *tetraName,const char *meshName,NxU32 tcount,const NxF32 *tetraData) = 0;
 
   virtual void        importAssetName(const char *assetName,const char *info) = 0;         // name of the overall asset.
   virtual void        importMesh(const char *meshName,const char *skeletonName) = 0;       // name of a mesh and the skeleton it refers to.
 
   virtual void        importTriangle(const char *meshName,
                                      const char *materialName,
-                                     unsigned int vertexFlags,
+                                     NxU32 vertexFlags,
                                      const MeshVertex &v1,
                                      const MeshVertex &v2,
                                      const MeshVertex &v3) = 0;
 
   virtual void        importIndexedTriangleList(const char *meshName,
                                                 const char *materialName,
-                                                unsigned int vertexFlags,
-                                                unsigned int vcount,
+                                                NxU32 vertexFlags,
+                                                NxU32 vcount,
                                                 const MeshVertex *vertices,
-                                                unsigned int tcount,
-                                                const unsigned int *indices) = 0;
+                                                NxU32 tcount,
+                                                const NxU32 *indices) = 0;
 
   virtual void        importAnimation(const MeshAnimation &animation) = 0;
   virtual void        importSkeleton(const MeshSkeleton &skeleton) = 0;
-  virtual void        importRawTexture(const char *textureName,const unsigned char *pixels,unsigned int wid,unsigned int hit) = 0;
-  virtual void        importMeshInstance(const char *meshName,const float pos[3],const float rotation[4],const float scale[3])= 0;
+  virtual void        importRawTexture(const char *textureName,const NxU8 *pixels,NxU32 wid,NxU32 hit) = 0;
+  virtual void        importMeshInstance(const char *meshName,const NxF32 pos[3],const NxF32 rotation[4],const NxF32 scale[3])= 0;
 
   virtual void importCollisionRepresentation(const char *name,const char *info) = 0; // the name of a new collision representation.
 
   virtual void importConvexHull(const char *collision_rep,    // the collision representation it is associated with
                                 const char *boneName,         // the name of the bone it is associated with in a skeleton.
-                                const float *transform,       // the full 4x4 transform for this hull, null if in world space.
-                                unsigned int vertex_count,
-                                const float *vertices,
-                                unsigned int tri_count,
-                                const unsigned int *indices) = 0;
+                                const NxF32 *transform,       // the full 4x4 transform for this hull, null if in world space.
+                                NxU32 vertex_count,
+                                const NxF32 *vertices,
+                                NxU32 tri_count,
+                                const NxU32 *indices) = 0;
 
-  virtual int getSerializeFrame(void) = 0;
+  virtual void importSphere(const char *collision_rep,    // the collision representation it is associated with
+                            const char *boneName,         // the name of the bone it is associated with in a skeleton.
+                            const NxF32 *transform,
+                            NxF32 radius) = 0;
+
+  virtual void importCapsule(const char *collision_rep,    // the collision representation it is associated with
+                                const char *boneName,         // the name of the bone it is associated with in a skeleton.
+                                const NxF32 *transform,       // the full 4x4 transform for this hull, null if in world space.
+                                NxF32 radius,
+                                NxF32 height) = 0;
+
+  virtual void importOBB(const char *collision_rep,    // the collision representation it is associated with
+                         const char *boneName,         // the name of the bone it is associated with in a skeleton.
+                         const NxF32 *transform,       // the full 4x4 transform for this hull, null if in world space.
+                         const NxF32 *sides) = 0;
+
+
+  virtual NxI32 getSerializeFrame(void) = 0;
+
+  virtual void importPlane(const NxF32 *p) = 0;
 
 
 };
@@ -1236,7 +1294,7 @@ public:
 class MeshImportApplicationResource
 {
 public:
-  virtual void * getApplicationResource(const char *base_name,const char *resource_name,unsigned int &len) = 0;
+  virtual void * getApplicationResource(const char *base_name,const char *resource_name,NxU32 &len) = 0;
   virtual void   releaseApplicationResource(void *mem) = 0;
 };
 
@@ -1245,11 +1303,11 @@ public:
 class MeshImporter
 {
 public:
-  virtual int              getExtensionCount(void) { return 1; }; // most importers support just one file name extension.
-  virtual const char *     getExtension(int index=0) = 0; // report the default file name extension for this mesh type.
-  virtual const char *     getDescription(int index=0) = 0; // report the ascii description of the import type.
+  virtual NxI32              getExtensionCount(void) { return 1; }; // most importers support just one file name extension.
+  virtual const char *     getExtension(NxI32 index=0) = 0; // report the default file name extension for this mesh type.
+  virtual const char *     getDescription(NxI32 index=0) = 0; // report the ascii description of the import type.
 
-  virtual bool             importMesh(const char *meshName,const void *data,unsigned int dlen,MeshImportInterface *callback,const char *options,MeshImportApplicationResource *appResource) = 0;
+  virtual bool             importMesh(const char *meshName,const void *data,NxU32 dlen,MeshImportInterface *callback,const char *options,MeshImportApplicationResource *appResource) = 0;
 
 };
 
@@ -1258,6 +1316,8 @@ enum MeshSerializeFormat
   MSF_EZMESH, // save it back out into ez-mesh, lossless XML format.
   MSF_OGRE3D, // save it back out into the Ogre3d XML format.
   MSF_WAVEFRONT, // save as wavefront OBJ
+  MSF_PSK, // save it back out as a PSK format file.
+  MSF_FBX,  // FBX import is supported by FBX output is not yet.
   MSF_LAST
 };
 
@@ -1276,12 +1336,12 @@ public:
   }
 
   const char *mBoneName;                     // the name of the bone
-  int         mParentIndex;                  // the parent index
-  float       mLocalTransform[16];
-  float       mTransform[16];                // the transform in world space
-  float       mAnimTransform[16];            // the sampled animation transform, multiplied times the inverse root transform.
-  float       mCompositeAnimTransform[16];   // teh composite transform
-  float       mInverseTransform[16];         // the inverse transform
+  NxI32         mParentIndex;                  // the parent index
+  NxF32       mLocalTransform[16];
+  NxF32       mTransform[16];                // the transform in world space
+  NxF32       mAnimTransform[16];            // the sampled animation transform, multiplied times the inverse root transform.
+  NxF32       mCompositeAnimTransform[16];   // teh composite transform
+  NxF32       mInverseTransform[16];         // the inverse transform
 };
 
 class MeshSkeletonInstance
@@ -1295,7 +1355,7 @@ public:
   }
 
   const char        *mName;
-  int                mBoneCount;
+  NxI32                mBoneCount;
   MeshBoneInstance  *mBones;
 };
 
@@ -1313,29 +1373,38 @@ public:
     fmi_identity(mExportTransform);
   }
   MeshSerializeFormat mFormat;
-  unsigned char      *mBaseData;
-  unsigned int        mBaseLen;
-  unsigned char      *mExtendedData;
-  unsigned int        mExtendedLen;
+  NxU8      *mBaseData;
+  NxU32        mBaseLen;
+  NxU8      *mExtendedData;
+  NxU32        mExtendedLen;
   const char         *mSaveFileName; // need to know the name of the save file name for OBJ and Ogre3d format.
-  float               mExportTransform[16]; // matrix transform on export
+  NxF32               mExportTransform[16]; // matrix transform on export
 };
 
 
 class MeshSystemContainer;
+
+class VertexIndex
+{
+public:
+  virtual NxU32    getIndex(const NxF32 pos[3],bool &newPos) = 0;  // get welded index for this NxF32 vector[3]
+  virtual const NxF32 *   getVertices(void) const = 0;
+  virtual const NxF32 *   getVertex(NxU32 index) const = 0;
+  virtual NxU32    getVcount(void) const = 0;
+};
 
 class MeshImport
 {
 public:
   virtual void             addImporter(MeshImporter *importer) = 0; // add an additional importer
 
-  virtual bool             importMesh(const char *meshName,const void *data,unsigned int dlen,MeshImportInterface *callback,const char *options) = 0;
+  virtual bool             importMesh(const char *meshName,const void *data,NxU32 dlen,MeshImportInterface *callback,const char *options) = 0;
 
   virtual MeshSystemContainer *     createMeshSystemContainer(void) = 0;
 
   virtual MeshSystemContainer *     createMeshSystemContainer(const char *meshName,
                                                               const void *data,
-                                                              unsigned int dlen,
+                                                              NxU32 dlen,
                                                               const char *options) = 0; // imports and converts to a single MeshSystem data structure
 
   virtual void             releaseMeshSystemContainer(MeshSystemContainer *mesh) = 0;
@@ -1346,8 +1415,8 @@ public:
   virtual void             releaseSerializeMemory(MeshSerialize &data) = 0;
 
 
-  virtual int              getImporterCount(void) = 0;
-  virtual MeshImporter    *getImporter(int index) = 0;
+  virtual NxI32              getImporterCount(void) = 0;
+  virtual MeshImporter    *getImporter(NxI32 index) = 0;
 
   virtual MeshImporter *   locateMeshImporter(const char *fname) = 0; // based on this file name, find a matching mesh importer.
 
@@ -1357,11 +1426,11 @@ public:
 
 // convenience helper functions.
   virtual MeshSkeletonInstance *createMeshSkeletonInstance(const MeshSkeleton &sk) = 0;
-  virtual bool                  sampleAnimationTrack(int trackIndex,const MeshSystem *msystem,MeshSkeletonInstance *skeleton) = 0;
+  virtual bool                  sampleAnimationTrack(NxI32 trackIndex,const MeshSystem *msystem,MeshSkeletonInstance *skeleton) = 0;
   virtual void                  releaseMeshSkeletonInstance(MeshSkeletonInstance *sk) = 0;
 
   // apply bone weighting transforms to this vertex buffer.
-  virtual void transformVertices(unsigned int vcount,
+  virtual void transformVertices(NxU32 vcount,
                                  const MeshVertex *source_vertices,
                                  MeshVertex *dest_vertices,
                                  MeshSkeletonInstance *skeleton) = 0;
@@ -1370,14 +1439,22 @@ public:
 
   virtual void gather(MeshSystemContainer *msc) = 0;
 
-  virtual void scale(MeshSystemContainer *msc,float scale) = 0;
+  virtual void scale(MeshSystemContainer *msc,NxF32 scale) = 0;
+  virtual void rotate(MeshSystemContainer *msc,NxF32 rotX,NxF32 rotY,NxF32 rotZ) = 0; // rotate mesh system using these euler angles expressed as degrees.
+
+  virtual CommLayer *      createCommLayerTelent(const char *address="LOCALHOST",NxU32 port=23) =  0;
+  virtual CommLayer *      createCommLayerWindowsMessage(const char *appName="MeshImport",const char *destApp="DestTool") = 0;
+  virtual void             releaseCommLayer(CommLayer *t) = 0;
+
+  virtual VertexIndex *            createVertexIndex(NxF32 granularity) = 0;  // create an indexed vertext system for floats
+  virtual void                     releaseVertexIndex(VertexIndex *vindex) = 0;
 
 
 };
 
 }; // End of namespace for MESHIMPORT
 
-#define MESHIMPORT_VERSION 5  // version 0.01  increase this version number whenever an interface change occurs.
+#define MESHIMPORT_VERSION 9  // version 0.01  increase this version number whenever an interface change occurs.
 
 
 extern MESHIMPORT::MeshImport *gMeshImport; // This is an optional global variable that can be used by the application.  If the application uses it, it should define it somewhere in its codespace.
@@ -1388,6 +1465,8 @@ class SystemServices;
 };
 
 MESHIMPORT::MeshImport * loadMeshImporters(const char *directory,SYSTEM_SERVICES::SystemServices *services); // loads the mesh import library (dll) and all available importers from the same directory.
+
+extern MESHIMPORT::CommLayer *gCommLayer;
 
 #pragma warning(pop)
 

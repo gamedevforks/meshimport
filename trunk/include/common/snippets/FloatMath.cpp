@@ -4,10 +4,9 @@
 #include <assert.h>
 #include <math.h>
 #include <float.h>
-
 /*!
 **
-** Copyright (c) 2007 by John W. Ratcliff mailto:jratcliff@infiniplex.net
+** Copyright (c) 2009 by John W. Ratcliff mailto:jratcliffscarab@gmail.com
 **
 ** Portions of this source has been released with the PhysXViewer application, as well as
 ** Rocket, CreateDynamics, ODF, and as a number of sample code snippets.
@@ -26,16 +25,15 @@
 **
 ** If you wish to contact me you can use the following methods:
 **
-** Skype Phone: 636-486-4040 (let it ring a long time while it goes through switches)
 ** Skype ID: jratcliff63367
 ** Yahoo: jratcliff63367
 ** AOL: jratcliff1961
-** email: jratcliff@infiniplex.net
+** email: jratcliffscarab@gmail.com
 **
 **
 ** The MIT license:
 **
-** Permission is hereby granted, MEMALLOC_FREE of charge, to any person obtaining a copy
+** Permission is hereby granted, free of charge, to any person obtaining a copy
 ** of this software and associated documentation files (the "Software"), to deal
 ** in the Software without restriction, including without limitation the rights
 ** to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
@@ -56,11 +54,11 @@
 
 #include "FloatMath.h"
 
-#define REAL float
+#define REAL NxF32
 
 #include "FloatMath.inl"
 
 #undef REAL
-#define REAL double
+#define REAL NxF64
 
 #include "FloatMath.inl"

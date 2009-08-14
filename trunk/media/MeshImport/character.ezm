@@ -1,3 +1,4 @@
+<?xml version="1.0"?>
     <Mesh name="character.gr2">
       <Skeleton name="Bip01" count="43">
         <Bone name="Bip01" orientation="0 0.707107008 0 0.707106173" position="0.000403098 1.222246408 0"/>

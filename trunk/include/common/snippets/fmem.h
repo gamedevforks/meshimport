@@ -54,7 +54,7 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "common/snippets/UserMemAlloc.h"
+#include "UserMemAlloc.h"
 
 #pragma warning(push)
 #pragma warning(disable:4996)

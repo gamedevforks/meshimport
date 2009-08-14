@@ -4,6 +4,8 @@
 #include <assert.h>
 
 #include "FastXml.h"
+#pragma warning(disable:4996)
+
 
 /*!
 **
@@ -102,7 +104,7 @@ public:
     return scan;
   }
 
-  char * processClose(char c,const char *element,char *scan,int argc,const char **argv,FastXmlInterface *iface)
+  char * processClose(char c,const char *element,char *scan,NxI32 argc,const char **argv,FastXmlInterface *iface)
   {
     if ( c == '/' || c == '?' )
     {
@@ -183,16 +185,54 @@ public:
     return scan;
   }
 
-  virtual bool processXml(const char *inputData,unsigned int dataLen,FastXmlInterface *iface)
+  virtual bool processXmlFile(const char* filename, FastXmlInterface* iface)
+  {
+	  bool ret = true;
+
+	  release();
+
+	  FILE *infile = fopen(filename, "rb");
+
+	  if(infile == NULL)
+		  return NULL;
+
+	  fseek(infile, 0L, SEEK_END);
+	  NxI32 numbytes = ftell(infile);
+	  fseek(infile, 0L, SEEK_SET);	
+
+	  mInputData = (char*)malloc((numbytes + 1) * sizeof(char));	
+
+	  if(mInputData == NULL)
+		  return NULL;
+
+	  memset(mInputData, 0, (numbytes + 1) * sizeof(char));
+
+	  /* copy all the text into the buffer */
+	  fread(mInputData, sizeof(char), numbytes, infile);
+
+	  fclose(infile);
+
+	  ret =  processXml(iface);
+
+	  return ret;
+  }
+
+  virtual bool processXml(const char *inputData,NxU32 dataLen,FastXmlInterface *iface)
+  {
+	  release();
+
+	  mInputData = (char *)malloc(dataLen+1);
+	  memcpy(mInputData,inputData,dataLen);
+	  mInputData[dataLen] = 0;
+
+	  return processXml(iface);
+  }
+
+  bool processXml(FastXmlInterface *iface)
   {
     bool ret = true;
 
     #define MAX_ATTRIBUTE 2048 // can't imagine having more than 2,048 attributes in a single element right?
-
-    release();
-    mInputData = (char *)malloc(dataLen+1);
-    memcpy(mInputData,inputData,dataLen);
-    mInputData[dataLen] = 0;
 
     mLineNo = 1;
 
@@ -218,7 +258,7 @@ public:
         else
         {
           element = scan;
-          int argc = 0;
+          NxI32 argc = 0;
           const char *argv[MAX_ATTRIBUTE];
           bool close;
           scan = nextSoftOrClose(scan,close);
@@ -297,8 +337,12 @@ public:
                     }
                     else
                     {
-                      mError = "Expected quote to begin attribute";
-                      return false;
+                      //mError = "Expected quote to begin attribute";
+					  //return false;
+					  // PH: let's try to have a more graceful fallback
+				      argc--;
+					  while (*scan != '/' && *scan != '>' && *scan != 0)
+						  scan++;
                     }
                   }
                 }
@@ -317,7 +361,7 @@ public:
     return ret;
   }
 
-  const char * getError(int &lineno)
+  const char * getError(NxI32 &lineno)
   {
     const char *ret = mError;
     lineno = mLineNo;
@@ -328,7 +372,7 @@ public:
 private:
   char         mTypes[256];
   char        *mInputData;
-  int          mLineNo;
+  NxI32          mLineNo;
   const char  *mError;
 };
 
@@ -345,4 +389,3 @@ void      releaseFastXml(FastXml *f)
   MyFastXml *m = static_cast< MyFastXml *>(f);
   delete m;
 }
-
