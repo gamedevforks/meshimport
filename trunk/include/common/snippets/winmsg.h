@@ -41,6 +41,9 @@
 
 // handles inter-application communication by sending windows messages to hidden windows.
 
+namespace NVSHARE
+{
+
 class WinMsg
 {
 public:
@@ -55,5 +58,6 @@ public:
 WinMsg * createWinMsg(const char *windowName); // can be null if this is being used only for send messages.
 void     releaseWinMsg(WinMsg *msg);
 
+}; // end of namespace
 
 #endif

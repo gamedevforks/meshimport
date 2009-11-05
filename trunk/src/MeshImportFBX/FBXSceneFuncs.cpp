@@ -1,4 +1,8 @@
+#include "UserMemAlloc.h"
 #include "ImportFBX.h"
+
+namespace NVSHARE
+{
 
 
 int sortPolygonMaterials( const void* a, const void* b );
@@ -61,8 +65,12 @@ void MeshImportFBX::AddMeshNode(KFbxNode* pNode)
 	KFbxLayerElementArrayTemplate<int>* materialIndices = NULL;
 	//KFbxLayerElementArrayTemplate<KFbxVector4>* normalValues = NULL;
 	//KFbxLayerElementArrayTemplate<int>* normalIndices = NULL;
+	KFbxLayerElementArrayTemplate<KFbxVector4>* tangentValues = NULL;
+	KFbxLayerElementArrayTemplate<int>* tangentIndices = NULL;
+	KFbxLayerElementArrayTemplate<KFbxVector4>* binormalValues = NULL;
+	KFbxLayerElementArrayTemplate<int>* binormalIndices = NULL;
 	KFbxLayerElementArrayTemplate<KFbxVector2>* uvValues = NULL;    
-	KFbxLayerElementArrayTemplate<int>* uvIndices = NULL;    
+	//KFbxLayerElementArrayTemplate<int>* uvIndices = NULL;    
 
 
 	KFbxMesh* lMesh = (KFbxMesh*) pNode->GetNodeAttribute();
@@ -72,24 +80,24 @@ void MeshImportFBX::AddMeshNode(KFbxNode* pNode)
 
 	if(lMesh->GetLayerCount() == 0)
 		return;
-	
+
 	KFbxLayer* lLayer0 = lMesh->GetLayer(0);
-	
+
 	int lPolygonCount = lMesh->GetPolygonCount();
 	if( lPolygonCount == 0 )
 		return;
 
-    int lPolyVertexCount = lMesh->GetPolygonVertexCount();
-    if (lPolyVertexCount == 0)
-        return;
+	int lPolyVertexCount = lMesh->GetPolygonVertexCount();
+	if (lPolyVertexCount == 0)
+		return;
 
-    int lVertexCount = lMesh->GetControlPointsCount();
-    if (lVertexCount == 0)
-        return;
+	int lVertexCount = lMesh->GetControlPointsCount();
+	if (lVertexCount == 0)
+		return;
 
 	positionValues = lMesh->GetControlPoints();
 	lMesh->GetMaterialIndices(&materialIndices);
-	
+
 	int materialIndexCount = materialIndices != NULL ? materialIndices->GetCount() : 1;
 
 	//if(!lMesh->GetNormals(&normalValues))
@@ -99,25 +107,44 @@ void MeshImportFBX::AddMeshNode(KFbxNode* pNode)
 	//}
 	//lMesh->GetNormalsIndices(&normalIndices);
 	//KFbxLayerElement::EMappingMode normalMapping = lLayer0->GetNormals()->GetMappingMode();
-	
 
-    lMesh->GetTextureUV(&uvValues, KFbxLayerElement::eDIFFUSE_TEXTURES); 
-    lMesh->GetTextureIndices(&uvIndices, KFbxLayerElement::eDIFFUSE_TEXTURES); 
-	KFbxLayerElement::EMappingMode uvMapping = uvIndices ? KFbxLayerElement::eBY_POLYGON_VERTEX : KFbxLayerElement::eBY_CONTROL_POINT;
+	// PH: tangents and binormals seem not to work, what a pity
+	lMesh->GetTangents(&tangentValues);
+	lMesh->GetTangentsIndices(&tangentIndices);
+	KFbxLayerElement::EMappingMode tangentMapping = tangentIndices ? KFbxLayerElement::eBY_POLYGON_VERTEX : KFbxLayerElement::eBY_CONTROL_POINT;
+
+	lMesh->GetBinormals(&binormalValues);
+	lMesh->GetBinormalsIndices(&binormalIndices);	
+	KFbxLayerElement::EMappingMode binormalMapping = binormalIndices ? KFbxLayerElement::eBY_POLYGON_VERTEX : KFbxLayerElement::eBY_CONTROL_POINT;
+
+	lMesh->GetTextureUV(&uvValues, KFbxLayerElement::eDIFFUSE_TEXTURES); 
+	//lMesh->GetTextureIndices(&uvIndices, KFbxLayerElement::eDIFFUSE_TEXTURES); 
+	//KFbxLayerElement::EMappingMode uvMapping = uvIndices ? KFbxLayerElement::eBY_POLYGON_VERTEX : KFbxLayerElement::eBY_CONTROL_POINT;
+	// PH: This seems to work correctly, unless the eBY_CONBTROL_POINT option
+	KFbxLayerElement::EMappingMode uvMapping = KFbxLayerElement::eBY_POLYGON_VERTEX;
 
 	std::vector<VertexSkinInfo> meshSkinInfo(lVertexCount);
 
 	mVertexFormat = 0;
-	mVertexFormat |= MESHIMPORT::MIVF_POSITION;
-	mVertexFormat |= MESHIMPORT::MIVF_BONE_WEIGHTING;
+	mVertexFormat |= NVSHARE::MIVF_POSITION;
+	mVertexFormat |= NVSHARE::MIVF_BONE_WEIGHTING;
 	//if(normalValues != NULL && normalValues->GetCount() > 0)
-	mVertexFormat |= MESHIMPORT::MIVF_NORMAL;
+	mVertexFormat |= NVSHARE::MIVF_NORMAL;
+
+	if (tangentValues != NULL && tangentValues->GetCount() > 0)
+	{
+		assert((tangentValues != NULL) == (binormalValues != NULL)); // we need both or none
+		mVertexFormat |= NVSHARE::MIVF_TANGENT | NVSHARE::MIVF_BINORMAL;
+	}
+
 	if(uvValues != NULL && uvValues->GetCount() > 0)
-		mVertexFormat |= MESHIMPORT::MIVF_TEXEL1;
+		mVertexFormat |= NVSHARE::MIVF_TEXEL1;
 
 	KFbxXMatrix bindShapeXform;
 	KFbxXMatrix geometryXform = GetGeometry(pNode);
 	KFbxXMatrix shapeNodeXform = m_takeInfo ? pNode->GetGlobalFromCurrentTake(m_takeInfo->mLocalTimeSpan.GetStart()) : pNode->GetGlobalFromDefaultTake();
+
+	bool isBindShapeSet = false;
 
 	int lSkinCount= lMesh->GetDeformerCount(KFbxDeformer::eSKIN);
 	for(int s = 0; s < lSkinCount; s++)
@@ -151,14 +178,16 @@ void MeshImportFBX::AddMeshNode(KFbxNode* pNode)
 			assert(boneIndex >=0 && boneIndex < meshBones.size());
 
 
-			if(c==0)
+			if(!isBindShapeSet)
 			{
 				KFbxXMatrix bindShapeBaseXform;
 				cluster->GetTransformMatrix(bindShapeBaseXform);
-				
+
 				bindShapeXform = bindShapeBaseXform;//shapeNodeXform * bindShapeBaseXform * geometryXform;
 
 				meshWorldBindShapeXforms[boneIndex] = bindShapeXform;
+
+				isBindShapeSet = true;
 			}
 
 			int *weightIndices = cluster->GetControlPointIndices();
@@ -169,14 +198,14 @@ void MeshImportFBX::AddMeshNode(KFbxNode* pNode)
 				double wValue = weightValues[w];
 
 				VertexSkinInfo& vertexSkinInfo = meshSkinInfo[wIndex];
-				
+
 				//Assign the weight to the vertex
 				for(int a = 0; a < MAX_BONES; a++ )
 				{
 					//Test to see if we want to insert here
 					if( wValue <= vertexSkinInfo.mWeight[a])
 						continue;//nope, try the next assignment
-		
+
 					//shift lower assignments to make room for the new value
 					for(int shift = MAX_BONES-1; shift > a; shift-- )
 					{
@@ -234,8 +263,8 @@ void MeshImportFBX::AddMeshNode(KFbxNode* pNode)
 
 	}
 	qsort( &sortedPolygonMaterials[0], materialIndexCount, sizeof( PolygonMaterial ), sortPolygonMaterials );
-	
-	
+
+
 	std::vector<int> partition;
 	partition.reserve(lPolygonCount+1);
 	partition.push_back(0);
@@ -247,50 +276,76 @@ void MeshImportFBX::AddMeshNode(KFbxNode* pNode)
 		}
 	}
 	partition.push_back(lPolygonCount);
-	
+
 	unsigned submeshCount = (unsigned)partition.size();
 	int lNbMat = pNode->GetSrcObjectCount(KFbxSurfaceMaterial::ClassId);
 	KString materialNamePrefix = m_fileName + KString( "#" );
-	PolygonMaterial* tmat = &sortedPolygonMaterials[0];
 
+	std::vector<NVSHARE::MeshVertex> meshVertices(lPolyVertexCount);
 
-
-	std::vector<MESHIMPORT::MeshVertex> meshVertices(lPolyVertexCount);
-
-	//for( unsigned submeshIndex = 0; submeshIndex < submeshCount; ++submeshIndex )
-	//{
-	//	KFbxSurfaceMaterial* lMaterial = NULL;
-	//	if( tmat->materialIndex >= 0 && tmat->materialIndex < lNbMat )
-	//	{
-	//		lMaterial = KFbxCast <KFbxSurfaceMaterial>(pNode->GetSrcObject(KFbxSurfaceMaterial::ClassId, tmat->materialIndex));
-	//	}
-	//	KString materialName = lMaterial ? (materialNamePrefix+lMaterial->GetName()) : KString("");
-
-	//	const int polygonNum = partition[submeshIndex+1]-partition[submeshIndex];
-
-
-		KFbxSurfaceMaterial* lMaterial = KFbxCast <KFbxSurfaceMaterial>(pNode->GetSrcObject(KFbxSurfaceMaterial::ClassId, tmat->materialIndex));
-		KString materialName = lMaterial ? (materialNamePrefix+lMaterial->GetName()) : KString("");
-
-		int lPolygonIndex;
-		for (lPolygonIndex = 0; lPolygonIndex < lPolygonCount; lPolygonIndex++)
+	for( unsigned submeshIndex = 0; submeshIndex < submeshCount-1; ++submeshIndex )
+	{
+		PolygonMaterial* tmat = &sortedPolygonMaterials[partition[submeshIndex]];
+		
+		KFbxSurfaceMaterial* lMaterial = NULL;
+		if( tmat->materialIndex >= 0 && tmat->materialIndex < lNbMat )
 		{
-			int lPolyVertexStart = lMesh->GetPolygonVertexIndex(lPolygonIndex);
+			lMaterial = KFbxCast <KFbxSurfaceMaterial>(pNode->GetSrcObject(KFbxSurfaceMaterial::ClassId, tmat->materialIndex));
+		}
+
+		const int polygonNum = partition[submeshIndex+1]-partition[submeshIndex];
+
+		// PH: Why on earth do we need a material prefix?
+		//KString materialName = lMaterial ? (materialNamePrefix+lMaterial->GetName()) : KString("");
+		KString materialName = lMaterial ? lMaterial->GetName() : KString("");
+
+		for (int lSortedPolygonIndex = partition[submeshIndex]; lSortedPolygonIndex < partition[submeshIndex+1]; lSortedPolygonIndex++)
+		{
+			const int lPolygonIndex = sortedPolygonMaterials[lSortedPolygonIndex].polygonIndex;
+			const int lPolyVertexStart = lMesh->GetPolygonVertexIndex(lPolygonIndex);
 			int lPolyVertexIndex = lPolyVertexStart;
 
 			int lPolyLocalVertexCount = lMesh->GetPolygonSize(lPolygonIndex);
 
 			for (int lPolyLocalVertexIndex=0; lPolyLocalVertexIndex < lPolyLocalVertexCount; lPolyLocalVertexIndex++, lPolyVertexIndex++)
 			{
-				int lVertexIndex = lMesh->GetPolygonVertex(lPolygonIndex, lPolyLocalVertexIndex);
+				const int lVertexIndex = lMesh->GetPolygonVertex(lPolygonIndex, lPolyLocalVertexIndex);
 
-				MESHIMPORT::MeshVertex& meshVertex = meshVertices[lPolyVertexIndex];
+				NVSHARE::MeshVertex& meshVertex = meshVertices[lPolyVertexIndex];
 				VertexSkinInfo& vertexSkinInfo = meshSkinInfo[lVertexIndex];
 				KFbxVector4& sourceVert = positionValues[lVertexIndex];
 
 				KFbxVector4 sourceNorm;
 				lMesh->GetPolygonVertexNormal(lPolygonIndex, lPolyLocalVertexIndex, sourceNorm);
 				sourceNorm[3] = 0;
+
+				KFbxVector4 sourceTangent;
+				if (tangentValues != NULL)
+				{
+					if (tangentMapping == KFbxLayerElement::eBY_POLYGON_VERTEX)
+					{
+						int tangentIndex = tangentIndices->GetAt(lPolygonIndex);
+						sourceTangent = tangentValues->GetAt(tangentIndex);
+					}
+					else // KFbxLayerElement::eBY_CONTROL_POINT
+					{
+						sourceTangent = tangentValues->GetAt(lVertexIndex);
+					}
+				}
+
+				KFbxVector4 sourceBinormal;
+				if (binormalValues != NULL)
+				{
+					if (tangentMapping == KFbxLayerElement::eBY_POLYGON_VERTEX)
+					{
+						int binormalIndex = binormalIndices->GetAt(lPolygonIndex);
+						sourceBinormal = binormalValues->GetAt(binormalIndex);
+					}
+					else // KFbxLayerElement::eBY_CONTROL_POINT
+					{
+						sourceBinormal = binormalValues->GetAt(lVertexIndex);
+					}
+				}
 
 				KFbxVector2 sourceUV;
 				if(uvValues != NULL)
@@ -302,13 +357,16 @@ void MeshImportFBX::AddMeshNode(KFbxNode* pNode)
 					}
 					else // KFbxLayerElement::eBY_CONTROL_POINT
 					{
+						// PH: This does not seem to lead to good results, not sure why, using the other codepath from now on
 						sourceUV = uvValues->GetAt(lVertexIndex);
 					}
 				}
 
 				KFbxVector4 accumVert;
 				KFbxVector4 accumNorm;
-//#define ACCUMULATE_BIND_SHAPE
+				KFbxVector4 accumTangent;
+				KFbxVector4 accumBinormal;
+				//#define ACCUMULATE_BIND_SHAPE
 #ifdef ACCUMULATE_BIND_SHAPE
 				for(int a = 0; a < MAX_BONES; a++ )
 				{
@@ -316,29 +374,66 @@ void MeshImportFBX::AddMeshNode(KFbxNode* pNode)
 						break;
 
 					KFbxXMatrix& bindXform = meshWorldBindShapeXforms[vertexSkinInfo.mBone[a]];
+					KFbxXMatrix bindXformWithoutTranslation(bindXform);
+					bindXformWithoutTranslation.SetT(KFbxVector4(0.0f, 0.0f, 0.0f, 1.0f));
+
 					float bindWeight = vertexSkinInfo.mWeight[a];
 
 					KFbxVector4 bindVert = bindXform.MultT(sourceVert);
-					KFbxVector4 bindNorm = bindXform.MultT(sourceNorm);
+					KFbxVector4 bindNorm = bindXformWithoutTranslation.MultT(sourceNorm);
+					KFbxVector4 bindTangent;
+					KFbxVector4 bindBinormal;
+					if (tangentValues != NULL)
+					{
+						bindTangent = bindXformWithoutTranslation.MultT(sourceTangent);
+						bindBinormal = bindXformWithoutTranslation.MultT(sourceBinormal);
+					}
 
 					accumVert += bindVert * bindWeight;
 					accumNorm += bindNorm * bindWeight;
+					accumTangent += bindTangent * bindWeight;
+					accumBinormal += bindBinormal * bindWeight;
 				}
 
 #else //!ACCUMULATE_BIND_SHAPE
 				accumVert = bindShapeXform.MultT(sourceVert);
-				accumNorm = bindShapeXform.MultT(sourceNorm);
+
+				KFbxXMatrix bindShapeXformWithoutTranslation(bindShapeXform);
+				bindShapeXformWithoutTranslation.SetT(KFbxVector4(0.0f, 0.0f, 0.0f, 1.0f));
+				accumNorm = bindShapeXformWithoutTranslation.MultT(sourceNorm);
+				if (tangentValues != NULL)
+				{
+					accumTangent = bindShapeXformWithoutTranslation.MultT(sourceTangent);
+					accumBinormal = bindShapeXformWithoutTranslation.MultT(sourceBinormal);
+				}
 #endif
-				accumNorm[3] = 0;
-				accumNorm.Normalize();
+
 
 				meshVertex.mPos[0] = accumVert[0];
 				meshVertex.mPos[1] = accumVert[1];
 				meshVertex.mPos[2] = accumVert[2];
 
+				accumNorm[3] = 0.0f;
+				accumNorm.Normalize();
 				meshVertex.mNormal[0] = accumNorm[0];
 				meshVertex.mNormal[1] = accumNorm[1];
 				meshVertex.mNormal[2] = accumNorm[2];
+
+				if (tangentValues != NULL)
+				{
+					accumTangent[3] = 0.0f;
+					accumTangent.Normalize();
+					accumBinormal[3] = 0.0f;
+					accumBinormal.Normalize();
+
+					meshVertex.mTangent[0] = accumTangent[0];
+					meshVertex.mTangent[1] = accumTangent[1];
+					meshVertex.mTangent[2] = accumTangent[2];
+
+					meshVertex.mBiNormal[0] = accumBinormal[0];
+					meshVertex.mBiNormal[1] = accumBinormal[1];
+					meshVertex.mBiNormal[2] = accumBinormal[2];
+				}
 
 				meshVertex.mTexel1[0] = sourceUV[0];
 				meshVertex.mTexel1[1] = sourceUV[1];
@@ -354,19 +449,18 @@ void MeshImportFBX::AddMeshNode(KFbxNode* pNode)
 				meshVertex.mWeight[3] = vertexSkinInfo.mWeight[3];
 			}
 
-			lPolyVertexIndex = lPolyVertexStart;
-			for (int lPolyLocalVertexIndex=0; lPolyLocalVertexIndex < lPolyLocalVertexCount-2; lPolyLocalVertexIndex++, lPolyVertexIndex++)
+			for (int lPolyLocalVertexIndex=0; lPolyLocalVertexIndex < lPolyLocalVertexCount-2; lPolyLocalVertexIndex++)
 			{
-			   m_callback->importTriangle(
-				   pNode->GetName(),
-				   pNode->GetName(),//materialName, 
+				m_callback->importTriangle(
+					nodeName,
+					materialName,
 					mVertexFormat,
 					meshVertices[lPolyVertexStart+0],
 					meshVertices[lPolyVertexStart+lPolyLocalVertexIndex+1],
 					meshVertices[lPolyVertexStart+lPolyLocalVertexIndex+2]);
 			}
 		}
-	//}  
+	}
 }
 
 
@@ -412,7 +506,7 @@ void MeshImportFBX::AddMeshNode(KFbxNode* pNode)
 //		const char * attrNodeName;
 //		KFbxNode* attrNode;
 //		
-//		MESHIMPORT::MeshBone* bone = new MESHIMPORT::MeshBone();
+//		NVSHARE::MeshBone* bone = new NVSHARE::MeshBone();
 //
 //		BoneRelation *bonePair = new BoneRelation();
 //			
@@ -618,7 +712,7 @@ inline void MeshImportFBX::GetBindShapeMatrix( KFbxCluster* lCluster, KFbxXMatri
 
 
 // Deform the vertex array with the links contained in the mesh.
-void MeshImportFBX::ApplyVertexTransform(KFbxMesh* pMesh, MESHIMPORT::MeshVertex* pVertexArray)
+void MeshImportFBX::ApplyVertexTransform(KFbxMesh* pMesh, NVSHARE::MeshVertex* pVertexArray)
 {
 	
 	int lVertexCount = pMesh->GetControlPointsCount();
@@ -652,8 +746,6 @@ void MeshImportFBX::ApplyVertexTransform(KFbxMesh* pMesh, MESHIMPORT::MeshVertex
 			GetBindShapeMatrix(lCluster, lVertexTransformMatrix);
 
 			char* clusterName = const_cast<char *>(lCluster->GetName());
-
-			MESHIMPORT::MeshBone bone;
 
 			ClusterBoneMap* clusterMap = new ClusterBoneMap();
 			clusterMap->clusterID = j;
@@ -783,9 +875,13 @@ void MeshImportFBX::ImportAnimation()
 	int numFrames = (int)(span.GetDuration().GetSecondDouble()/dTime);
 	float duration = (float)numFrames * dTime;
 
+	meshWorldAnimXforms.clear();
 	meshWorldAnimXforms.resize(meshBones.size());
+	meshTrackPtrs.clear();
 	meshTrackPtrs.resize(meshBones.size() );
+	meshTracks.clear();
 	meshTracks.resize(meshBones.size() );
+	meshPoses.clear();
 	meshPoses.resize(meshBones.size() * numFrames);
 
 	meshAnimation.mName = m_takeName->Buffer();
@@ -798,8 +894,8 @@ void MeshImportFBX::ImportAnimation()
 	for(int b=0;b<meshBones.size();b++)
 	{
 		KFbxNode* node = meshNodes[b];
-		MESHIMPORT::MeshBone& bone = meshBones[b];
-		MESHIMPORT::MeshAnimTrack& track = meshTracks[b];
+		const NVSHARE::MeshBone& bone = meshBones[b];
+		NVSHARE::MeshAnimTrack& track = meshTracks[b];
 		meshTrackPtrs[b] = &track;
 
 		track.SetName(bone.GetName());
@@ -825,10 +921,10 @@ void MeshImportFBX::ImportAnimation()
 		//Convert to locals
 		for(int b=0;b<meshBones.size();b++)
 		{
-			MESHIMPORT::MeshBone& bone = meshBones[b];
-			MESHIMPORT::MeshAnimTrack& track = meshTracks[b];
+			const NVSHARE::MeshBone& bone = meshBones[b];
+			NVSHARE::MeshAnimTrack& track = meshTracks[b];
 		
-			KFbxXMatrix localAnimXform; 
+			KFbxXMatrix localAnimXform;
 			if(bone.mParentIndex == -1)
 				localAnimXform = meshWorldAnimXforms[b];
 			else
@@ -860,6 +956,8 @@ bool MeshImportFBX::importSkeletonRecursive(
 {
 	bool result = true;
 
+	// PH: unfortunately we must add all nodes, not just skeleton bones. Some other nodes can contain
+	//     keyframed animation and objects might be bound to them as well...
 	int boneIndex = boneAllocator;
 	boneAllocator++;
 
@@ -870,7 +968,7 @@ bool MeshImportFBX::importSkeletonRecursive(
 	meshNodes[boneIndex] = node;
 
 	const char* nodeName = meshStrings.Get(node->GetName()).Get();
-	MESHIMPORT::MeshBone& milBone = meshBones[boneIndex];
+	NVSHARE::MeshBone& milBone = meshBones[boneIndex];
 	milBone.SetName(nodeName);
 	milBone.mParentIndex = parentBone;
 
@@ -888,12 +986,13 @@ bool MeshImportFBX::importSkeletonRecursive(
 void MeshImportFBX::ImportSkeleton()
 {
 	bool result = true;
-	
-	
+
 	meshSkeleton.SetName("skeleton");
 
-	
+	// PH: We must clear these arrays to get them re-initialized. Otherwise we will have side effects from previous calls to Import!!
+	meshNodes.clear();
 	meshNodes.reserve(m_scene->GetNodeCount());
+	meshBones.clear();
 	meshBones.reserve(m_scene->GetNodeCount());
 
 	int boneAllocator = 0;
@@ -901,11 +1000,43 @@ void MeshImportFBX::ImportSkeleton()
 
 
 	meshSkeleton.SetBones((int)meshBones.size(), &meshBones[0]);
+	meshWorldBindPoseXforms.clear();
 	meshWorldBindPoseXforms.resize(meshBones.size());
+	meshWorldBindShapeXforms.clear();
 	meshWorldBindShapeXforms.resize(meshBones.size());
 
-
+#if 0
+	// PH: We need to initialize them with the correct scale at least.
+	// PH: Doesn't work at all :( since it does not just depend on scale, I need full bind pose for all bones!
 	for( int n = 0; n < meshBones.size(); n++)
+	{
+		KFbxXMatrix defaultTake = meshNodes[n]->GetGlobalFromDefaultTake();
+		defaultTake.SetT(KFbxVector4(0.0f, 0.0f, 0.0f, 1.0f));
+		KFbxVector4 test(1.0f, 0.0f, 0.0f, 0.0f); // we better have uniform scaling!
+		test = defaultTake.MultT(test);
+		meshWorldBindPoseXforms[n].SetIdentity();
+		meshWorldBindPoseXforms[n] *= test.Length();
+	}
+#endif
+
+#if 0
+	// PH: initially fill them with the default pose (maybe similar to bind pose)
+	// PH: unfortunately this is not working: It will put the skeleton into the first frame of the animation, not the t-pose. Then of
+	//     course the animation is completely broken
+	for( int n = 0; n < meshBones.size(); n++)
+	{
+		meshWorldBindPoseXforms[n] = meshNodes[n]->GetGlobalFromDefaultTake(KFbxNode::eSOURCE_SET);
+		//meshWorldBindPoseXforms[n] = meshNodes[n]->GetGlobalFromDefaultTake(KFbxNode::eDESTINATION_SET);
+	}
+#endif
+
+#if 1
+	std::vector<bool> boneInitialized(meshBones.size());
+	std::vector<bool> boneImportant(meshBones.size());
+
+	// PH: This still seems to be leading to the best results
+	//     But some bones don't get a bind pose if they are not referenced by the mesh.
+	for( int n = 0; n < m_scene->GetNodeCount(); n++)
 	{
 		KFbxNode* node = m_scene->GetNode(n);
 	    KFbxNodeAttribute* nodeAttribute = node->GetNodeAttribute();
@@ -953,15 +1084,38 @@ void MeshImportFBX::ImportSkeleton()
 					continue;
 
 				cluster->GetTransformLinkMatrix(meshWorldBindPoseXforms[b]);
+				boneInitialized[b] = true;
+				boneImportant[b] = true;
 				//DH:  Removed because we need to update it later anyways if it is bound to two different meshes
 				//cluster->GetTransformMatrix(meshWorldBindShapeXforms[b]);
 			}
 		}
 	}
+#if 0
+	// PH: this will generate the list of bones that should be initialized
+	//     put a breakpoint where the comment says 'parent should be initialized' and dump the list of 'parent's
+	for (int b = 0; b < meshBones.size(); b++)
+	{
+		if (!boneImportant[b])
+			continue;
+
+		int parent = meshBones[b].mParentIndex;
+		while (parent > 0)
+		{
+			if (!boneInitialized[parent])
+			{
+				// parent should be initialized!
+				boneInitialized[parent] = true;
+			}
+			parent = meshBones[parent].mParentIndex;
+		}
+	}
+#endif
+#endif
 
 	for(int b = 0; b < meshBones.size(); b++)
 	{
-		MESHIMPORT::MeshBone& bone = meshBones[b];
+		NVSHARE::MeshBone& bone = meshBones[b];
 		KFbxXMatrix& worldBindPose = meshWorldBindPoseXforms[b];
 		KFbxXMatrix localBindPose;
 		if(bone.mParentIndex == -1)
@@ -976,7 +1130,9 @@ void MeshImportFBX::ImportSkeleton()
 		float localBindPoseF[16];
 		for(int x = 0; x < 16; x++ )
 		{
-			localBindPoseF[x] = ((double*)localBindPose)[x];
+			//localBindPoseF[x] = ((double*)localBindPose)[x];
+			// PH: This looks somewhat nicer...
+			localBindPoseF[x] = localBindPose.Get(x / 4, x % 4);
 		}
 
 		float t[3];
@@ -1119,9 +1275,4 @@ KFbxXMatrix MeshImportFBX::GetPoseMatrix(KFbxPose* pPose, int pNodeIndex)
     return lPoseMatrix;
 }
 
-
-
-
-
-
-
+}; // end of namespace

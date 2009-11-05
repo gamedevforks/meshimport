@@ -61,11 +61,11 @@
 
 #include "VtxWeld.h"
 
-namespace MESHIMPORT
+namespace NVSHARE
 {
 
 template<> MeshVertex VertexLess<MeshVertex>::mFind = MeshVertex();
-template<> USER_STL::vector<MeshVertex > *VertexLess<MeshVertex>::mList=0;
+template<> std::vector<MeshVertex > *VertexLess<MeshVertex>::mList=0;
 
 
 template<>

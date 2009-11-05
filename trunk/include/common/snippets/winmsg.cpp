@@ -11,12 +11,13 @@
 
 #define MAXPARSEBUFFER 2048
 
+#include "winmsg.h"
+
+
 #ifdef WIN32
 #include <windows.h>
 #endif
 
-#include "winmsg.h"
-#include "UserMemAlloc.h"
 
 /*!
 **
@@ -53,7 +54,11 @@
 
 */
 
-namespace WINMSG
+#ifdef WIN32
+
+#define WINMSG_NVSHARE WINMSG_##NVSHARE
+
+namespace WINMSG_NVSHARE
 {
 
 #if defined(__APPLE__) || defined(__CELLOS_LV2__) || defined(LINUX)
@@ -515,7 +520,7 @@ const char ** InPlaceParser::GetArglist(char *line,NxI32 &count) // convert sour
 
 static INT_PTR CALLBACK _MsgWindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam);
 
-class WindowsMessage
+class WindowsMessage : public NVSHARE::Memalloc
 {
 public:
   WindowsMessage(void)
@@ -566,29 +571,29 @@ public:
   NxU32    mLen;
 };
 
-typedef USER_STL::queue< WindowsMessage *> WindowsMessageQueue;
+typedef std::queue< WindowsMessage *> WindowsMessageQueue;
 
-class MyWinMsg : public WinMsg
+class MyWinMsg : public NVSHARE::WinMsg, public NVSHARE::Memalloc
 {
 public:
 
-	~MyWinMsg(void)
+	virtual ~MyWinMsg(void)
 	{
 #ifdef WIN32
         if ( mCurrent )
         {
-            MEMALLOC_DELETE(WindowsMessage,mCurrent);
+            delete mCurrent;
         }
         while ( !mStrings.empty() )
         {
             WindowsMessage *wm = mStrings.front();
-            MEMALLOC_DELETE(WindowsMessage,wm);
+            delete wm;
             mStrings.pop();
         }
         while ( !mBlobs.empty() )
         {
             WindowsMessage *wm = mBlobs.front();
-            MEMALLOC_DELETE(WindowsMessage,wm);
+            delete wm;
             mBlobs.pop();
         }
 
@@ -677,7 +682,7 @@ public:
 
         if ( !mStrings.empty() )
         {
-            MEMALLOC_DELETE(WindowsMessage,mCurrent);
+            delete mCurrent;
             mCurrent = mStrings.front();
             mStrings.pop();
             ret = mCurrent->mMessage;
@@ -692,7 +697,7 @@ public:
         checkWinMsg();
         if ( !mBlobs.empty() )
         {
-            MEMALLOC_DELETE(WindowsMessage,mCurrent);
+            delete mCurrent;
             mCurrent = mBlobs.front();
             mBlobs.pop();
             ret = mCurrent->mType;
@@ -907,7 +912,10 @@ static INT_PTR CALLBACK _MsgWindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARA
 
 }; // end of namespace
 
-using namespace WINMSG;
+namespace NVSHARE
+{
+
+using namespace WINMSG_NVSHARE;
 
 WinMsg * createWinMsg(const char *windowName)  // can be null if this is being used only for send messages.
 {
@@ -918,7 +926,26 @@ WinMsg * createWinMsg(const char *windowName)  // can be null if this is being u
 void     releaseWinMsg(WinMsg *msg)
 {
     MyWinMsg *mwm = static_cast< MyWinMsg *>(msg);
-    MEMALLOC_DELETE(MyWinMsg,mwm);
+    delete mwm;
 }
 
+}; // end of namespace
 
+#else
+
+namespace NVSHARE
+{
+
+	WinMsg * createWinMsg(const char *windowName)  // can be null if this is being used only for send messages.
+	{
+		return 0;
+
+	}
+	void     releaseWinMsg(WinMsg *msg)
+	{
+	}
+
+}; // end of namespace
+
+
+#endif

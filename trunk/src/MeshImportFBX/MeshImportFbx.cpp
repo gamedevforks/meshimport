@@ -1,12 +1,11 @@
 #include <assert.h>
 
-
+#include "UserMemAlloc.h"
 #include "ImportFBX.h"
 #include "MeshImportFbx.h"
 
 
 static MeshImportFBX *gInterface=0;
-
 
 extern "C"
 {
@@ -25,19 +24,6 @@ FBX_DLL_API MeshImportFBX * getInterface(int version_number)
 };
 
 }
-
-bool doShutdown(void)
-{
-  bool ret = false;
-  if ( gInterface )
-  {
-    ret = true;
-    MEMALLOC_DELETE(MeshImportFbx,gInterface);
-    gInterface = 0;
-  }
-  return ret;
-}
-
 
 #ifdef WIN32
 

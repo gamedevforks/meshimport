@@ -2,7 +2,6 @@
 #include "UserMemAlloc.h"
 #include "MeshImport.h"
 #include "ImportPSK.h"
-#include "SystemServices.h"
 
 #ifdef WIN32
 #ifdef MESHIMPORTOGRE_EXPORTS
@@ -20,19 +19,19 @@ bool doShutdown(void);
 
 extern "C"
 {
-MESHIMPORTOGRE_API MESHIMPORT::MeshImporter * getInterface(NxI32 version_number,SYSTEM_SERVICES::SystemServices *services);
+MESHIMPORTOGRE_API NVSHARE::MeshImporter * getInterface(NxI32 version_number,NVSHARE::SystemServices *services);
 };
 
-namespace MESHIMPORT
+namespace NVSHARE
 {
-class MyMeshImportPSK : public MeshImporter
+class MyMeshImportPSK : public MeshImporter, public Memalloc
 {
 public:
   MyMeshImportPSK(void)
   {
   }
 
-  ~MyMeshImportPSK(void)
+  virtual ~MyMeshImportPSK(void)
   {
   }
 
@@ -53,16 +52,16 @@ public:
     return "PSK 3d Skeletal Mesh Files";
   }
 
-  virtual bool importMesh(const char *meshName,const void *data,NxU32 dlen,MESHIMPORT::MeshImportInterface *callback,const char *options,MeshImportApplicationResource *appResource)
+  virtual bool importMesh(const char *meshName,const void *data,NxU32 dlen,NVSHARE::MeshImportInterface *callback,const char *options,MeshImportApplicationResource *appResource)
   {
     bool ret = false;
 
-    MESHIMPORT::MeshImporter *mi = MESHIMPORT::createMeshImportPSK();
+    NVSHARE::MeshImporter *mi = NVSHARE::createMeshImportPSK();
 
     if ( mi )
     {
       ret = mi->importMesh(meshName,data,dlen,callback,options,appResource);
-      MESHIMPORT::releaseMeshImportPSK(mi);
+      NVSHARE::releaseMeshImportPSK(mi);
     }
 
     return ret;
@@ -81,7 +80,7 @@ enum MeshImportPSKAPI
 };  // End of Namespace
 
 
-using namespace MESHIMPORT;
+using namespace NVSHARE;
 
 
 static MyMeshImportPSK *gInterface=0;
@@ -89,14 +88,14 @@ static MyMeshImportPSK *gInterface=0;
 extern "C"
 {
 #ifdef PLUGINS_EMBEDDED
-  MeshImporter * getInterfaceMeshImportPSK(NxI32 version_number,SYSTEM_SERVICES::SystemServices *services)
+  MeshImporter * getInterfaceMeshImportPSK(NxI32 version_number,NVSHARE::SystemServices *services)
 #else
-MESHIMPORTOGRE_API MeshImporter * getInterface(NxI32 version_number,SYSTEM_SERVICES::SystemServices *services)
+MESHIMPORTOGRE_API MeshImporter * getInterface(NxI32 version_number,NVSHARE::SystemServices *services)
 #endif
 {
   if ( services )
   {
-    SYSTEM_SERVICES::gSystemServices = services;
+    NVSHARE::gSystemServices = services;
   }
   assert( gInterface == 0 );
   if ( gInterface == 0 && version_number == MESHIMPORT_VERSION )
@@ -110,7 +109,7 @@ MESHIMPORTOGRE_API MeshImporter * getInterface(NxI32 version_number,SYSTEM_SERVI
 
 #ifndef PLUGINS_EMBEDDED
 
-using namespace MESHIMPORT;
+using namespace NVSHARE;
 
 bool doShutdown(void)
 {
@@ -118,13 +117,13 @@ bool doShutdown(void)
   if ( gInterface )
   {
     ret = true;
-    MEMALLOC_DELETE(MeshImportPSK,gInterface);
+    delete gInterface;
     gInterface = 0;
   }
   return ret;
 }
 
-using namespace MESHIMPORT;
+using namespace NVSHARE;
 
 #ifdef WIN32
 

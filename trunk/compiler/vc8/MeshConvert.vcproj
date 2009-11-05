@@ -4,6 +4,7 @@
 	Version="8.00"
 	Name="MeshConvert"
 	ProjectGUID="{6E37CFC1-CCA2-832E-A166-9103C14A8FFA}"
+	RootNamespace="MeshConvert"
 	>
 	<Platforms>
 		<Platform
@@ -193,14 +194,6 @@
 			<Filter
 				Name="snippets"
 				>
-				<File
-					RelativePath="..\..\include\common\snippets\SystemServices.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\include\common\snippets\SystemServices.h"
-					>
-				</File>
 				<File
 					RelativePath="..\..\include\common\snippets\UserMemAlloc.h"
 					>

@@ -192,14 +192,6 @@
 			</File>
 		</Filter>
 		<Filter
-			Name="Public Header Files"
-			>
-			<File
-				RelativePath="..\..\include\MeshImportObj\MeshImportObj.h"
-				>
-			</File>
-		</Filter>
-		<Filter
 			Name="Common Include-Binding Files"
 			>
 			<Filter
@@ -214,6 +206,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\include\common\snippets\nvstl.cpp"
+					>
+				</File>
+				<File
 					RelativePath="..\..\include\common\snippets\Nx.h"
 					>
 				</File>
@@ -222,7 +218,15 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\include\common\snippets\NxMath.h"
+					>
+				</File>
+				<File
 					RelativePath="..\..\include\common\snippets\NxSimpleTypes.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\include\common\snippets\NxUserAllocator.h"
 					>
 				</File>
 				<File
@@ -243,14 +247,6 @@
 				</File>
 				<File
 					RelativePath="..\..\include\common\snippets\sutil.h"
-					>
-				</File>
-				<File
-					RelativePath="..\..\include\common\snippets\SystemServices.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\include\common\snippets\SystemServices.h"
 					>
 				</File>
 			</Filter>

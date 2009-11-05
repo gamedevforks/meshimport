@@ -63,7 +63,6 @@
 #include "UserMemAlloc.h"
 #include "MeshImport.h"
 #include "ImportEZM.h"
-#include "SendTextMessage.h"
 #include "StringDict.h"
 #include "sutil.h"
 #include "stable.h"
@@ -74,7 +73,7 @@
 #pragma warning(disable:4100)
 #pragma warning(disable:4996)
 
-namespace MESHIMPORT
+namespace NVSHARE
 {
 
 #define DEBUG_LOG 0
@@ -140,7 +139,7 @@ enum AttributeType
 	AT_LAST
 };
 
-class MeshImportEZM : public MeshImporter, public FastXmlInterface
+class MeshImportEZM : public MeshImporter, public FastXmlInterface, public Memalloc
 {
 public:
 	MeshImportEZM(void)
@@ -231,6 +230,11 @@ public:
     mMeshCollisionConvex = 0;
 
 	}
+
+  virtual ~MeshImportEZM(void)
+  {
+
+  }
 
   const NxU8 * getVertex(const NxU8 *src,MeshVertex &v,const char **types,NxI32 tcount)
   {
@@ -509,17 +513,17 @@ public:
         for (NxI32 i=0; i<mAnimation->mTrackCount; i++)
         {
           MeshAnimTrack *t = mAnimation->mTracks[i];
-          MEMALLOC_DELETE_ARRAY(MeshAnimPose,t->mPose);
-          MEMALLOC_DELETE(MeshAnimTrack,t);
+          delete []t->mPose;
+          delete t;
         }
-        MEMALLOC_DELETE_ARRAY(MeshAnimTrack *,mAnimation->mTracks);
-        MEMALLOC_DELETE(MeshAnimation,mAnimation);
-  			mAnimation = 0;
-  		}
+        delete []mAnimation->mTracks;
+        delete mAnimation;
+  		mAnimation = 0;
+		}
 
-      MEMALLOC_DELETE(MeshCollisionRepresentation,mMeshCollisionRepresentation);
-      MEMALLOC_DELETE(MeshCollision,mMeshCollision);
-      MEMALLOC_DELETE(MeshCollisionConvex,mMeshCollisionConvex);
+      delete mMeshCollisionRepresentation;
+      delete mMeshCollision;
+      delete mMeshCollisionConvex;
       mMeshCollisionRepresentation = 0;
       mMeshCollision = 0;
       mMeshCollisionConvex = 0;
@@ -540,29 +544,29 @@ public:
         assert(0);
         break;
       case NT_MESH_COLLISION_REPRESENTATION:
-        MEMALLOC_DELETE(MeshCollisionRepresentation,mMeshCollisionRepresentation);
+        delete mMeshCollisionRepresentation;
         mMeshCollisionRepresentation = MEMALLOC_NEW(MeshCollisionRepresentation);
         break;
       case NT_MESH_COLLISION:
         if ( mMeshCollisionRepresentation )
         {
           mCallback->importCollisionRepresentation( mMeshCollisionRepresentation->mName, mMeshCollisionRepresentation->mInfo );
-          mCollisionRepName = mMeshCollisionRepresentation->mName;
-          MEMALLOC_DELETE(MeshCollisionRepresentation,mMeshCollisionRepresentation);
+          mCollisionRepName = SGET(mMeshCollisionRepresentation->mName);
+          delete mMeshCollisionRepresentation;
           mMeshCollisionRepresentation = 0;
         }
-        MEMALLOC_DELETE(MeshCollision,mMeshCollision);
+        delete mMeshCollision;
         mMeshCollision = MEMALLOC_NEW(MeshCollision);
         break;
       case NT_MESH_COLLISION_CONVEX:
         assert(mMeshCollision);
         if ( mMeshCollision )
         {
-          MEMALLOC_DELETE(MeshCollisionConvex,mMeshCollisionConvex);
+          delete mMeshCollisionConvex;
           mMeshCollisionConvex = MEMALLOC_NEW(MeshCollisionConvex);
           MeshCollision *d = static_cast< MeshCollision *>(mMeshCollisionConvex);
           *d = *mMeshCollision;
-          MEMALLOC_DELETE(MeshCollision,mMeshCollision);
+          delete mMeshCollision;
           mMeshCollision = 0;
         }
         break;
@@ -570,7 +574,7 @@ public:
 				if ( mAnimation )
 				{
 					mCallback->importAnimation(*mAnimation);
-					MEMALLOC_DELETE(MeshAnimation,mAnimation);
+					delete mAnimation;
 					mAnimation = 0;
 				}
 				mName       = 0;
@@ -597,14 +601,14 @@ public:
                   mAnimation->mFrameCount = framecount;
                   mAnimation->mDuration = duration;
                   mAnimation->mDtime = dtime;
-                  mAnimation->mTracks = MEMALLOC_NEW_ARRAY(MeshAnimTrack *,mAnimation->mTrackCount)[mAnimation->mTrackCount];
+                  mAnimation->mTracks = (MeshAnimTrack **)MEMALLOC_MALLOC(sizeof(MeshAnimTrack *)*mAnimation->mTrackCount);
                   for (NxI32 i=0; i<mAnimation->mTrackCount; i++)
                   {
                     MeshAnimTrack *track = MEMALLOC_NEW(MeshAnimTrack);
                     track->mDtime = mAnimation->mDuration;
                     track->mFrameCount = mAnimation->mFrameCount;
                     track->mDuration = mAnimation->mDuration;
-                    track->mPose = MEMALLOC_NEW_ARRAY(MeshAnimPose,track->mFrameCount)[track->mFrameCount];
+                    track->mPose = MEMALLOC_NEW(MeshAnimPose)[track->mFrameCount];
                     mAnimation->mTracks[i] = track;
                   }
 						}
@@ -618,7 +622,7 @@ public:
 				break;
 			case NT_SKELETON:
 				{
-					MEMALLOC_DELETE(MeshSkeleton,mSkeleton);
+					delete mSkeleton;
 					mSkeleton = MEMALLOC_NEW(MeshSkeleton);
 				}
 			case NT_BONE:
@@ -739,7 +743,7 @@ public:
   				break;
   			case NT_VERTEX_BUFFER:
   	      MEMALLOC_FREE( mVertexBuffer);
-            MEMALLOC_DELETE_ARRAY(MeshVertex,mVertices);
+            delete []mVertices;
             mVertices = 0;
   				mVertexCount = 0;
   				mVertexBuffer = 0;
@@ -768,7 +772,7 @@ public:
                     mVertexFlags = validateSemantics(a1,a2,c1);
                     if ( mVertexFlags )
                     {
-                      mVertices = MEMALLOC_NEW_ARRAY(MeshVertex,mVertexCount)[mVertexCount];
+                      mVertices = MEMALLOC_NEW(MeshVertex)[mVertexCount];
                       const NxU8 *scan = (const NxU8 *)mVertexBuffer;
                       for (NxI32 i=0; i<mVertexCount; i++)
                       {
@@ -799,7 +803,7 @@ public:
   				{
               if ( mMeshCollisionConvex )
               {
-                NxF32 *vertices = MEMALLOC_NEW_ARRAY(NxF32,mVertexCount*3)[mVertexCount*3];
+                NxF32 *vertices = (NxF32 *)MEMALLOC_MALLOC(sizeof(NxF32)*mVertexCount*3);
                 NxF32 *dest = vertices;
                 for (NxI32 i=0; i<mVertexCount; i++)
                 {
@@ -817,8 +821,8 @@ public:
                                             mIndexCount,
                                             (const NxU32 *)mIndexBuffer);
 
-                MEMALLOC_DELETE_ARRAY(NxF32,vertices);
-                MEMALLOC_DELETE(MeshCollisionConvex,mMeshCollisionConvex);
+                delete []vertices;
+                delete mMeshCollisionConvex;
                 mMeshCollisionConvex = 0;
               }
               else
@@ -857,22 +861,26 @@ public:
       case AT_ASSET_INFO:
         mAssetInfo = mStrings.Get(savalue);
         break;
-			case AT_POSITION:
-				if ( mType == NT_BONE && mBone )
+	  case AT_SCALE:
+		  if ( mType == NT_BONE && mBone )
+		  {
+			  Asc2Bin(savalue,1,"fff", mBone->mScale );
+		  }
+		  break;
+		case AT_POSITION:
+			if ( mType == NT_BONE && mBone )
+			{
+				Asc2Bin(savalue,1,"fff", mBone->mPosition );
+				mBoneIndex++;
+				if ( mBoneIndex == mSkeleton->GetBoneCount() )
 				{
-					Asc2Bin(savalue,1,"fff", mBone->mPosition );
-					mBoneIndex++;
-
-					if ( mBoneIndex == mSkeleton->GetBoneCount() )
-					{
-						mCallback->importSkeleton(*mSkeleton);
-						MEMALLOC_DELETE(MeshSkeleton,mSkeleton);
-						mSkeleton = 0;
-						mBoneIndex = 0;
-					}
-
+					mCallback->importSkeleton(*mSkeleton);
+					delete mSkeleton;
+					mSkeleton = 0;
+					mBoneIndex = 0;
 				}
-				break;
+			}
+			break;
 			case AT_ORIENTATION:
 				if ( mType == NT_BONE && mBone )
 				{
@@ -970,7 +978,7 @@ public:
 						if ( count > 0 )
 						{
 							MeshBone *bones;
-							bones = MEMALLOC_NEW_ARRAY(MeshBone,count)[count];
+							bones = MEMALLOC_NEW(MeshBone)[count];
 							mSkeleton->SetBones(count,bones);
 							mBoneIndex = 0;
 						}
@@ -1095,7 +1103,7 @@ MeshImporter * createMeshImportEZM(void)
 void         releaseMeshImportEZM(MeshImporter *iface)
 {
   MeshImportEZM *m = static_cast< MeshImportEZM *>(iface);
-  MEMALLOC_DELETE(MeshImportEZM,m);
+  delete m;
 }
 
 }; // end of namepsace

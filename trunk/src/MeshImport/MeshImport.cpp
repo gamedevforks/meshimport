@@ -2,7 +2,6 @@
 #include <assert.h>
 #include <vector>
 
-#include "CommLayer.h"
 #include "MeshImport.h"
 #include "VtxWeld.h"
 #include "MeshImportBuilder.h"
@@ -10,9 +9,8 @@
 #include "FileInterface.h"
 #include "sutil.h"
 #include "FloatMath.h"
-#include "SendTextMessage.h"
-#include "SystemServices.h"
 #include "KeyValueIni.h"
+#include "CommLayer.h"
 
 #pragma warning(disable:4996)
 
@@ -29,10 +27,8 @@
 
 #pragma warning(disable:4100)
 
-#ifndef PLUGINS_EMBEDDED
-SendTextMessage *gSendTextMessage=0;
-#endif
-
+namespace NVSHARE
+{
 
 struct Vector
 {
@@ -117,16 +113,17 @@ struct ScaleKey
     NxF32 mScale[4];
 };
 
+}; // end of namespace
 
 extern "C"
 {
-  MESHIMPORT_API MESHIMPORT::MeshImport * getInterface(NxI32 version_number,SYSTEM_SERVICES::SystemServices *services);
+  MESHIMPORT_API NVSHARE::MeshImport * getInterface(NxI32 version_number,NVSHARE::SystemServices *services);
 };
 
-namespace MESHIMPORT
+namespace NVSHARE
 {
 
-class MyVertexIndex : public VertexIndex
+class MyVertexIndex : public VertexIndex, public Memalloc
 {
 public:
   MyVertexIndex(NxF32 granularity)
@@ -134,7 +131,7 @@ public:
     mVertexIndex = fm_createVertexIndex(granularity,false);
   }
 
-  ~MyVertexIndex(void)
+  virtual ~MyVertexIndex(void)
   {
     fm_releaseVertexIndex(mVertexIndex);
   }
@@ -194,9 +191,9 @@ public:
 
 };
 
-typedef USER_STL::vector< MeshImporter * > MeshImporterVector;
+typedef std::vector< MeshImporter * > MeshImporterVector;
 
-class MyMeshImport : public MeshImport, public MyMeshImportApplicationResource
+class MyMeshImport : public MeshImport, public MyMeshImportApplicationResource, public Memalloc
 {
 public:
   MyMeshImport(void)
@@ -220,7 +217,7 @@ public:
   void                     releaseVertexIndex(VertexIndex *vindex)
   {
     MyVertexIndex *m = static_cast< MyVertexIndex *>(vindex);
-    MEMALLOC_DELETE(MyVertexIndex,m);
+    delete m;
   }
 
   virtual MeshImporter *   locateMeshImporter(const char *fname) // based on this file name, find a matching mesh importer.
@@ -321,7 +318,7 @@ public:
 
   virtual NxI32              getImporterCount(void)
   {
-    return mImporters.size();
+    return (NxI32)mImporters.size();
   }
 
   virtual MeshImporter    *getImporter(NxI32 index)
@@ -482,7 +479,7 @@ public:
     if ( !mCtype.empty() )
     {
       char *foo = (char *)mCtype.c_str();
-      NxI32 len =  strlen(foo);
+      NxI32 len =  (NxI32)strlen(foo);
       if ( foo[len-1] == ' ' )
       {
         foo[len-1] = 0;
@@ -511,7 +508,7 @@ public:
     if ( !mSemantic.empty() )
     {
       char *foo = (char *)mSemantic.c_str();
-      NxI32 len =  strlen(foo);
+      NxI32 len =  (NxI32)strlen(foo);
       if ( foo[len-1] == ' ' )
       {
         foo[len-1] = 0;
@@ -597,7 +594,7 @@ public:
       strcat(scratch,temp);
     }
     strcat(scratch,",    ");
-    NxU32 slen = strlen(scratch);
+    NxU32 slen = (NxI32)strlen(scratch);
     fi_fprintf(fph,"%s", scratch );
     column+=slen;
     if ( column >= 160 )
@@ -619,7 +616,7 @@ public:
     char temp[1024];
     sprintf(temp,"%d %d %d,  ", idx[0], idx[1], idx[2] );
     fi_fprintf(fph,"%s",temp);
-    NxU32 slen = strlen(temp);
+    NxU32 slen = (NxU32)strlen(temp);
     column+=slen;
     if ( column >= 160 )
       newRow = true;
@@ -842,12 +839,12 @@ public:
   {
 	  if ( ms->mMeshCount == 0 ) return;
 
-	  typedef USER_STL::vector< Vector > VectorVector;
-	  typedef USER_STL::vector< Vertex > VertexVector;
-	  typedef USER_STL::vector< Triangle > TriangleVector;
-	  typedef USER_STL::vector< Material > MaterialVector;
-	  typedef USER_STL::vector< Bone > BoneVector;
-	  typedef USER_STL::vector< BoneInfluence > BoneInfluenceVector;
+	  typedef std::vector< Vector > VectorVector;
+	  typedef std::vector< Vertex > VertexVector;
+	  typedef std::vector< Triangle > TriangleVector;
+	  typedef std::vector< Material > MaterialVector;
+	  typedef std::vector< Bone > BoneVector;
+	  typedef std::vector< BoneInfluence > BoneInfluenceVector;
 
 	  Mesh *mesh = ms->mMeshes[0];
 
@@ -1665,7 +1662,7 @@ public:
     fi_fprintf(exfph,"</skeleton>\r\n");
   }
 
-  typedef USER_STL::vector< NxU32 > NxU32Vector;
+  typedef std::vector< NxU32 > NxU32Vector;
 
   class Msave
   {
@@ -1674,7 +1671,7 @@ public:
       NxU32Vector mIndices;
   };
 
-  typedef USER_STL::vector< Msave > MsaveVector;
+  typedef std::vector< Msave > MsaveVector;
 
   void serializeWavefront(FILE_INTERFACE *fph,FILE_INTERFACE *exfph,MeshSystem *mesh,const char *saveName,const NxF32 *exportTransform)
   {
@@ -1832,7 +1829,7 @@ public:
         {
           Msave &ms = (*i);
           fi_fprintf(fph,"usemtl %s\r\n", ms.mMaterialName );
-          NxU32 tcount = ms.mIndices.size()/3;
+          NxU32 tcount = (NxU32)ms.mIndices.size()/3;
           NxU32 *indices = &ms.mIndices[0];
           for (NxU32 k=0; k<tcount; k++)
           {
@@ -1949,7 +1946,7 @@ public:
         {
           Msave &ms = (*i);
           fi_fprintf(fph,"usemtl %s\r\n", ms.mMaterialName );
-          NxU32 tcount = ms.mIndices.size()/3;
+          NxU32 tcount = (NxU32)ms.mIndices.size()/3;
           NxU32 *indices = &ms.mIndices[0];
           for (NxU32 k=0; k<tcount; k++)
           {
@@ -1981,7 +1978,7 @@ public:
         {
           data.mExtendedData = (NxU8 *)MEMALLOC_MALLOC(olen);
           memcpy(data.mExtendedData,temp,olen);
-          data.mExtendedLen = olen;
+          data.mExtendedLen = (NxU32)olen;
         }
         fi_fclose(exfph);
       }
@@ -1999,7 +1996,7 @@ public:
         {
           data.mExtendedData = (NxU8 *)MEMALLOC_MALLOC(olen);
           memcpy(data.mExtendedData,temp,olen);
-          data.mExtendedLen = olen;
+          data.mExtendedLen = (NxU32)olen;
         }
         fi_fclose(exfph);
       }
@@ -2013,7 +2010,7 @@ public:
         {
           data.mExtendedData = (NxU8 *)MEMALLOC_MALLOC(olen);
           memcpy(data.mExtendedData,temp,olen);
-          data.mExtendedLen = olen;
+          data.mExtendedLen = (NxU32)olen;
         }
         fi_fclose(exfph);
       }
@@ -2024,7 +2021,7 @@ public:
       {
         data.mBaseData = (NxU8 *)MEMALLOC_MALLOC(olen);
         memcpy(data.mBaseData,temp,olen);
-        data.mBaseLen = olen;
+        data.mBaseLen = (NxU32)olen;
         ret = true;
       }
       fi_fclose(fph);
@@ -2046,14 +2043,14 @@ public:
 
   virtual const char   *    getFileRequestDialogString(void)
   {
-    typedef USER_STL::vector< std::string > StringVector;
+    typedef std::vector< std::string > StringVector;
     StringVector descriptions;
     StringVector extensions;
 
     NxU32 count = getImporterCount();
     for (unsigned i=0; i<count; i++)
     {
-      MESHIMPORT::MeshImporter *imp = getImporter(i);
+      NVSHARE::MeshImporter *imp = getImporter(i);
       NxU32 ecount = imp->getExtensionCount();
       for (NxU32 j=0; j<ecount; j++)
       {
@@ -2067,7 +2064,7 @@ public:
     }
     mFileRequest.clear();
     mFileRequest+="All (";
-    count = descriptions.size();
+    count = (NxU32)descriptions.size();
     for (NxU32 i=0; i<count; i++)
     {
       mFileRequest+="*";
@@ -2112,7 +2109,7 @@ public:
       ret = MEMALLOC_NEW(MeshSkeletonInstance);
       ret->mName = sk.mName;
       ret->mBoneCount = sk.mBoneCount;
-      ret->mBones = MEMALLOC_NEW_ARRAY(MeshBoneInstance,sk.mBoneCount)[sk.mBoneCount];
+      ret->mBones = MEMALLOC_NEW(MeshBoneInstance)[sk.mBoneCount];
       for (NxI32 i=0; i<ret->mBoneCount; i++)
       {
         const MeshBone &src   = sk.mBones[i];
@@ -2139,8 +2136,8 @@ public:
   {
     if ( sk )
     {
-      MEMALLOC_DELETE_ARRAY(MeshBoneInstance,sk->mBones);
-      MEMALLOC_DELETE(MeshSkeletonInstance,sk);
+      delete []sk->mBones;
+      delete sk;
     }
   }
 
@@ -2314,7 +2311,7 @@ private:
 };  // End of Namespace
 
 
-using namespace MESHIMPORT;
+using namespace NVSHARE;
 
 
 static MyMeshImport *gInterface=0;
@@ -2322,15 +2319,15 @@ static MyMeshImport *gInterface=0;
 extern "C"
 {
 #ifdef PLUGINS_EMBEDDED
-  MeshImport * getInterfaceMeshImport(NxI32 version_number,SYSTEM_SERVICES::SystemServices *services)
+  MeshImport * getInterfaceMeshImport(NxI32 version_number,NVSHARE::SystemServices *services)
 #else
-  MESHIMPORT_API MeshImport * getInterface(NxI32 version_number,SYSTEM_SERVICES::SystemServices *services)
+  MESHIMPORT_API MeshImport * getInterface(NxI32 version_number,NVSHARE::SystemServices *services)
 #endif
 {
 
   if ( services )
   {
-    SYSTEM_SERVICES::gSystemServices = services;
+    NVSHARE::gSystemServices = services;
   }
 
   assert( gInterface == 0 );
@@ -2343,11 +2340,11 @@ extern "C"
 
 };  // End of namespace PATHPLANNING
 
-using namespace MESHIMPORT;
+using namespace NVSHARE;
 
 #ifndef PLUGINS_EMBEDDED
 
-using namespace MESHIMPORT;
+using namespace NVSHARE;
 
 #ifdef WIN32
 

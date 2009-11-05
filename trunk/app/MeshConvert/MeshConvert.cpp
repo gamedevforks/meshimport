@@ -6,9 +6,11 @@
 
 #include "MeshImport.h"
 
+using namespace NVSHARE;
+
 #pragma warning(disable:4996 4100)
 
-char * findLastDot(char *scan)
+static char * findLastDot(char *scan)
 {
   char *lastDot = 0;
   while ( *scan )
@@ -19,7 +21,7 @@ char * findLastDot(char *scan)
   return lastDot;
 }
 
-char *stristr(const char *str,const char *key)       // case insensitive str str
+static char *stristr(const char *str,const char *key)       // case insensitive str str
 {
 	assert( strlen(str) < 2048 );
 	assert( strlen(key) < 2048 );
@@ -40,7 +42,7 @@ char *stristr(const char *str,const char *key)       // case insensitive str str
 	return foo;
 }
 
-class MyMeshImportApplicationResource : public MESHIMPORT::MeshImportApplicationResource
+class MyMeshImportApplicationResource : public NVSHARE::MeshImportApplicationResource
 {
 public:
 	virtual void * getApplicationResource(const char *base_name,const char *resource_name,NxU32 &len) 
@@ -88,8 +90,8 @@ void main(NxI32 argc,const char **argv)
         NxF32 meshScale = 1;
         NxF32 rot[3];
 
-        MESHIMPORT::MeshSerializeFormat inputFormat = MESHIMPORT::MSF_EZMESH;
-        MESHIMPORT::MeshSerializeFormat outputFormat = MESHIMPORT::MSF_EZMESH;
+        NVSHARE::MeshSerializeFormat inputFormat = NVSHARE::MSF_EZMESH;
+        NVSHARE::MeshSerializeFormat outputFormat = NVSHARE::MSF_EZMESH;
 
         for (NxI32 i=2; i<argc; i++)
         {
@@ -143,22 +145,22 @@ void main(NxI32 argc,const char **argv)
                     const char *value = argv[i];
                     if ( stricmp(value,"ezm") == 0 )
                     {
-                        outputFormat = MESHIMPORT::MSF_EZMESH;
+                        outputFormat = NVSHARE::MSF_EZMESH;
                         printf("Setting output format to EZ-MESH\r\n");
                     }
                     else if ( stricmp(value,"obj") == 0 )
                     {
-                        outputFormat = MESHIMPORT::MSF_WAVEFRONT;
+                        outputFormat = NVSHARE::MSF_WAVEFRONT;
                         printf("Setting output format to Wavefront OBJ\r\n");
                     }
                     else if ( stricmp(value,"xml") == 0 )
                     {
-                        outputFormat = MESHIMPORT::MSF_OGRE3D;
+                        outputFormat = NVSHARE::MSF_OGRE3D;
                         printf("Setting output format to Ogre3d\r\n");
                     }
                     else if ( stricmp(value,"psk") == 0 )
                     {
-                        outputFormat = MESHIMPORT::MSF_PSK;
+                        outputFormat = NVSHARE::MSF_PSK;
                         printf("Setting output format to UE3 PSK\r\n");
                     }
                     else
@@ -189,7 +191,7 @@ void main(NxI32 argc,const char **argv)
 			len--;
 		}
 
-		MESHIMPORT::MeshImport *meshImport = loadMeshImporters(dirname,0); // loads the mesh import library (dll) and all available importers from the same directory.
+		NVSHARE::MeshImport *meshImport = loadMeshImporters(dirname,0); // loads the mesh import library (dll) and all available importers from the same directory.
 		if ( meshImport )
 		{
 			printf("Succesfully loaded the MeshImport DLL from directory: %s\r\n", dirname );
@@ -203,23 +205,23 @@ void main(NxI32 argc,const char **argv)
 
             if ( strstr(fname,".ezm") )
             {
-                inputFormat = MESHIMPORT::MSF_EZMESH;
+                inputFormat = NVSHARE::MSF_EZMESH;
             }
             else if ( strstr(fname,".mesh.xml") )
             {
-                inputFormat = MESHIMPORT::MSF_OGRE3D;
+                inputFormat = NVSHARE::MSF_OGRE3D;
             }
             else if ( strstr(fname,".obj") )
             {
-                inputFormat = MESHIMPORT::MSF_WAVEFRONT;
+                inputFormat = NVSHARE::MSF_WAVEFRONT;
             }
             else if ( strstr(fname,".psk") )
             {
-                inputFormat = MESHIMPORT::MSF_PSK;
+                inputFormat = NVSHARE::MSF_PSK;
             }
             else if ( strstr(fname,".fbx") )
             {
-				inputFormat = MESHIMPORT::MSF_FBX;
+				inputFormat = NVSHARE::MSF_FBX;
             }
 			strncpy(fname,argv[1],512);
 			FILE *fph = fopen(fname,"rb");
@@ -232,7 +234,7 @@ void main(NxI32 argc,const char **argv)
 				{
 					char *mem = (char *)malloc(len);
 					fread(mem,len,1,fph);
-					MESHIMPORT::MeshSystemContainer *msc = meshImport->createMeshSystemContainer(fname,mem,len,0);
+					NVSHARE::MeshSystemContainer *msc = meshImport->createMeshSystemContainer(fname,mem,len,0);
 					if ( msc )
 					{
 						printf("Succesfully loaded input mesh: %s\r\n", fname );
@@ -241,6 +243,7 @@ void main(NxI32 argc,const char **argv)
                             printf("Scaling input mesh by %0.4f\r\n", meshScale );
                             meshImport->scale(msc,meshScale);
                         }
+
                         if ( rotate )
                         {
                             printf("Rotating input mesh by euler angles (%0.2f,%0.2f,%0.2f)\r\n", rot[0], rot[1], rot[2] );
@@ -258,22 +261,22 @@ void main(NxI32 argc,const char **argv)
                             }
                             switch ( outputFormat )
                             {
-                              case MESHIMPORT::MSF_EZMESH:
+                              case NVSHARE::MSF_EZMESH:
                                 strcat(fname,".ezm");
                                 break;
-                              case MESHIMPORT::MSF_WAVEFRONT:
+                              case NVSHARE::MSF_WAVEFRONT:
                                 strcat(fname,".obj");
                                 break;
-                              case MESHIMPORT::MSF_OGRE3D:
+                              case NVSHARE::MSF_OGRE3D:
                                 strcat(fname,".xml");
                                 break;
-                              case MESHIMPORT::MSF_PSK:
+                              case NVSHARE::MSF_PSK:
                                 strcat(fname,".psk");
                                 break;
                             }
 
-                            MESHIMPORT::MeshSerialize ms(outputFormat);
-							MESHIMPORT::MeshSystem *msystem = meshImport->getMeshSystem(msc);
+                            NVSHARE::MeshSerialize ms(outputFormat);
+							NVSHARE::MeshSystem *msystem = meshImport->getMeshSystem(msc);
                             meshImport->serializeMeshSystem(msystem,ms);
 
                             if ( ms.mBaseData )
@@ -296,11 +299,11 @@ void main(NxI32 argc,const char **argv)
                                 {
                                   switch ( outputFormat )
                                   {
-                                    case MESHIMPORT::MSF_EZMESH:
+                                    case NVSHARE::MSF_EZMESH:
                                       assert(0);
                                       exname = 0;
                                       break;
-                                    case MESHIMPORT::MSF_WAVEFRONT:
+                                    case NVSHARE::MSF_WAVEFRONT:
                                       {
                                         char *lastDot = findLastDot(exname);
 										assert(lastDot);
@@ -315,7 +318,7 @@ void main(NxI32 argc,const char **argv)
 										}
                                       }
                                       break;
-                                    case MESHIMPORT::MSF_OGRE3D:
+                                    case NVSHARE::MSF_OGRE3D:
                                       {
                                         char *scan = stristr(exname,".mesh.xml");
                                         if ( scan )
@@ -330,7 +333,7 @@ void main(NxI32 argc,const char **argv)
                                         }
                                       }
                                       break;
-                                    case MESHIMPORT::MSF_PSK:
+                                    case NVSHARE::MSF_PSK:
                                       {
                                         char *lastDot = findLastDot(exname);
 										if ( lastDot )

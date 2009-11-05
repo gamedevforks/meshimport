@@ -1,6 +1,10 @@
 // Local definitions
 
 #include "FBXReader.h"
+#include "UserMemAlloc.h"
+
+namespace NVSHARE
+{
 
 FBXImporterReader::FBXImporterReader(KFbxSdkManager &pFbxSdkManager, int pID):
 KFbxReader(pFbxSdkManager, pID),
@@ -157,3 +161,5 @@ void* GetFBXImporterReaderInfo( KFbxReader::KInfoRequest pRequest, int pId )
 void FillFBXImporterReaderIOSettings( KFbxIOSettings& pIOS )
 {    
 }
+
+}; // end of namespace

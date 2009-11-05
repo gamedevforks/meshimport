@@ -1,4 +1,11 @@
-inline float fmi_computePlane(const float *A,const float *B,const float *C,float *n) // returns D
+#ifndef FMI_MATH_H
+
+#define FMI_MATH_H
+
+namespace NVSHARE
+{
+
+inline float fbx_computePlane(const float *A,const float *B,const float *C,float *n) // returns D
 {
 	float vx = (B[0] - C[0]);
 	float vy = (B[1] - C[1]);
@@ -37,7 +44,7 @@ inline float fmi_computePlane(const float *A,const float *B,const float *C,float
 	return D;
 }
 
-inline void  fmi_transform(const float matrix[16],const float v[3],float t[3]) // rotate and translate this point
+inline void  fbx_transform(const float matrix[16],const float v[3],float t[3]) // rotate and translate this point
 {
   if ( matrix )
   {
@@ -56,7 +63,7 @@ inline void  fmi_transform(const float matrix[16],const float v[3],float t[3]) /
   }
 }
 
-inline void  fmi_transformRotate(const float matrix[16],const float v[3],float t[3]) // rotate only
+inline void  fbx_transformRotate(const float matrix[16],const float v[3],float t[3]) // rotate only
 {
   if ( matrix )
   {
@@ -75,7 +82,7 @@ inline void  fmi_transformRotate(const float matrix[16],const float v[3],float t
   }
 }
 
-inline float fmi_normalize(float *n) // normalize this vector
+inline float fbx_normalize(float *n) // normalize this vector
 {
   float dist = (float)sqrt(n[0]*n[0] + n[1]*n[1] + n[2]*n[2]);
   if ( dist > 0.0000001f )
@@ -96,7 +103,7 @@ inline float fmi_normalize(float *n) // normalize this vector
 }
 
 
-inline void fmi_quatToMatrix(const float *quat,float *matrix) // convert quaterinion rotation to matrix, zeros out the translation component.
+inline void fbx_quatToMatrix(const float *quat,float *matrix) // convert quaterinion rotation to matrix, zeros out the translation component.
 {
 
   float xx = quat[0]*quat[0];
@@ -131,7 +138,7 @@ inline void fmi_quatToMatrix(const float *quat,float *matrix) // convert quateri
 
 // minimal support math routines
 // *** Support math routines
-inline void fmi_getAngleAxis(float &angle,float *axis,const float *quat)
+inline void fbx_getAngleAxis(float &angle,float *axis,const float *quat)
 {
   //return axis and angle of rotation of quaternion
   float x = quat[0];
@@ -155,7 +162,7 @@ inline void fmi_getAngleAxis(float &angle,float *axis,const float *quat)
   }
 }
 
-inline void fmi_setOrientationFromAxisAngle(const float axis[3],float angle,float *quat)
+inline void fbx_setOrientationFromAxisAngle(const float axis[3],float angle,float *quat)
 {
   float x,y,z,w;
 
@@ -188,7 +195,7 @@ inline void fmi_setOrientationFromAxisAngle(const float axis[3],float angle,floa
 }
 
 
-inline void fmi_identity(float *matrix)
+inline void fbx_identity(float *matrix)
 {
   matrix[0*4+0] = 1;    matrix[1*4+1] = 1;    matrix[2*4+2] = 1;    matrix[3*4+3] = 1;
   matrix[1*4+0] = 0;    matrix[2*4+0] = 0;    matrix[3*4+0] = 0;
@@ -198,9 +205,9 @@ inline void fmi_identity(float *matrix)
 }
 
 
-inline void fmi_fromQuat(float *matrix,const float quat[4])
+inline void fbx_fromQuat(float *matrix,const float quat[4])
 {
-  fmi_identity(matrix);
+  fbx_identity(matrix);
 
   float xx = quat[0]*quat[0];
   float yy = quat[1]*quat[1];
@@ -231,7 +238,7 @@ inline void fmi_fromQuat(float *matrix,const float quat[4])
 
 }
 
-inline void fmi_matrixToQuat(const float *matrix,float *quat) // convert the 3x3 portion of a 4x4 matrix into a quaterion as x,y,z,w
+inline void fbx_matrixToQuat(const float *matrix,float *quat) // convert the 3x3 portion of a 4x4 matrix into a quaterion as x,y,z,w
 {
 
   float tr = matrix[0*4+0] + matrix[1*4+1] + matrix[2*4+2];
@@ -282,18 +289,18 @@ inline void fmi_matrixToQuat(const float *matrix,float *quat) // convert the 3x3
 }
 
 
-inline float fmi_squared(float x) { return x*x; };
+inline float fbx_squared(float x) { return x*x; };
 
-inline void fmi_decomposeTransform(const float local_transform[16],float trans[3],float rot[4],float scale[3])
+inline void fbx_decomposeTransform(const float local_transform[16],float trans[3],float rot[4],float scale[3])
 {
 
   trans[0] = local_transform[12];
   trans[1] = local_transform[13];
   trans[2] = local_transform[14];
 
-  scale[0] = sqrtf(fmi_squared(local_transform[0*4+0]) + fmi_squared(local_transform[0*4+1]) + fmi_squared(local_transform[0*4+2]));
-  scale[1] = sqrtf(fmi_squared(local_transform[1*4+0]) + fmi_squared(local_transform[1*4+1]) + fmi_squared(local_transform[1*4+2]));
-  scale[2] = sqrtf(fmi_squared(local_transform[2*4+0]) + fmi_squared(local_transform[2*4+1]) + fmi_squared(local_transform[2*4+2]));
+  scale[0] = sqrtf(fbx_squared(local_transform[0*4+0]) + fbx_squared(local_transform[0*4+1]) + fbx_squared(local_transform[0*4+2]));
+  scale[1] = sqrtf(fbx_squared(local_transform[1*4+0]) + fbx_squared(local_transform[1*4+1]) + fbx_squared(local_transform[1*4+2]));
+  scale[2] = sqrtf(fbx_squared(local_transform[2*4+0]) + fbx_squared(local_transform[2*4+1]) + fbx_squared(local_transform[2*4+2]));
 
   float m[16];
   memcpy(m,local_transform,sizeof(float)*16);
@@ -314,20 +321,20 @@ inline void fmi_decomposeTransform(const float local_transform[16],float trans[3
   m[2*4+1]*=sz;
   m[2*4+2]*=sz;
 
-  fmi_matrixToQuat(m,rot);
+  fbx_matrixToQuat(m,rot);
 
 }
 
-inline void fmi_fromScale(float *matrix,const float scale[3])
+inline void fbx_fromScale(float *matrix,const float scale[3])
 {
-  fmi_identity(matrix);
+  fbx_identity(matrix);
   matrix[0*4+0] = scale[0];
   matrix[1*4+1] = scale[1];
   matrix[2*4+2] = scale[2];
 
 }
 
-inline void  fmi_multiply(const float *pA,const float *pB,float *pM)
+inline void  fbx_multiply(const float *pA,const float *pB,float *pM)
 {
 
   float a = pA[0*4+0] * pB[0*4+0] + pA[0*4+1] * pB[1*4+0] + pA[0*4+2] * pB[2*4+0] + pA[0*4+3] * pB[3*4+0];
@@ -360,29 +367,29 @@ inline void  fmi_multiply(const float *pA,const float *pB,float *pM)
 }
 
 
-inline void fmi_setTranslation(float *matrix,const float pos[3])
+inline void fbx_setTranslation(float *matrix,const float pos[3])
 {
   matrix[12] = pos[0];  matrix[13] = pos[1];  matrix[14] = pos[2];
 }
 
 
 // compose this transform
-inline void fmi_composeTransform(const float pos[3],const float quat[4],const float scale[3],float matrix[16])
+inline void fbx_composeTransform(const float pos[3],const float quat[4],const float scale[3],float matrix[16])
 {
   float mscale[16];
   float mrot[16];
-  fmi_fromQuat(mrot,quat);
-  fmi_fromScale(mscale,scale);
-  fmi_multiply(mscale,mrot,matrix);
-  fmi_setTranslation(matrix,pos);
+  fbx_fromQuat(mrot,quat);
+  fbx_fromScale(mscale,scale);
+  fbx_multiply(mscale,mrot,matrix);
+  fbx_setTranslation(matrix,pos);
 }
 
-inline float fmi_dot(const float *p1,const float *p2)
+inline float fbx_dot(const float *p1,const float *p2)
 {
   return p1[0]*p2[0]+p1[1]*p2[1]+p1[2]*p2[2];
 }
 
-inline void fmi_cross(float *cross,const float *a,const float *b)
+inline void fbx_cross(float *cross,const float *a,const float *b)
 {
   cross[0] = a[1]*b[2] - a[2]*b[1];
   cross[1] = a[2]*b[0] - a[0]*b[2];
@@ -390,7 +397,7 @@ inline void fmi_cross(float *cross,const float *a,const float *b)
 }
 
 
-inline float fmi_getDeterminant(const float matrix[16])
+inline float fbx_getDeterminant(const float matrix[16])
 {
   float tempv[3];
   float p0[3];
@@ -409,13 +416,13 @@ inline float fmi_getDeterminant(const float matrix[16])
   p2[1] = matrix[2*4+1];
   p2[2] = matrix[2*4+2];
 
-  fmi_cross(tempv,p1,p2);
+  fbx_cross(tempv,p1,p2);
 
-  return fmi_dot(p0,tempv);
+  return fbx_dot(p0,tempv);
 
 }
 
-inline void fmi_getSubMatrix(int ki,int kj,float pDst[16],const float matrix[16])
+inline void fbx_getSubMatrix(int ki,int kj,float pDst[16],const float matrix[16])
 {
   int row, col;
   int dstCol = 0, dstRow = 0;
@@ -439,9 +446,9 @@ inline void fmi_getSubMatrix(int ki,int kj,float pDst[16],const float matrix[16]
   }
 }
 
-inline void fmi_inverseTransform(const float matrix[16],float inverse_matrix[16])
+inline void fbx_inverseTransform(const float matrix[16],float inverse_matrix[16])
 {
-  float determinant = fmi_getDeterminant(matrix);
+  float determinant = fbx_getDeterminant(matrix);
   determinant = 1.0f / determinant;
   for (int i = 0; i < 4; i++ )
   {
@@ -449,12 +456,14 @@ inline void fmi_inverseTransform(const float matrix[16],float inverse_matrix[16]
     {
       int sign = 1 - ( ( i + j ) % 2 ) * 2;
       float subMat[16];
-      fmi_identity(subMat);
-      fmi_getSubMatrix( i, j, subMat, matrix );
-      float subDeterminant = fmi_getDeterminant(subMat);
+      fbx_identity(subMat);
+      fbx_getSubMatrix( i, j, subMat, matrix );
+      float subDeterminant = fbx_getDeterminant(subMat);
       inverse_matrix[i*4+j] = ( subDeterminant * sign ) * determinant;
     }
   }
 }
 
+}; // end of namespace
 
+#endif

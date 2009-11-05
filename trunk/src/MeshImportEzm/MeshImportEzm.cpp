@@ -2,7 +2,6 @@
 #include "UserMemAlloc.h"
 #include "MeshImport.h"
 #include "ImportEzm.h"
-#include "SystemServices.h"
 
 #ifdef WIN32
 #ifdef MESHIMPORTEZM_EXPORTS
@@ -20,19 +19,19 @@ bool doShutdown(void);
 
 extern "C"
 {
-MESHIMPORTEZM_API MESHIMPORT::MeshImporter * getInterface(NxI32 version_number,SYSTEM_SERVICES::SystemServices *services);
+MESHIMPORTEZM_API NVSHARE::MeshImporter * getInterface(NxI32 version_number,NVSHARE::SystemServices *services);
 };
 
-namespace MESHIMPORT
+namespace NVSHARE
 {
-class MyMeshImportEzm : public MeshImporter
+class MyMeshImportEzm : public MeshImporter, public Memalloc
 {
 public:
   MyMeshImportEzm(void)
   {
   }
 
-  ~MyMeshImportEzm(void)
+  virtual ~MyMeshImportEzm(void)
   {
   }
 
@@ -52,15 +51,15 @@ public:
   }
 
 
-  virtual bool importMesh(const char *meshName,const void *data,NxU32 dlen,MESHIMPORT::MeshImportInterface *callback,const char *options,MeshImportApplicationResource *appResource)
+  virtual bool importMesh(const char *meshName,const void *data,NxU32 dlen,NVSHARE::MeshImportInterface *callback,const char *options,MeshImportApplicationResource *appResource)
   {
     bool ret = false;
 
-    MeshImporter *mi = MESHIMPORT::createMeshImportEZM();
+    MeshImporter *mi = NVSHARE::createMeshImportEZM();
     if ( mi )
     {
       ret = mi->importMesh(meshName,data,dlen,callback,options,appResource);
-      MESHIMPORT::releaseMeshImportEZM(mi);
+      NVSHARE::releaseMeshImportEZM(mi);
     }
 
     return ret;
@@ -74,7 +73,7 @@ public:
 
 
 
-using namespace MESHIMPORT;
+using namespace NVSHARE;
 
 
 static MyMeshImportEzm *gInterface=0;
@@ -82,14 +81,14 @@ static MyMeshImportEzm *gInterface=0;
 extern "C"
 {
 #ifdef PLUGINS_EMBEDDED
-  MeshImporter * getInterfaceMeshImportEzm(NxI32 version_number,SYSTEM_SERVICES::SystemServices *services)
+  MeshImporter * getInterfaceMeshImportEzm(NxI32 version_number,NVSHARE::SystemServices *services)
 #else
-MESHIMPORTEZM_API MeshImporter * getInterface(NxI32 version_number,SYSTEM_SERVICES::SystemServices *services)
+MESHIMPORTEZM_API MeshImporter * getInterface(NxI32 version_number,NVSHARE::SystemServices *services)
 #endif
 {
   if ( services )
   {
-    SYSTEM_SERVICES::gSystemServices = services;
+    NVSHARE::gSystemServices = services;
   }
   assert( gInterface == 0 );
   if ( gInterface == 0 && version_number == MESHIMPORT_VERSION )
@@ -103,7 +102,7 @@ MESHIMPORTEZM_API MeshImporter * getInterface(NxI32 version_number,SYSTEM_SERVIC
 
 #ifndef PLUGINS_EMBEDDED
 
-using namespace MESHIMPORT;
+using namespace NVSHARE;
 
 bool doShutdown(void)
 {
@@ -111,13 +110,13 @@ bool doShutdown(void)
   if ( gInterface )
   {
     ret = true;
-    MEMALLOC_DELETE(MeshimImportEzm,gInterface);
+    delete gInterface;
     gInterface = 0;
   }
   return ret;
 }
 
-using namespace MESHIMPORT;
+using namespace NVSHARE;
 
 #ifdef WIN32
 

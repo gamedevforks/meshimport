@@ -22,6 +22,7 @@
 #include <float.h>
 #include <malloc.h>
 #include <math.h>
+
 #include "UserMemAlloc.h"
 
 #pragma warning(push)
@@ -39,9 +40,7 @@
 //                          Leveller heightfields using RTIN
 //
 
-class MemoryServices;
-
-namespace MESHIMPORT
+namespace NVSHARE
 {
 
 class CommLayer
@@ -57,7 +56,6 @@ public:
 protected:
   virtual ~CommLayer(void) { };
 };
-
 
 
 inline NxF32 fmi_computePlane(const NxF32 *A,const NxF32 *B,const NxF32 *C,NxF32 *n) // returns D
@@ -534,10 +532,10 @@ enum MeshVertexFlag
   MIVF_BINORMAL       = (1<<8),
   MIVF_BONE_WEIGHTING = (1<<9),
   MIVF_RADIUS         = (1<<10),
-	MIVF_ALL = (MIVF_POSITION | MIVF_NORMAL | MIVF_COLOR | MIVF_TEXEL1 | MIVF_TEXEL2 | MIVF_TEXEL3 | MIVF_TEXEL4 | MIVF_TANGENT | MIVF_BINORMAL | MIVF_BONE_WEIGHTING | MIVF_RADIUS)
+  MIVF_ALL = (MIVF_POSITION | MIVF_NORMAL | MIVF_COLOR | MIVF_TEXEL1 | MIVF_TEXEL2 | MIVF_TEXEL3 | MIVF_TEXEL4 | MIVF_TANGENT | MIVF_BINORMAL | MIVF_BONE_WEIGHTING | MIVF_RADIUS)
 };
 
-class MeshVertex
+class MeshVertex : public Memalloc
 {
 public:
   MeshVertex(void)
@@ -579,7 +577,7 @@ public:
   NxF32          mRadius;
 };
 
-class MeshBone
+class MeshBone : public Memalloc
 {
 public:
 	MeshBone(void)
@@ -664,7 +662,7 @@ public:
 	NxI32         mBone;         // bone this mesh is associcated
 };
 
-class MeshSkeleton
+class MeshSkeleton : public Memalloc
 {
 public:
 	MeshSkeleton(void)
@@ -701,7 +699,7 @@ public:
 };
 
 
-class MeshAnimPose
+class MeshAnimPose : public Memalloc
 {
 public:
   MeshAnimPose(void)
@@ -756,7 +754,7 @@ public:
   NxF32 mScale[3];
 };
 
-class MeshAnimTrack
+class MeshAnimTrack : public Memalloc
 {
 public:
   MeshAnimTrack(void)
@@ -797,7 +795,7 @@ public:
 	MeshAnimPose *mPose;
 };
 
-class MeshAnimation
+class MeshAnimation : public Memalloc
 {
 public:
   MeshAnimation(void)
@@ -1052,7 +1050,7 @@ enum MeshCollisionType
   MCT_LAST
 };
 
-class MeshCollision
+class MeshCollision : public Memalloc
 {
 public:
   MeshCollision(void)
@@ -1131,7 +1129,7 @@ public:
 
 };
 
-class MeshCollisionRepresentation
+class MeshCollisionRepresentation : public Memalloc
 {
 public:
   MeshCollisionRepresentation(void)
@@ -1285,7 +1283,7 @@ public:
 
   virtual void importPlane(const NxF32 *p) = 0;
 
-
+  
 };
 
 // allows the application to load external resources.
@@ -1322,7 +1320,7 @@ enum MeshSerializeFormat
 };
 
 
-class MeshBoneInstance
+class MeshBoneInstance : public Memalloc
 {
 public:
   MeshBoneInstance(void)
@@ -1344,7 +1342,7 @@ public:
   NxF32       mInverseTransform[16];         // the inverse transform
 };
 
-class MeshSkeletonInstance
+class MeshSkeletonInstance : public Memalloc
 {
 public:
   MeshSkeletonInstance(void)
@@ -1448,25 +1446,23 @@ public:
 
   virtual VertexIndex *            createVertexIndex(NxF32 granularity) = 0;  // create an indexed vertext system for floats
   virtual void                     releaseVertexIndex(VertexIndex *vindex) = 0;
-
+protected:
+  virtual ~MeshImport(void) { };
 
 };
 
-}; // End of namespace for MESHIMPORT
 
 #define MESHIMPORT_VERSION 9  // version 0.01  increase this version number whenever an interface change occurs.
 
 
-extern MESHIMPORT::MeshImport *gMeshImport; // This is an optional global variable that can be used by the application.  If the application uses it, it should define it somewhere in its codespace.
+extern MeshImport *gMeshImport; // This is an optional global variable that can be used by the application.  If the application uses it, it should define it somewhere in its codespace.
 
-namespace SYSTEM_SERVICES
-{
-class SystemServices;
-};
+MeshImport * loadMeshImporters(const char *directory,SystemServices *services); // loads the mesh import library (dll) and all available importers from the same directory.
 
-MESHIMPORT::MeshImport * loadMeshImporters(const char *directory,SYSTEM_SERVICES::SystemServices *services); // loads the mesh import library (dll) and all available importers from the same directory.
+extern CommLayer *gCommLayer;
 
-extern MESHIMPORT::CommLayer *gCommLayer;
+
+}; // End of namespace for NVSHARE
 
 #pragma warning(pop)
 

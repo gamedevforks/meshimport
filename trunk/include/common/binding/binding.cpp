@@ -14,14 +14,14 @@
 
 #define DLL_IN_EXT       ".dll"
 
-typedef USER_STL_EXT::hash_map<USER_STL::string, PLUGIN_INTERFACE_FUNC> PLUGIN_INTERFACE_HASH;
+typedef stdext::hash_map<std::string, PLUGIN_INTERFACE_FUNC> PLUGIN_INTERFACE_HASH;
 PLUGIN_INTERFACE_HASH *gPluginInterfaceHash=0;
 
 PLUGIN_INTERFACE_HASH & getHash(void)
 {
   if ( gPluginInterfaceHash == 0 )
   {
-    gPluginInterfaceHash = MEMALLOC_NEW(PLUGIN_INTERFACE_HASH);
+    gPluginInterfaceHash = new PLUGIN_INTERFACE_HASH;
   }
   return *gPluginInterfaceHash;
 }
@@ -51,7 +51,7 @@ void loadModuleInterfaces(const char *dll, void **rmodule) // loads the interfac
   HMODULE module = LoadLibraryA(dll);
   SetErrorMode(oldErrorMode);
 #else
-  USER_STL::string mname(dll);
+  std::string mname(dll);
   mname.assign(mname.substr(0, mname.rfind(DLL_IN_EXT)));
   mname.insert(0,"lib");
   mname.append(".so");
@@ -88,7 +88,7 @@ void loadModuleInterfaces(const char *dll, void **rmodule) // loads the interfac
       if ( proc )
       {
         // store the name of the dll sans extension as the classname lookup
-        USER_STL::string cname(dll);
+        std::string cname(dll);
         getHash()[cname.substr(0, cname.rfind(DLL_IN_EXT))] = (PLUGIN_INTERFACE_FUNC)proc;
         found_exports = true;
       }
@@ -109,7 +109,7 @@ void loadModuleInterfaces(const char *dll, void **rmodule) // loads the interfac
   }
 }
 
-void *getBindingInterface(const char *dll, const char *name, NxI32 version_number, SYSTEM_SERVICES::SystemServices *services, void **rmodule) // loads the dll and grabs the interface
+void *getBindingInterface(const char *dll, const char *name, NxI32 version_number, NVSHARE::SystemServices *services, void **rmodule) // loads the dll and grabs the interface
 {
   if (dll)
     loadModuleInterfaces(dll, rmodule);

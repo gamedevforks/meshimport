@@ -32,8 +32,7 @@
           MeshImport/*.h
 				</Files>
 				<Files name="Common Include-Binding Files" root="../../include/common" type="header">
-          snippets/SystemServices.cpp
-          snippets/SystemServices.h
+          snippets/nvstl.cpp
           snippets/UserMemAlloc.h
           snippets/Nx*.h
           snippets/sutil.h

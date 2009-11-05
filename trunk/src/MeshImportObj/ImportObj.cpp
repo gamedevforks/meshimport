@@ -14,7 +14,7 @@
 
 #pragma warning(disable:4100 4505)
 
-namespace MESHIMPORT
+namespace NVSHARE
 {
 
 class Vec3
@@ -92,8 +92,8 @@ public:
   NxF32 y;
 };
 
-typedef USER_STL::vector< Vec2 > Vec2Vector;
-typedef USER_STL::vector< Vec3 > Vec3Vector;
+typedef std::vector< Vec2 > Vec2Vector;
+typedef std::vector< Vec3 > Vec3Vector;
 
 class ObjMaterial
 {
@@ -112,14 +112,14 @@ public:
   StringRef     map_kd; // texture map to use.
 };
 
-typedef USER_STL::vector< ObjMaterial *> ObjMaterialVector;
+typedef std::vector< ObjMaterial *> ObjMaterialVector;
 
 // reads file format as output from Qhull
-class OBJ : public InPlaceParserInterface, public MeshImporter
+class OBJ : public InPlaceParserInterface, public MeshImporter, public Memalloc
 {
 public:
   OBJ(void);
-  ~OBJ(void);
+  virtual ~OBJ(void);
 
 
   const char * getExtension(NxI32 index) { return ".obj"; };

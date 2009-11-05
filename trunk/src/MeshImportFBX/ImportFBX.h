@@ -1,26 +1,20 @@
 #ifndef IMPORT_FBX_H
 #define IMPORT_FBX_H
 
+#pragma warning(disable:4265)
 #include <fbxsdk.h>
 #include <fbxfilesdk/fbxfilesdk_nsuse.h>
-
 #include <map>
 #include <vector>
+#include "UserMemAlloc.h"
 
 #include "FBXReader.h"
 #include "Texture.h"
 #include "MeshImport.h"
 #include "stringdict.h"
-
-#include <iostream>
-#include <fstream>
-#include <string.h>
-
-#include <vector>
-
 #include "fmi_math.h"
 
-using namespace std;
+using namespace NVSHARE;
 
 #pragma warning(disable: 4565)
 
@@ -30,6 +24,8 @@ using namespace std;
 #define FBX_DLL_API extern "C" __declspec(dllimport)
 #endif
 
+namespace NVSHARE
+{
 
 #define MAX_BONES	4
 
@@ -79,7 +75,7 @@ public:
 	const char* clusterName;
 	const char* boneName;
 	KFbxXMatrix bindPose;
-	MESHIMPORT::MeshBone* meshBone;
+	NVSHARE::MeshBone* meshBone;
 	KFbxMesh *pMesh;
 	KFbxXMatrix globalPosition;
 	bool boneDataInitialized;
@@ -91,20 +87,20 @@ public:
 };
 
 
-class MeshImportFBX: public MESHIMPORT::MeshImporter
+class MeshImportFBX: public NVSHARE::MeshImporter, public Memalloc
 {
 
 public:
 	MeshImportFBX();
-	~MeshImportFBX();
+	virtual ~MeshImportFBX();
 
 	virtual const char * getExtension(int index);
 	virtual const char * getDescription(int index);
 	virtual bool importMesh(const char *fname,
 		                    const void *data,unsigned int dlen,
-							MESHIMPORT::MeshImportInterface *callback,
+							NVSHARE::MeshImportInterface *callback,
 							const char *options,
-							MESHIMPORT::MeshImportApplicationResource *appResource);
+							NVSHARE::MeshImportApplicationResource *appResource);
 
 
 	void ProcessScene(KFbxNode *subScene = NULL);
@@ -135,27 +131,27 @@ public:
 	
 	const char* getFileName( const char* fullPath);
 
-	bool Import( const char* filename, MESHIMPORT::MeshImportInterface* callBack );
+	bool Import( const char* filename, NVSHARE::MeshImportInterface* callBack );
 
 	void outputMessage( const char* message );
 
 
 	StringDict									meshStrings;
-	MESHIMPORT::MeshSkeleton					meshSkeleton;
-	std::vector<MESHIMPORT::MeshBone>			meshBones;
+	NVSHARE::MeshSkeleton					meshSkeleton;
+	std::vector<NVSHARE::MeshBone>			meshBones;
 	std::vector<KFbxNode*>						meshNodes;
 	std::vector<KFbxXMatrix>					meshWorldBindPoseXforms;
 	std::vector<KFbxXMatrix>					meshWorldBindShapeXforms;
 	std::vector<KFbxXMatrix>					meshWorldAnimXforms;
-	MESHIMPORT::MeshAnimation					meshAnimation;
-	std::vector<MESHIMPORT::MeshAnimTrack*>		meshTrackPtrs;
-	std::vector<MESHIMPORT::MeshAnimTrack>		meshTracks;
-	std::vector<MESHIMPORT::MeshAnimPose>		meshPoses;
+	NVSHARE::MeshAnimation					meshAnimation;
+	std::vector<NVSHARE::MeshAnimTrack*>		meshTrackPtrs;
+	std::vector<NVSHARE::MeshAnimTrack>		meshTracks;
+	std::vector<NVSHARE::MeshAnimPose>		meshPoses;
 
 
 	inline void GetBindPoseMatrix(KFbxCluster *lCluster, KFbxXMatrix& bindPose);
 	inline void GetBindShapeMatrix( KFbxCluster *lCluster, KFbxXMatrix& bindShape);
-	void ApplyVertexTransform(KFbxMesh* pMesh, MESHIMPORT::MeshVertex *pVerts);
+	void ApplyVertexTransform(KFbxMesh* pMesh, NVSHARE::MeshVertex *pVerts);
 	
 	void ConvertNurbsAndPatch(KFbxSdkManager* pSdk, KFbxScene* pScene);
 
@@ -174,7 +170,7 @@ public:
 		
 		bool ret = false;
 
-		map<const char * , ClusterBoneMap*>::iterator it = m_boneClusterMap.begin();
+		std::map<const char * , ClusterBoneMap*>::iterator it = m_boneClusterMap.begin();
 
 		while(it != m_boneClusterMap.end())
 		{
@@ -199,7 +195,7 @@ public:
 	{
 		bool ret = false;
 
-		map<const char *, ClusterBoneMap*>::iterator it = m_boneClusterMap.begin();
+		std::map<const char *, ClusterBoneMap*>::iterator it = m_boneClusterMap.begin();
 
 		while(it != m_boneClusterMap.end())
 		{
@@ -221,7 +217,7 @@ public:
 		bool ret = false;
 
 
-		map<const char * , ClusterBoneMap*>::iterator it = m_boneClusterMap.begin();
+		std::map<const char * , ClusterBoneMap*>::iterator it = m_boneClusterMap.begin();
 			
 
 		char clusterName[128];
@@ -284,7 +280,7 @@ public:
 
 		} else
 		{
-		    m_boneClusterMap.insert(m_boneClusterMap.begin(), pair<const char *, ClusterBoneMap*>(pCluster->clusterName, pCluster));
+			m_boneClusterMap.insert(m_boneClusterMap.begin(), std::pair<const char *, ClusterBoneMap*>(pCluster->clusterName, pCluster));
 			pCluster->clusterInfoInitialized = true;
 		}
 
@@ -295,7 +291,7 @@ public:
 	{
 		return (int)m_boneClusterMap.size();
 	}
-	 bool getBone(const char *name, MESHIMPORT::MeshBone& bone)
+	 bool getBone(const char *name, NVSHARE::MeshBone& bone)
 	{
 		bool ret = false;
 
@@ -304,7 +300,7 @@ public:
 		strcat(clusterName, name);
 		strcat(clusterName, "\0");
 
-		map<const char *, ClusterBoneMap*>::iterator it;
+		std::map<const char *, ClusterBoneMap*>::iterator it;
 
 		if((it = m_boneClusterMap.find(clusterName)) != m_boneClusterMap.end())
 		{
@@ -319,7 +315,7 @@ public:
 
 	}
 
-	void updateBone(const char* name, MESHIMPORT::MeshBone *newBone, KFbxXMatrix& pGlobalPosition)
+	void updateBone(const char* name, NVSHARE::MeshBone *newBone, KFbxXMatrix& pGlobalPosition)
 	{
 		ClusterBoneMap* pose;
 
@@ -341,7 +337,7 @@ public:
 
 	}
 	
-	//void addBoneInfo(const char *name, MESHIMPORT::MeshBone* newBone, KFbxXMatrix& globalPos, bool isRoot)
+	//void addBoneInfo(const char *name, NVSHARE::MeshBone* newBone, KFbxXMatrix& globalPos, bool isRoot)
 	//{
 	//	
 	//	
@@ -380,12 +376,12 @@ public:
 	long mVertexFormat;
 	
 	
-	map<const char * , ClusterBoneMap* >m_boneClusterMap; // Map to cluster ID
-	vector<BoneRelation*>  m_boneHierarchy;
+	std::map<const char * , ClusterBoneMap* >m_boneClusterMap; // Map to cluster ID
+	std::vector<BoneRelation*>  m_boneHierarchy;
 
 protected:
 
-	MESHIMPORT::MeshImportInterface *m_callback;
+	NVSHARE::MeshImportInterface *m_callback;
 
 	void Release();
 
@@ -426,8 +422,9 @@ private:
 
 
 //MeshImporter * createMeshImportFBX(void);
-void           releaseMeshImportFBX(MESHIMPORT::MeshImporter *iface);
+void           releaseMeshImportFBX(NVSHARE::MeshImporter *iface);
 
 
+}; // end of namespace
 
 #endif

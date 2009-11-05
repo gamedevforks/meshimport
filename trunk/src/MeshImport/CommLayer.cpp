@@ -1,20 +1,44 @@
 #include "CommLayer.h"
+
+#ifdef PLUGINS_EMBEDDED
+
+
+namespace NVSHARE
+{
+
+CommLayer *      CreateCommLayerTelent(const char *address,NxU32 port)
+{
+	return 0;
+}
+
+CommLayer *      CreateCommLayerWindowsMessage(const char *appName,const char *destApp)
+{
+	return 0;
+}
+
+void             ReleaseCommLayer(CommLayer *t)
+{
+}
+
+};
+
+#else
 #include "WinMsg.h"
 #include "Telnet.h"
 #include "UserMemAlloc.h"
 
 #pragma warning(disable:4100 4996)
 
-namespace MESHIMPORT
+namespace NVSHARE
 {
 
-class MyCommLayer : public CommLayer
+class MyCommLayer : public CommLayer, public Memalloc
 {
 public:
 
   MyCommLayer(const char *address,NxU32 port)
   {
-    mTelnet = TELNET::createTelnet(address,port);
+	  mTelnet = NVSHARE::createTelnet(NVSHARE::TT_CLIENT_OR_SERVER,address,port);
     mWinMsg = 0;
     mWindowName = 0;
   }
@@ -31,7 +55,7 @@ public:
   ~MyCommLayer(void)
   {
     if ( mTelnet )
-        TELNET::releaseTelnet(mTelnet);
+        NVSHARE::releaseTelnet(mTelnet);
     if ( mWindowName )
         MEMALLOC_FREE(mWindowName);
   }
@@ -127,7 +151,7 @@ public:
 
 private:
   char              *mWindowName;
-  TELNET::Telnet    *mTelnet;
+  NVSHARE::Telnet    *mTelnet;
   WinMsg            *mWinMsg;
 };
 
@@ -146,9 +170,9 @@ CommLayer *      CreateCommLayerWindowsMessage(const char *appName,const char *d
 void             ReleaseCommLayer(CommLayer *t)
 {
     MyCommLayer *mcl = static_cast< MyCommLayer *>(t);
-    MEMALLOC_DELETE(MyCommLayer,mcl);
+    delete mcl;
 }
 
 
 };
-
+#endif

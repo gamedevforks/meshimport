@@ -32,7 +32,8 @@
 
 */
 
-
+namespace NVSHARE
+{
 class MyFastXml : public FastXml
 {
 public:
@@ -59,7 +60,7 @@ public:
     mTypes[13] = CT_END_OF_LINE;
     mError = 0;
   }
-  ~MyFastXml(void)
+  virtual ~MyFastXml(void)
   {
     release();
   }
@@ -389,3 +390,5 @@ void      releaseFastXml(FastXml *f)
   MyFastXml *m = static_cast< MyFastXml *>(f);
   delete m;
 }
+
+}; // end of namespace

@@ -65,13 +65,13 @@
 #include "UserMemAlloc.h"
 #include "MeshImport.h"
 
-namespace MESHIMPORT
+namespace NVSHARE
 {
 
 template <class Type> class VertexLess
 {
 public:
-	typedef USER_STL::vector< Type > VertexVector;
+	typedef std::vector< Type > VertexVector;
 
 	bool operator()(NxI32 v1,NxI32 v2) const;
 
@@ -96,11 +96,11 @@ template <class Type> class VertexPool
 {
 public:
 #if HE_USE_MEMORY_TRACKING
-  typedef USER_STL::set<NxI32, USER_STL::GlobalMemoryPool, VertexLess<Type> > VertexSet;
+  typedef std::set<NxI32, std::GlobalMemoryPool, VertexLess<Type> > VertexSet;
 #else
-  typedef USER_STL::set<NxI32, VertexLess<Type> > VertexSet;
+  typedef std::set<NxI32, VertexLess<Type> > VertexSet;
 #endif
-	typedef USER_STL::vector< Type > VertexVector;
+	typedef std::vector< Type > VertexVector;
 
 	NxI32 GetVertex(const Type& vtx)
 	{

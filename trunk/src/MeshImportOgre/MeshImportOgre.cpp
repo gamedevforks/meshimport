@@ -2,7 +2,6 @@
 #include "UserMemAlloc.h"
 #include "MeshImport.h"
 #include "ImportOgre.h"
-#include "SystemServices.h"
 
 #ifdef WIN32
 #ifdef MESHIMPORTOGRE_EXPORTS
@@ -20,19 +19,19 @@ bool doShutdown(void);
 
 extern "C"
 {
-MESHIMPORTOGRE_API MESHIMPORT::MeshImporter * getInterface(NxI32 version_number,SYSTEM_SERVICES::SystemServices *services);
+MESHIMPORTOGRE_API NVSHARE::MeshImporter * getInterface(int version_number,NVSHARE::SystemServices *services);
 };
 
-namespace MESHIMPORT
+namespace NVSHARE
 {
-class MyMeshImportOgre : public MeshImporter
+class MyMeshImportOgre : public MeshImporter, public Memalloc
 {
 public:
   MyMeshImportOgre(void)
   {
   }
 
-  ~MyMeshImportOgre(void)
+  virtual ~MyMeshImportOgre(void)
   {
   }
 
@@ -41,9 +40,9 @@ public:
     return doShutdown();
   }
 
-  virtual NxI32              getExtensionCount(void) { return 1; }; // most importers support just one file name extension.
+  virtual int              getExtensionCount(void) { return 1; }; // most importers support just one file name extension.
 
-  virtual const char * getExtension(NxI32 index)  // report the default file name extension for this mesh type.
+  virtual const char * getExtension(int index)  // report the default file name extension for this mesh type.
   {
     return ".xml";
 //    if ( index == 0 )
@@ -52,7 +51,7 @@ public:
 //      return ".skeleton.xml";
   }
 
-  virtual const char * getDescription(NxI32 index)  // report the default file name extension for this mesh type.
+  virtual const char * getDescription(int index)  // report the default file name extension for this mesh type.
   {
 //    if ( index == 0 )
       return "Ogre3d XML Mesh Files";
@@ -60,16 +59,16 @@ public:
 //      return "Ogre3d XML Skeleton Files";
   }
 
-  virtual bool importMesh(const char *meshName,const void *data,NxU32 dlen,MESHIMPORT::MeshImportInterface *callback,const char *options,MeshImportApplicationResource *appResource)
+  virtual bool importMesh(const char *meshName,const void *data,unsigned int dlen,NVSHARE::MeshImportInterface *callback,const char *options,MeshImportApplicationResource *appResource)
   {
     bool ret = false;
 
-    MESHIMPORT::MeshImporter *mi = MESHIMPORT::createMeshImportOgre();
+    NVSHARE::MeshImporter *mi = NVSHARE::createMeshImportOgre();
 
     if ( mi )
     {
       ret = mi->importMesh(meshName,data,dlen,callback,options,appResource);
-      MESHIMPORT::releaseMeshImportOgre(mi);
+      NVSHARE::releaseMeshImportOgre(mi);
     }
 
     return ret;
@@ -88,7 +87,7 @@ enum MeshImportOgreAPI
 };  // End of Namespace
 
 
-using namespace MESHIMPORT;
+using namespace NVSHARE;
 
 
 static MyMeshImportOgre *gInterface=0;
@@ -96,14 +95,14 @@ static MyMeshImportOgre *gInterface=0;
 extern "C"
 {
 #ifdef PLUGINS_EMBEDDED
-  MeshImporter * getInterfaceMeshImportOgre(NxI32 version_number,SYSTEM_SERVICES::SystemServices *services)
+  MeshImporter * getInterfaceMeshImportOgre(int version_number,NVSHARE::SystemServices *services)
 #else
-MESHIMPORTOGRE_API MeshImporter * getInterface(NxI32 version_number,SYSTEM_SERVICES::SystemServices *services)
+MESHIMPORTOGRE_API MeshImporter * getInterface(int version_number,NVSHARE::SystemServices *services)
 #endif
 {
   if ( services )
   {
-    SYSTEM_SERVICES::gSystemServices = services;
+    NVSHARE::gSystemServices = services;
   }
   assert( gInterface == 0 );
   if ( gInterface == 0 && version_number == MESHIMPORT_VERSION )
@@ -117,7 +116,7 @@ MESHIMPORTOGRE_API MeshImporter * getInterface(NxI32 version_number,SYSTEM_SERVI
 
 #ifndef PLUGINS_EMBEDDED
 
-using namespace MESHIMPORT;
+using namespace NVSHARE;
 
 bool doShutdown(void)
 {
@@ -125,13 +124,13 @@ bool doShutdown(void)
   if ( gInterface )
   {
     ret = true;
-    MEMALLOC_DELETE(MeshImportOgre,gInterface);
+    delete gInterface;
     gInterface = 0;
   }
   return ret;
 }
 
-using namespace MESHIMPORT;
+using namespace NVSHARE;
 
 #ifdef WIN32
 
@@ -141,7 +140,7 @@ BOOL APIENTRY DllMain( HANDLE ,
                        DWORD  ul_reason_for_call,
                        LPVOID )
 {
-  NxI32 ret = 0;
+  int ret = 0;
 
   switch (ul_reason_for_call)
 	{

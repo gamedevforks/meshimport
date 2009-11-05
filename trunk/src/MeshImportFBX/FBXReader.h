@@ -1,6 +1,13 @@
-#pragma once;
+#ifndef FBX_READER_H
+
+#define FBX_READER_H
+
 
 #include "ImportFBX.h"
+#include "UserMemAlloc.h"
+
+namespace NVSHARE
+{
 
 #define OUTPUT_TEXT_BUFFER_SIZE	1000
 
@@ -30,3 +37,7 @@ private:
 extern  KFbxReader* CreateFBXImporterReader( KFbxSdkManager& pManager, KFbxImporter& pImporter, int pSubID, int pPluginID );
 extern void* GetFBXImporterReaderInfo( KFbxReader::KInfoRequest pRequest, int pId );
 extern void FillFBXImporterReaderIOSettings( KFbxIOSettings& pIOS );
+
+};
+
+#endif

@@ -3,10 +3,12 @@
 #include <string.h>
 #include <assert.h>
 
-#include "MeshImport.h"
+#ifdef WIN32
+#include <windows.h>
+#include <windowsx.h>
+#endif
 
-MESHIMPORT::MeshImport *gMeshImport=0; // This is an optional global variable that can be used by the application.  If the application uses it, it should define it somewhere in its codespace.
-MESHIMPORT::CommLayer *gCommLayer=0;
+#include "MeshImport.h"
 
 #pragma warning(disable:4996)
 
@@ -15,11 +17,12 @@ MESHIMPORT::CommLayer *gCommLayer=0;
 #include <string.h>
 #include <assert.h>
 
-#ifdef WIN32
-#include <windows.h>
-#include <windowsx.h>
+namespace NVSHARE
+{
 
-void *getBindingInterface(const char *dll,NxI32 version_number,SYSTEM_SERVICES::SystemServices *services) // loads the tetra maker DLL and returns the interface pointer.
+#ifdef WIN32
+
+static void *getMeshBindingInterface(const char *dll,NxI32 version_number,NVSHARE::SystemServices *services) // loads the tetra maker DLL and returns the interface pointer.
 {
   void *ret = 0;
 
@@ -33,7 +36,7 @@ void *getBindingInterface(const char *dll,NxI32 version_number,SYSTEM_SERVICES::
     void *proc = GetProcAddress(module,"getInterface");
     if ( proc )
     {
-      typedef void * (__cdecl * NX_GetToolkit)(NxI32 version,SYSTEM_SERVICES::SystemServices *services);
+      typedef void * (__cdecl * NX_GetToolkit)(NxI32 version,NVSHARE::SystemServices *services);
       ret = ((NX_GetToolkit)proc)(version_number,services);
     }
   }
@@ -44,6 +47,8 @@ void *getBindingInterface(const char *dll,NxI32 version_number,SYSTEM_SERVICES::
 
 #endif
 
+}; // end of namespace
+
 #ifdef LINUX_GENERIC
 #include <sys/types.h>
 #include <sys/dir.h>
@@ -51,7 +56,9 @@ void *getBindingInterface(const char *dll,NxI32 version_number,SYSTEM_SERVICES::
 
 #define MAXNAME 512
 
-namespace MESHIMPORT
+#define MESHIMPORT_NVSHARE MESHIMPORT_##NVSHARE
+
+namespace MESHIMPORT_NVSHARE
 {
 
 class FileFind
@@ -72,7 +79,7 @@ public:
 
   bool FindFirst(char *name)
   {
-    bool ret;
+    bool ret=false;
 
     #ifdef WIN32
     hFindNext = FindFirstFileA(mSearchName, &finddata);
@@ -160,6 +167,11 @@ private:
 
 }; // end of namespace
 
+namespace NVSHARE
+{
+
+	using namespace MESHIMPORT_NVSHARE;
+
 static const char *lastSlash(const char *foo)
 {
   const char *ret = foo;
@@ -176,9 +188,9 @@ static const char *lastSlash(const char *foo)
   return ret;
 }
 
-MESHIMPORT::MeshImport * loadMeshImporters(const char * directory,SYSTEM_SERVICES::SystemServices *services) // loads the mesh import library (dll) and all available importers from the same directory.
+NVSHARE::MeshImport * loadMeshImporters(const char * directory,NVSHARE::SystemServices *services) // loads the mesh import library (dll) and all available importers from the same directory.
 {
-  MESHIMPORT::MeshImport *ret = 0;
+  NVSHARE::MeshImport *ret = 0;
 
   char scratch[512];
   if ( directory && strlen(directory) )
@@ -190,11 +202,15 @@ MESHIMPORT::MeshImport * loadMeshImporters(const char * directory,SYSTEM_SERVICE
     strcpy(scratch,"MeshImport.dll");
   }
 
-  ret = (MESHIMPORT::MeshImport *)getBindingInterface(scratch,MESHIMPORT_VERSION,services);
+#ifdef WIN32
+  ret = (NVSHARE::MeshImport *)getMeshBindingInterface(scratch,MESHIMPORT_VERSION,services);
+#else
+  ret = 0;
+#endif
 
   if ( ret )
   {
-    MESHIMPORT::FileFind ff(directory,"MeshImport*.dll");
+    NVSHARE::FileFind ff(directory,"MeshImport*.dll");
     char name[MAXNAME];
     if ( ff.FindFirst(name) )
     {
@@ -208,7 +224,11 @@ MESHIMPORT::MeshImport * loadMeshImporters(const char * directory,SYSTEM_SERVICE
         else
         {
           printf("Loading '%s'\r\n", scan );
-          MESHIMPORT::MeshImporter *imp = (MESHIMPORT::MeshImporter *)getBindingInterface(name,MESHIMPORT_VERSION,services);
+#ifdef WIN32
+          NVSHARE::MeshImporter *imp = (NVSHARE::MeshImporter *)getMeshBindingInterface(name,MESHIMPORT_VERSION,services);
+#else
+		  NVSHARE::MeshImporter *imp = 0;
+#endif
           if ( imp )
           {
             ret->addImporter(imp);
@@ -220,3 +240,5 @@ MESHIMPORT::MeshImport * loadMeshImporters(const char * directory,SYSTEM_SERVICE
   }
   return ret;
 }
+
+}; // end of namespace

@@ -21,7 +21,7 @@
 #include "UserMemAlloc.h"
 
 
-namespace SYSTEM_SERVICES
+namespace NVSHARE
 {
 class SystemServices;
 };
@@ -30,7 +30,7 @@ class SystemServices;
 * \brief
 * function type used by interface registration
 */
-typedef void * (__cdecl * PLUGIN_INTERFACE_FUNC)     (NxI32 version,SYSTEM_SERVICES::SystemServices *services);
+typedef void * (__cdecl * PLUGIN_INTERFACE_FUNC)     (NxI32 version,NVSHARE::SystemServices *services);
 
 /*!
 * \brief
@@ -75,7 +75,7 @@ extern "C"
  * Separate items with the '|' character.
  */
 void       loadModuleInterfaces(const char *dll, void **rmodule = 0);
-void *     getBindingInterface(const char *dll, const char *name, NxI32 version_number, SYSTEM_SERVICES::SystemServices *services, void **rmodule = 0); 
+void *     getBindingInterface(const char *dll, const char *name, NxI32 version_number, NVSHARE::SystemServices *services, void **rmodule = 0); 
 bool       unloadModule(void *module);
 
 

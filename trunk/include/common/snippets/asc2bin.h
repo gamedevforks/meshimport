@@ -67,7 +67,11 @@
 //
 //    Asc2Bin("1 2 3 4 5 6",1,"fffff",0);
 
+namespace NVSHARE
+{
+
 void * Asc2Bin(const char *source,const NxI32 count,const char *ctype,void *dest=0);
 
+}; //
 
 #endif

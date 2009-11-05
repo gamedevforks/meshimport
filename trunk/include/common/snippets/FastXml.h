@@ -61,6 +61,9 @@
 // You can then call the method 'getError' to get a description of why it failed
 // and on what line number of the source XML file it occurred.
 
+namespace NVSHARE
+{
+
 class FastXmlInterface
 {
 public:
@@ -84,5 +87,7 @@ public:
 
 FastXml * createFastXml(void);
 void      releaseFastXml(FastXml *f);
+
+}; // end of namespace
 
 #endif
