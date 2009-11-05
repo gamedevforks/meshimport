@@ -55,6 +55,8 @@
 #include "UserMemAlloc.h"
 #include "asc2bin.h"
 
+namespace NVSHARE
+{
 
 static inline bool         IsWhitespace(char c)
 {
@@ -419,3 +421,5 @@ void * Asc2Bin(const char *source,const NxI32 count,const char *spec,void *dest)
 
 	return dest;
 }
+
+}; // end of namespace

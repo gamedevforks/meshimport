@@ -55,7 +55,8 @@
 
 #include <stdio.h>
 
-#include "UserMemAlloc.h"
+namespace NVSHARE
+{
 
 class FileSystem
 {
@@ -67,12 +68,14 @@ class DefaultFileSystem : public FileSystem
 {
 public:
   DefaultFileSystem(const char *relativePath);
-  ~DefaultFileSystem(void);
+  virtual ~DefaultFileSystem(void);
 	const char * FileOpenString(const char *fname,bool readAccess); // return the full path name for this file, set 'readAccess' to true to try to 'find' the file.
 private:
   char mRelativePath[512];
 };
 
 extern FileSystem *gFileSystem; // a global variable that contains the optional File access system.
+
+}; // end of namespace
 
 #endif

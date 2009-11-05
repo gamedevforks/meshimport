@@ -55,8 +55,7 @@
          snippets/UserMemAlloc.h
          snippets/stable.h
          snippets/SendTextMessage.h
-         snippets/SystemServices.h
-         snippets/SystemServices.cpp
+         snippets/nvstl.cpp
          snippets/FileInterface.h
          snippets/FileInterface.cpp
          snippets/Nx*.h

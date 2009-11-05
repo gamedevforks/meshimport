@@ -2,9 +2,10 @@
 
 #define COMM_LAYER_H
 
+#include "UserMemAlloc.h"
 #include "MeshImport.h"
 
-namespace MESHIMPORT
+namespace NVSHARE
 {
 
 CommLayer *      CreateCommLayerTelent(const char *address="LOCALHOST",NxU32 port=23);

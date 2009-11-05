@@ -59,8 +59,8 @@
 */
 
 
-#include "UserMemAlloc.h"
-
+namespace NVSHARE
+{
 
 char *         stristr(const char *str,const char *key);       // case insensitive str str
 bool           isstristr(const char *str,const char *key);     // bool true/false based on case insenstive strstr
@@ -98,5 +98,6 @@ void           normalizeFQN(const wchar_t *source,wchar_t *dest);
 void           normalizeFQN(const char *source,char *dest);
 bool           endsWith(const char *str,const char *ends,bool caseSensitive);
 
+}; // end of namespace
 
 #endif

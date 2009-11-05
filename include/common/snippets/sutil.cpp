@@ -68,6 +68,9 @@
 #include "linux_compat.h"
 #endif
 
+namespace NVSHARE
+{
+
 static char ToLower(char c)
 {
 	if ( c >= 'A' && c <= 'Z' ) c+=32;
@@ -827,3 +830,5 @@ bool           endsWith(const char *str,const char *ends,bool caseSensitive)
   }
   return ret;
 }
+
+}; // end of namespace

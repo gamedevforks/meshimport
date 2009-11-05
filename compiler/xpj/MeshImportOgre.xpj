@@ -41,8 +41,7 @@
           snippets/sutil.h
           snippets/inparser.cpp
           snippets/inparser.h
-          snippets/SystemServices.cpp
-          snippets/SystemServices.h
+          snippets/nvstl.cpp
           snippets/FastXml.h
           snippets/FastXml.cpp
           snippets/UserMemAlloc.h

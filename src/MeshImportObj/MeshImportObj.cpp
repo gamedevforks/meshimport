@@ -2,7 +2,6 @@
 #include "UserMemAlloc.h"
 #include "MeshImport.h"
 #include "ImportObj.h"
-#include "SystemServices.h"
 
 #ifdef WIN32
 #ifdef MESHIMPORTOBJ_EXPORTS
@@ -20,19 +19,19 @@ bool doShutdown(void);
 
 extern "C"
 {
-MESHIMPORTOBJ_API MESHIMPORT::MeshImporter * getInterface(NxI32 version_number,SYSTEM_SERVICES::SystemServices *services);
+MESHIMPORTOBJ_API NVSHARE::MeshImporter * getInterface(NxI32 version_number,NVSHARE::SystemServices *services);
 };
 
-namespace MESHIMPORT
+namespace NVSHARE
 {
-class MyMeshImportObj : public MeshImporter
+class MyMeshImportObj : public MeshImporter, public Memalloc
 {
 public:
   MyMeshImportObj(void)
   {
   }
 
-  ~MyMeshImportObj(void)
+  virtual ~MyMeshImportObj(void)
   {
   }
 
@@ -51,7 +50,7 @@ public:
     return "Wavefront Obj Files";
   }
 
-  virtual bool importMesh(const char *meshName,const void *data,NxU32 dlen,MESHIMPORT::MeshImportInterface *callback,const char *options,MeshImportApplicationResource *appResource)
+  virtual bool importMesh(const char *meshName,const void *data,NxU32 dlen,NVSHARE::MeshImportInterface *callback,const char *options,MeshImportApplicationResource *appResource)
   {
     bool ret = false;
 
@@ -67,7 +66,7 @@ public:
 
 
 
-};
+}; // end of namespace
 
 
 enum MeshImportObjAPI
@@ -78,22 +77,18 @@ enum MeshImportObjAPI
 };  // End of Namespace
 
 
-using namespace MESHIMPORT;
+using namespace NVSHARE;
 
 
 static MyMeshImportObj *gInterface=0;
 
 extern "C"
 {
-#ifdef PLUGINS_EMBEDDED
-  MeshImporter * getInterfaceMeshImportObj(NxI32 version_number,SYSTEM_SERVICES::SystemServices *services)
-#else
-MESHIMPORTOBJ_API MeshImporter * getInterface(NxI32 version_number,SYSTEM_SERVICES::SystemServices *services)
-#endif
+MESHIMPORTOBJ_API MeshImporter * getInterface(NxI32 version_number,NVSHARE::SystemServices *services)
 {
   if ( services )
   {
-    SYSTEM_SERVICES::gSystemServices = services;
+    NVSHARE::gSystemServices = services;
   }
   assert( gInterface == 0 );
   if ( gInterface == 0 && version_number == MESHIMPORT_VERSION )
@@ -107,7 +102,7 @@ MESHIMPORTOBJ_API MeshImporter * getInterface(NxI32 version_number,SYSTEM_SERVIC
 
 #ifndef PLUGINS_EMBEDDED
 
-using namespace MESHIMPORT;
+using namespace NVSHARE;
 
 bool doShutdown(void)
 {
@@ -115,13 +110,13 @@ bool doShutdown(void)
   if ( gInterface )
   {
     ret = true;
-    MEMALLOC_DELETE(MeshImportObj,gInterface);
+    delete gInterface;
     gInterface = 0;
   }
   return ret;
 }
 
-using namespace MESHIMPORT;
+using namespace NVSHARE;
 
 #ifdef WIN32
 

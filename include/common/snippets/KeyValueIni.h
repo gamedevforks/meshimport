@@ -54,6 +54,9 @@
 
 #include "UserMemAlloc.h"
 
+namespace NVSHARE
+{
+
 class KeyValueIni;
 class KeyValueSection;
 
@@ -246,5 +249,7 @@ KeyValueIni      *createKeyValueIni(void); // create an empty .INI file in memor
 KeyValueSection  *createKeyValueSection(KeyValueIni *ini,const char *section_name,bool reset);  // creates, or locates and existing section for editing.  If reset it true, will erase previous contents of the section.
 bool              addKeyValue(KeyValueSection *section,const char *key,const char *value); // adds a key-value pair.  These pointers *must* be persistent for the lifetime of the INI file!
 
+
+}; // end of namespace
 
 #endif

@@ -1,63 +1,6 @@
-#ifndef STABLE_H
+#ifndef NV_STRING_TABLE_H
 
-#define STABLE_H
-
-/*!
-**
-** Copyright (c) 2007 by John W. Ratcliff mailto:jratcliff@infiniplex.net
-**
-** Portions of this source has been released with the PhysXViewer application, as well as
-** Rocket, CreateDynamics, ODF, and as a number of sample code snippets.
-**
-** If you find this code useful or you are feeling particularily generous I would
-** ask that you please go to http://www.amillionpixels.us and make a donation
-** to Troy DeMolay.
-**
-** DeMolay is a youth group for young men between the ages of 12 and 21.
-** It teaches strong moral principles, as well as leadership skills and
-** public speaking.  The donations page uses the 'pay for pixels' paradigm
-** where, in this case, a pixel is only a single penny.  Donations can be
-** made for as small as $4 or as high as a $100 block.  Each person who donates
-** will get a link to their own site as well as acknowledgement on the
-** donations blog located here http://www.amillionpixels.blogspot.com/
-**
-** If you wish to contact me you can use the following methods:
-**
-** Skype Phone: 636-486-4040 (let it ring a long time while it goes through switches)
-** Skype ID: jratcliff63367
-** Yahoo: jratcliff63367
-** AOL: jratcliff1961
-** email: jratcliff@infiniplex.net
-** Personal website: http://jratcliffscarab.blogspot.com
-** Coding Website:   http://codesuppository.blogspot.com
-** FundRaising Blog: http://amillionpixels.blogspot.com
-** Fundraising site: http://www.amillionpixels.us
-** New Temple Site:  http://newtemple.blogspot.com
-**
-**
-** The MIT license:
-**
-** Permission is hereby granted, MEMALLOC_FREE of charge, to any person obtaining a copy
-** of this software and associated documentation files (the "Software"), to deal
-** in the Software without restriction, including without limitation the rights
-** to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-** copies of the Software, and to permit persons to whom the Software is furnished
-** to do so, subject to the following conditions:
-**
-** The above copyright notice and this permission notice shall be included in all
-** copies or substantial portions of the Software.
-
-** THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-** IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-** FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-** AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
-** WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
-** CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-
-*/
-
-
-
+#define NV_STRING_TABLE_H
 
 #pragma warning(disable:4786)
 #pragma warning(disable:4995)
@@ -66,244 +9,445 @@
 
 #include <assert.h>
 #include <string.h>
-#include <string>
-#include <set>
 
 #include "UserMemAlloc.h"
+#include "NvHashMap.h"
 
 #if defined(LINUX)
 #define stricmp strcasecmp
 #endif
-class CharPtrLess
+
+namespace NVSHARE
+{
+
+class CRC32
 {
 public:
-	bool operator()(const char *v1,const char *v2) const
+  CRC32(void)
+  {
+    const NxU32 QUOTIENT=0x04c11db7;
+    for (NxU32 i = 0; i < 256; i++)
+    {
+      NxU32 crc = i << 24;
+      for (NxU32 j = 0; j < 8; j++)
+      {
+        if (crc & 0x80000000)
+          crc = (crc << 1) ^ QUOTIENT;
+        else
+          crc = crc << 1;
+      }
+      mCRCTable[i] = myhtonl(crc);
+    }
+    mIsLittleEndian = !isBigEndian();
+  }
+
+
+  inline NxU32 myhtonl(NxU32 n_ecx)
+  {
+    NxU32 n_eax = n_ecx;           //mov         eax,ecx
+    NxU32 n_edx = n_ecx;           //mov         edx,ecx
+    n_edx = n_edx << 16;           //shl         edx,10h
+    n_eax = n_eax & 0x0FF00;       //and         eax,0FF00h
+    n_eax = n_eax | n_edx;         //or          eax,edx
+    n_edx = n_ecx;                 // mov         edx,ecx
+    n_edx = n_edx & 0x0FF0000;     //and edx,0FF0000h
+    n_ecx = n_ecx >> 16;           //shr         ecx,10h
+    n_edx = n_edx | n_ecx;         //or          edx,ecx
+    n_eax = n_eax << 8;            //shl         eax,8
+    n_edx = n_edx >> 8;            //shr         edx,8
+    n_eax|=n_edx;                  //  71AB2BE9  or          eax,edx
+    return n_eax;
+  }
+
+  inline void getRand(NxU32 &current) const
+  {
+    current = (current * 214013L + 2531011L) & 0x7fffffff;
+  };
+
+  NxU32 crc32(const NxU8 *data, NxU32 len) const
+  {
+    NxU32 ret;
+
+    ret =  crc32Internal(data,len);
+
+    return ret;
+  }
+
+  NxU32 crc32(const char *data) const
+  {
+    NxU32 len = (NxU32)strlen(data);
+    return crc32( (const NxU8 *)data,len);
+  }
+
+private:
+
+  bool inline isBigEndian() { int i = 1; return *((char*)&i)==0; }
+
+  NxU32 crc32Internal(const NxU8 *data,NxU32 len) const
+  {
+    NxU32        dlen = (len/4)*4;
+    NxU32        result=len;
+    NxU32        *p = (NxU32 *)data;
+    NxU32        *e = (NxU32 *)(data + dlen);
+    NxU32         current = len;
+
+
+	if ( dlen >= 4 )
 	{
-		NxI32 v = strcmp(v1,v2);
-		if ( v < 0 ) return true;
-		return false;
-	};
+		result = ~*p++;
+		result = result ^ len;
+
+		const NxU32 *tmp = (const NxU32 *) data;
+		current = *tmp & len;
+
+		if ( mIsLittleEndian )
+		{
+		  while( p<e )
+		  {
+			getRand(current);
+			result = mCRCTable[result & 0xff] ^ result >> 8;
+			result = mCRCTable[result & 0xff] ^ result >> 8;
+			result = mCRCTable[result & 0xff] ^ result >> 8;
+			result = mCRCTable[result & 0xff] ^ result >> 8;
+			result ^= *p++;
+			result ^= current;
+			current &= result; // feed the result back into the random number seed, this forces the random sequence to drift with the input charcter stream.
+		  }
+		}
+		else
+		{
+		  while( p<e )
+		  {
+			getRand(current);
+			result = mCRCTable[result >> 24] ^ result << 8;
+			result = mCRCTable[result >> 24] ^ result << 8;
+			result = mCRCTable[result >> 24] ^ result << 8;
+			result = mCRCTable[result >> 24] ^ result << 8;
+			result ^= *p++;
+			result ^= current;
+			current &= result; // feed the result back into the random number seed, this forces the random sequence to drift with the input charcter stream.
+		  }
+	  }
+
+
+    }
+    NxU32 partial = len&3;
+    if ( partial )
+    {
+      for (NxU32 i=0; i<partial; i++)
+      {
+          getRand(current);
+          NxU8 v = data[dlen+i];
+          result = mCRCTable[v]^result;
+          result^=current;
+          current &= result;
+      }
+    }
+    return ~result;
+  }
+
+  bool  mIsLittleEndian;
+  NxU32 mCRCTable[256];
 };
 
-#if HE_USE_MEMORY_TRACKING
-typedef USER_STL::set< const char *, USER_STL::GlobalMemoryPool, CharPtrLess > CharPtrSet;
-#else
-typedef USER_STL::set< const char *, CharPtrLess > CharPtrSet;
-#endif
 
-class StringTable
+
+class StringHash : public Memalloc
 {
 public:
+  StringHash(const char *str)
+  {
+    mNextHash = 0;
+    NxU32 len = (NxU32)strlen(str);
+    mString = (char *)MEMALLOC_MALLOC(len+1);
+    strcpy(mString,str);
+  }
+
+  ~StringHash(void)
+  {
+    MEMALLOC_FREE(mString);
+  }
+
+  inline const char * getString(void) const { return mString; };
+  inline StringHash * getNextHash(void) const { return mNextHash; };
+  inline void         setNextHash(StringHash *sh) { mNextHash = sh; };
+  inline bool         match(const char *str,bool caseSensitive) const 
+  { 
+	  return caseSensitive ? (strcmp(mString,str) == 0) : (stricmp(mString,str) == 0);
+  };
+
+private:
+  StringHash *mNextHash;
+  char       *mString;
+};
+
+
+
+class StringTable : public Memalloc, public CRC32
+{
+public:
+
+    typedef HashMap< NxU32, StringHash *> StringHashMap;
+
 	StringTable(void)
 	{
+        mCaseSensitive = true;
 	};
 
 	~StringTable(void)
 	{
-		CharPtrSet::iterator i;
-		for (i=mStrings.begin(); i!=mStrings.end(); i++)
-		{
-			char *str = (char *)(*i);
-			MEMALLOC_FREE(str);
-		}
+    	for (StringHashMap::Iterator i=mStrings.getIterator(); !i.done(); ++i)
+        {
+            StringHash *sh = (*i).second;
+            while ( sh )
+            {
+                StringHash *next = sh->getNextHash();
+                delete sh;
+                sh = next;
+            }
+        }
 	}
-
-	const char * Get(const char *str)
-	{
-    const char *ret = 0;
-    if ( str )
-    {
-		  CharPtrSet::iterator found;
-		  found = mStrings.find( str );
-		  if ( found != mStrings.end() ) return (*found);
-		  NxU32 l = (NxU32)strlen(str);
-		  char *mem = (char *) MEMALLOC_MALLOC(sizeof(char)*(l+1));
-		  strcpy(mem,str);
-		  mStrings.insert( mem );
-      ret = mem;
-    }
-		return ret;
-	};
 
 	const char * Get(const char *str,bool &first)
 	{
-		CharPtrSet::iterator found;
-		found = mStrings.find( str );
-		if ( found != mStrings.end() )
-		{
-			first = false;
-			return (*found);
-		}
-		first = true;
-		NxU32 l = (NxU32)strlen(str);
-		char *mem = (char *) MEMALLOC_MALLOC(sizeof(char)*(l+1));
-		strcpy(mem,str);
-		mStrings.insert( mem );
-		return mem;
+		first = false;
+        const char *ret=0;
+
+        NxU32 hash;
+
+        if ( !mCaseSensitive )
+        {
+            char temp_string[8192];
+            strncpy(temp_string,str,8192);
+            strlwr(temp_string);
+            hash = crc32(temp_string);
+        }
+        else
+        {
+          hash = crc32(str);
+        }
+
+        const StringHashMap::Entry *found = mStrings.find(hash);
+
+        if ( found == NULL )
+        {
+            StringHash *sh = MEMALLOC_NEW(StringHash)(str);
+            mStrings[hash] = sh;
+            ret = sh->getString();
+			first = true;
+        }
+        else
+        {
+            StringHash *sh = (*found).second;
+            while ( sh )
+            {
+                if ( sh->match(str,mCaseSensitive) )
+                {
+                    ret = sh->getString();
+                    break;
+                }
+                sh = sh->getNextHash();
+            }
+            if ( !ret )
+            {
+                StringHash *nh = new StringHash(str);
+                sh = (*found).second;
+                nh->setNextHash(sh);
+				mStrings.erase(hash); // erase the old hash.
+				mStrings[hash] = nh;  // assign the new hash
+				ret = sh->getString();
+				first = true;
+            }
+        }
+        return ret;
 	};
 
-	CharPtrSet& GetSet(void) { return mStrings; };
+
+    void setCaseSensitive(bool state)
+    {
+        mCaseSensitive = state;
+    }
 
 private:
-	CharPtrSet mStrings;
+    bool                mCaseSensitive;
+    StringHashMap       mStrings;
+};
+
+class StringIntHash : public Memalloc
+{
+public:
+  StringIntHash(const char *str,NxU32 id)
+  {
+    mNextHash = 0;
+    mId       = id;
+    NxU32 len = (NxU32)strlen(str);
+    mString = (char *)MEMALLOC_MALLOC(len+1);
+    strcpy(mString,str);
+  }
+
+  ~StringIntHash(void)
+  {
+    MEMALLOC_FREE(mString);
+  }
+
+  inline const char *    getString(void) const { return mString; };
+  inline StringIntHash * getNextHash(void) const { return mNextHash; };
+  inline void            setNextHash(StringIntHash *sh) { mNextHash = sh; };
+
+  inline bool         match(const char *str,bool caseSensitive) const
+  { 
+	  return caseSensitive ? (strcmp(mString,str) == 0) : (stricmp(mString,str) == 0);
+  };
+
+  inline NxU32           getId(void) const { return mId; };
+
+private:
+  StringIntHash *mNextHash;
+  NxU32          mId;
+  char          *mString;
 };
 
 
-class CharPtrInt
+class StringTableInt : public Memalloc, public CRC32
 {
 public:
-	const char *mString;
-	NxU32      mId;
-};
 
-class CharPtrIntLess1
-{
-public:
-	bool operator()(const CharPtrInt &v1,const CharPtrInt &v2) const
-	{
-		NxI32 v = strcmp(v1.mString,v2.mString);
-		if ( v < 0 ) return true;
-		return false;
-	};
-};
+    typedef HashMap< NxU32, StringIntHash *>  StringIntHashMap;
+    typedef HashMap< NxU32, StringIntHash * > IntCharHashMap;
 
-class CharPtrIntLess2
-{
-public:
-	bool operator()(const CharPtrInt &v1,const CharPtrInt &v2) const
-	{
-		NxI32 v = stricmp(v1.mString,v2.mString);
-		if ( v < 0 ) return true;
-		return false;
-	};
-};
-
-#if HE_USE_MEMORY_TRACKING
-typedef USER_STL::set< CharPtrInt, USER_STL::GlobalMemoryPool,  CharPtrIntLess1 > CharPtrIntSet1;
-typedef USER_STL::set< CharPtrInt, USER_STL::GlobalMemoryPool,  CharPtrIntLess2 > CharPtrIntSet2;
-#else
-typedef USER_STL::set< CharPtrInt, CharPtrIntLess1 > CharPtrIntSet1;
-typedef USER_STL::set< CharPtrInt, CharPtrIntLess2 > CharPtrIntSet2;
-#endif
-
-class StringTableInt
-{
-public:
 	StringTableInt(void)
 	{
-		mCase = true;
+		mCaseSensitive = false;
+  }
+  ~StringTableInt(void)
+  {
+		for (StringIntHashMap::Iterator i=mStrings.getIterator(); !i.done(); ++i)
+        {
+            StringIntHash *sh = (*i).second;
+            while ( sh )
+            {
+                StringIntHash *next = sh->getNextHash();
+                delete sh;
+                sh = next;
+            }
+        }
+	}
+
+	bool Get(const char *str,NxU32 &id) const
+	{
+		id = Get(str);
+		return id != 0;
 	}
 
 	NxU32 Get(const char *str) const
 	{
 		NxU32 ret = 0;
-		if ( mCase )
-		{
-			CharPtrIntSet1::const_iterator found;
-			CharPtrInt cpi;
-			cpi.mString = str;
-			cpi.mId     = 0;
-			found = mStrings1.find( cpi );
-			if ( found != mStrings1.end() )
-				ret = (*found).mId;
-		}
-		else
-		{
-			CharPtrIntSet2::const_iterator found;
-			CharPtrInt cpi;
-			cpi.mString = str;
-			cpi.mId     = 0;
-			found = mStrings2.find( cpi );
-			if ( found != mStrings2.end() )
-				ret = (*found).mId;
-		}
+
+        if ( str )
+        {
+          NxU32 hash;
+
+          if ( !mCaseSensitive )
+          {
+              char temp_string[8192];
+              strncpy(temp_string,str,8192);
+              strlwr(temp_string);
+              hash = crc32(temp_string);
+          }
+          else
+          {
+              hash = crc32(str); // compute the hash value.
+          }
+          const StringIntHashMap::Entry *found = mStrings.find(hash);
+          if ( found != NULL )
+          {
+              const StringIntHash *sh = (*found).second;
+              while ( sh )
+              {
+                  if ( sh->match(str,mCaseSensitive) )
+                  {
+                      ret = sh->getId();
+                      break;
+                  }
+                  sh = sh->getNextHash();
+              }
+          }
+        }
+
+
 		return ret;
 	};
 
-	bool Get(const char *str,NxU32 &ret) const
+	void Add(const char *str,NxU32 id)
 	{
-		bool rfound = false;
+        StringIntHash *sh;
+        char temp_string[8192];
 
-		if ( mCase )
-		{
-			CharPtrIntSet1::const_iterator found;
-			CharPtrInt cpi;
-			cpi.mString = str;
-			cpi.mId     = 0;
-			found = mStrings1.find( cpi );
-			if ( found != mStrings1.end() )
-      {
-				ret = (*found).mId;
-        rfound = true;
-      }
-		}
-		else
-		{
-			CharPtrIntSet2::const_iterator found;
-			CharPtrInt cpi;
-			cpi.mString = str;
-			cpi.mId     = 0;
-			found = mStrings2.find( cpi );
-			if ( found != mStrings2.end() )
-      {
-				ret = (*found).mId;
-        rfound = true;
-      }
-		}
-		return rfound;
-	};
-
-	void Add(const char *foo,NxU32 id)
-	{
-		CharPtrInt cpi;
-		cpi.mString = foo;
-		cpi.mId     = id;
-		if ( mCase )
-			mStrings1.insert(cpi);
-		else
-			mStrings2.insert(cpi);
+        NxU32 hash;
+        if ( !mCaseSensitive )
+        {
+            strncpy(temp_string,str,8192);
+            strlwr(temp_string);
+            hash = crc32(temp_string);
+        }
+        else
+        {
+          hash = crc32(str);
+        }
+        const StringIntHashMap::Entry *found = mStrings.find(hash);
+        if ( found == NULL )
+        {
+            sh = MEMALLOC_NEW(StringIntHash)(str,id);
+            mStrings[hash] = sh;
+        }
+        else
+        {
+            sh = (*found).second;
+            while ( sh )
+            {
+                if ( sh->match(str,mCaseSensitive) )
+                {
+                    assert(0); // same string mapped to multiple ids!!
+                    break;
+                }
+                sh = sh->getNextHash();
+            }
+            if ( !sh )
+            {
+                StringIntHash *nh = MEMALLOC_NEW(StringIntHash)(str,id);
+                sh = (*found).second;
+                nh->setNextHash(sh);
+				mStrings.erase(hash);
+				mStrings[hash] = nh;
+                sh = nh;
+            }
+        }
+        mIds[id] = sh;
 	}
 
 	const char * Get(NxU32 id) const
 	{
 		const char *ret = 0;
-		if ( mCase )
-		{
-			CharPtrIntSet1::const_iterator i;
-			for (i=mStrings1.begin(); i!=mStrings1.end(); ++i)
-			{
-				if ( (*i).mId == id )
-				{
-					ret = (*i).mString;
-					break;
-				}
-			}
-		}
-		else
-		{
-			CharPtrIntSet2::const_iterator i;
-			for (i=mStrings2.begin(); i!=mStrings2.end(); ++i)
-			{
-				if ( (*i).mId == id )
-				{
-					ret = (*i).mString;
-					break;
-				}
-			}
-		}
+
+        const IntCharHashMap::Entry *found = mIds.find(id);
+        if ( found != NULL )
+            ret = (*found).second->getString();
+
 		return ret;
 	}
 
 	void SetCaseSensitive(bool s)
 	{
-		mCase = s;
+		mCaseSensitive = s;
 	}
 
+
+    IntCharHashMap      mIds;
 private:
-	bool        mCase;
-	CharPtrIntSet1 mStrings1;     // case sensitive
-	CharPtrIntSet2 mStrings2;     // case insensitive
+    bool                mCaseSensitive;
+    StringIntHashMap    mStrings;
 };
 
+}; // end of namespace
 
 #endif

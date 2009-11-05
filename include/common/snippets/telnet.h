@@ -74,7 +74,7 @@
 //*** You can keep launching as many of them as you wish.
 //***********************************************************************************
 
-namespace TELNET
+namespace NVSHARE
 {
 
 class Telnet
@@ -93,11 +93,20 @@ protected:
   virtual ~Telnet(void) { };
 };
 
-Telnet * createTelnet(const char *address="LOCALHOST",NxU32 port=23);
-void     releaseTelnet(Telnet *t);
-
+enum TelnetType
+{
+	TT_CLIENT_ONLY,
+	TT_SERVER_ONLY,
+	TT_CLIENT_OR_SERVER
 };
 
-extern TELNET::Telnet *gTelnet; // optional global variable representing the TELNET singleton for the application.
+Telnet * createTelnet(TelnetType type,const char *address="LOCALHOST",NxU32 port=23);
+void     releaseTelnet(Telnet *t);
+
+
+extern Telnet *gTelnet; // optional global variable representing the TELNET singleton for the application.
+
+
+}; // End of namespace
 
 #endif

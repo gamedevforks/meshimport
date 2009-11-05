@@ -1,4 +1,9 @@
+#pragma warning(disable:4265)
+#include "UserMemAlloc.h"
 #include "ImportFBX.h"
+
+namespace NVSHARE
+{
 
 #define DEBUG_LOG 1
 
@@ -6,7 +11,12 @@
 #define MESSAGE_BUFFER_SIZE 1000
 char messageBuffer[MESSAGE_BUFFER_SIZE];
 
-MeshImportFBX::MeshImportFBX()
+MeshImportFBX::MeshImportFBX() :
+m_sdkManager(NULL),
+m_importer(NULL),
+m_scene(NULL),
+m_takeInfo(NULL),
+m_takeName(NULL)
 {
 	mNumBones = 0;
 	mVertexFormat = 0;
@@ -45,15 +55,23 @@ void MeshImportFBX::Release(void)
 	m_boneHierarchy.clear();
 	
 
-	m_scene->Destroy(true, true); 
-	m_scene = NULL;
+	if (m_scene != NULL)
+	{
+		m_scene->Destroy(true, true); 
+		m_scene = NULL;
+	}
 
-	m_importer->Destroy(true, true);
-	m_importer = NULL;
+	if (m_importer != NULL)
+	{
+		m_importer->Destroy(true, true);
+		m_importer = NULL;
+	}
 
-	m_sdkManager->Destroy();
-	m_sdkManager = NULL;	
-
+	if (m_sdkManager != NULL)
+	{
+		m_sdkManager->Destroy();
+		m_sdkManager = NULL;	
+	}
 }
  const char* MeshImportFBX::getFileName( const char* fullPath )
 {
@@ -78,7 +96,7 @@ void MeshImportFBX::Release(void)
 
 void MeshImportFBX::outputMessage( const char* message )
 {
-	cout << message << endl;
+	printf("%s\r\n", message);
 }
 
 const char * MeshImportFBX::getExtension(int index)  // report the default file name extension for this mesh type.
@@ -94,9 +112,9 @@ const char * MeshImportFBX::getDescription(int index)  // report the default fil
 bool MeshImportFBX::importMesh(const char *fname,
 							   const void *data,
 							   unsigned int dlen,
-							   MESHIMPORT::MeshImportInterface *callback,
+							   NVSHARE::MeshImportInterface *callback,
 							   const char *options, 
-							   MESHIMPORT::MeshImportApplicationResource *appResource)
+							   NVSHARE::MeshImportApplicationResource *appResource)
 {	
 	bool ret = false;
 
@@ -112,7 +130,7 @@ bool MeshImportFBX::importMesh(const char *fname,
     return ret;
 }
 
-bool MeshImportFBX::Import( const char* filename, MESHIMPORT::MeshImportInterface *callback  )
+bool MeshImportFBX::Import( const char* filename, NVSHARE::MeshImportInterface *callback  )
 {
 	char message[OUTPUT_TEXT_BUFFER_SIZE+1] = "";
 	message[OUTPUT_TEXT_BUFFER_SIZE] = '\0';
@@ -123,7 +141,7 @@ bool MeshImportFBX::Import( const char* filename, MESHIMPORT::MeshImportInterfac
 
 	m_sdkManager = KFbxSdkManager::Create();
 
-	if( !m_sdkManager )
+	if(m_sdkManager == NULL)
 		return false;
 
 
@@ -231,15 +249,25 @@ bool MeshImportFBX::Import( const char* filename, MESHIMPORT::MeshImportInterfac
 	sprintf_s( message, OUTPUT_TEXT_BUFFER_SIZE, "done!" );
 	outputMessage( message );
 
+
+	m_scene->Destroy(true, true);
+	m_scene = NULL;
+
+	m_importer->Destroy(true, true);
+	m_importer = NULL;
+
+	m_sdkManager->Destroy();
+	m_sdkManager = NULL;
+
 	return true;
 }
 
 
 
-void releaseMeshImportFBX(MESHIMPORT::MeshImporter *iface)
+void releaseMeshImportFBX(NVSHARE::MeshImporter *iface)
 {
     MeshImportFBX *m = static_cast< MeshImportFBX *>(iface);
-    MEMALLOC_DELETE(MeshImportFBX,m);
+    delete m;
 }
 
 
@@ -344,3 +372,4 @@ void FBXImporter::nodeCollectMaterials( ApexDefaultMaterialLibrary& materialLibr
 }
 */
 
+}; // end of namespace

@@ -4,10 +4,10 @@
 
 #include "MeshImport.h"
 
-class KeyValueIni;
-
-namespace MESHIMPORT
+namespace NVSHARE
 {
+
+class KeyValueIni;
 
 class MeshBuilder : public MeshSystem, public MeshImportInterface
 {
@@ -18,7 +18,6 @@ public:
 
 
 };
-
 
 MeshBuilder * createMeshBuilder(KeyValueIni *ini,
                                 const char *meshName,
@@ -31,6 +30,6 @@ MeshBuilder * createMeshBuilder(KeyValueIni *ini,
 MeshBuilder * createMeshBuilder(MeshImportApplicationResource *appResource);
 void          releaseMeshBuilder(MeshBuilder *m);
 
-};
+}; // end of namespace
 
 #endif

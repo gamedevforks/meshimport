@@ -49,15 +49,16 @@
 
 */
 
-#include <vector>
 #include <string.h>
+#include <stdio.h>
 #include <assert.h>
-
-#include "KeyValueIni.h"
+#include <vector>
 
 #pragma warning(disable:4100 4267)
 
-namespace KEYVALUEINI
+#define KEYVALUEINI_NVSHARE KEYVALUEINI_##NVSHARE
+
+namespace KEYVALUEINI_NVSHARE
 {
 
 
@@ -70,7 +71,7 @@ namespace KEYVALUEINI
 #   define _stricmp(a,b) strcasecmp((a),(b))
 #endif
 
-class FILE_INTERFACE
+class FILE_INTERFACE : public NVSHARE::Memalloc
 {
 public:
 	FILE_INTERFACE(const char *fname,const char *spec,void *mem,size_t len)
@@ -849,9 +850,11 @@ void InPlaceParser::DefaultSymbols(void)
 }
 
 
-}; // END KEYVALUE INI NAMESPACE
+}; // END NAMESPACE
 
-using namespace KEYVALUEINI;
+namespace NVSHARE
+{
+using namespace KEYVALUEINI_NVSHARE;
 
 
 class KeyValue
@@ -884,9 +887,9 @@ private:
   const char *mValue;
 };
 
-typedef USER_STL::vector< KeyValue > KeyValueVector;
+typedef std::vector< KeyValue > KeyValueVector;
 
-class KeyValueSection
+class KeyValueSection : public NVSHARE::Memalloc
 {
 public:
   KeyValueSection(const char *section,NxU32 lineno)
@@ -919,7 +922,7 @@ public:
   const char *getKey(NxU32 index,NxU32 &lineno) const
   {
     const char * ret  = 0;
-    if ( index >= 0 && index < mKeys.size() )
+    if ( index < mKeys.size() )
     {
       const KeyValue &v = mKeys[index];
       ret = v.getKey();
@@ -931,7 +934,7 @@ public:
   const char *getValue(NxU32 index,NxU32 &lineno) const
   {
     const char * ret  = 0;
-    if ( index >= 0 && index < mKeys.size() )
+    if ( index < mKeys.size() )
     {
       const KeyValue &v = mKeys[index];
       ret = v.getValue();
@@ -1000,9 +1003,9 @@ private:
   KeyValueVector mKeys;
 };
 
-typedef USER_STL::vector< KeyValueSection *> KeyValueSectionVector;
+typedef std::vector< KeyValueSection *> KeyValueSectionVector;
 
-class KeyValueIni : public InPlaceParserInterface
+class KeyValueIni : public InPlaceParserInterface, public NVSHARE::Memalloc
 {
 public:
   KeyValueIni(const char *fname)
@@ -1042,7 +1045,7 @@ public:
     mSections.push_back(kvs);
   }
 
-  ~KeyValueIni(void)
+  virtual ~KeyValueIni(void)
   {
     reset();
   }
@@ -1131,7 +1134,7 @@ public:
   const KeyValueSection * getSection(NxU32 index,NxU32 &keys,NxU32 &lineno) const
   {
     const KeyValueSection *ret=0;
-    if ( index >= 0 && index < mSections.size() )
+    if ( index < mSections.size() )
     {
       const KeyValueSection &s = *mSections[index];
       ret = &s;
@@ -1168,7 +1171,9 @@ public:
         mSections[i]->save(fph);
       }
 
-      void *temp = fi_getMemBuffer(fph,len);
+	  size_t tmpLen;
+      void *temp = fi_getMemBuffer(fph,tmpLen);
+	  len = (NxU32)tmpLen;
       if ( temp )
       {
         ret = MEMALLOC_MALLOC(len);
@@ -1212,8 +1217,6 @@ private:
   KeyValueSectionVector mSections;
   InPlaceParser         mData;
 };
-
-
 
 KeyValueIni *loadKeyValueIni(const char *fname,NxU32 &sections)
 {
@@ -1385,55 +1388,5 @@ bool              releaseIniMem(void *mem)
 }
 
 
-#define TEST_MAIN 0
 
-#if TEST_MAIN
-void main(NxI32 argc,const char **argv) // test to see if INI files work.
-{
-  const char *fname = "test.ini";
-  NxU32 sections;
-  const KeyValueIni *ini = loadKeyValueIni(fname,sections);
-  if ( ini )
-  {
-    printf("INI file '%s' has %d sections.\r\n", fname, sections);
-    for (NxU32 i=0; i<sections; i++)
-    {
-      NxU32 lineno;
-      NxU32 keycount;
-      const KeyValueSection *s = getSection(ini,i,keycount,lineno);
-      assert(s);
-      const char *sname  = getSectionName(s);
-      assert(sname);
-      printf("Section %d=%s starts at line number %d and contains %d keyvalue pairs\r\n", i+1, sname, lineno, keycount );
-      for (NxU32 j=0; j<keycount; j++)
-      {
-        NxU32 lineno;
-        const char *key = getKey(s,j,lineno);
-        const char *value = getValue(s,j,lineno);
-        if ( key && value )
-        {
-          printf("           %d  %s=%s\r\n", j, key , value );
-        }
-        else if ( key )
-        {
-          printf("           %d Key=%s\r\n", j, key );
-        }
-        else if ( value )
-        {
-          printf("           %d Value=%s\r\n", j, value );
-        }
-      }
-    }
-    releaseKeyValueIni(ini);
-  }
-  else
-  {
-    printf("Failed to load ini file '%s'\r\n", fname );
-  }
-}
-
-
-
-#endif
-
-
+}; // end of namespace

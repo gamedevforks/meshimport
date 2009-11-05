@@ -106,7 +106,11 @@
 */
 
 //==================================================================================
-void InPlaceParser::SetFile(const char *fname,FileSystem *fsystem)
+
+namespace NVSHARE
+{
+
+	void InPlaceParser::SetFile(const char *fname,FileSystem *fsystem)
 {
 	if ( mMyAlloc )
 	{
@@ -461,3 +465,5 @@ const char ** InPlaceParser::GetArglist(char *line,NxI32 &count)
 	return ret;
 }
 
+
+}; // end of namespace

@@ -1,11 +1,5 @@
 #include <assert.h>
-#include <map>
-#include <queue>
 #include <ctype.h>
-#include <deque>
-#include <queue>
-#include <list>
-#include <vector>
 
 #pragma warning(disable:4211)
 #pragma warning(disable:4244)
@@ -16,6 +10,9 @@
 #pragma warning(disable:4267)
 
 #include "UserMemAlloc.h"
+#include <list>
+#include <queue>
+#include <map>
 
 /*!
 **
@@ -116,9 +113,14 @@
 #pragma comment(lib,"wsock32.lib")
 #endif
 
-TELNET::Telnet *gTelnet=0; // optional global variable representing the TELNET singleton for the application.
+namespace NVSHARE
+{
+Telnet *gTelnet=0; // optional global variable representing the TELNET singleton for the application.
+};
 
-namespace TELNET
+#define TELNET_NVSHARE TELNET_##NVSHARE
+
+namespace TELNET_NVSHARE
 {
 
 ///*************** The FastXML code snippet
@@ -146,7 +148,7 @@ public:
 FastXml * createFastXml(void);
 void      releaseFastXml(FastXml *f);
 
-class MyFastXml : public FastXml
+class MyFastXml : public FastXml, public NVSHARE::Memalloc
 {
 public:
   enum CharType
@@ -172,7 +174,7 @@ public:
     mTypes[13] = CT_END_OF_LINE;
     mError = 0;
   }
-  ~MyFastXml(void)
+  virtual ~MyFastXml(void)
   {
     release();
   }
@@ -451,7 +453,7 @@ private:
 
 FastXml * createFastXml(void)
 {
-  MyFastXml *f = new MyFastXml;
+  MyFastXml *f = MEMALLOC_NEW(MyFastXml);
   return static_cast< FastXml *>(f);
 }
 
@@ -524,7 +526,7 @@ static inline bool getHexValue(char c1,char c2,NxU8 &v)
     return ret;
 }
 
-class Blob
+class Blob : public NVSHARE::Memalloc
 {
 public:
   Blob(const char *blobType,NxU32 client,NxU32 blobId,NxU32 olen,const char *data)
@@ -593,7 +595,7 @@ public:
 
 typedef std::list< Blob * > BlobList;
 
-class MyBlobIO : public BlobIO, public FastXmlInterface
+class MyBlobIO : public BlobIO, public FastXmlInterface, public NVSHARE::Memalloc
 {
 public:
   MyBlobIO(BlobIOInterface *iface)
@@ -604,16 +606,16 @@ public:
     mFastXml = createFastXml();
   }
 
-  ~MyBlobIO(void)
+  virtual ~MyBlobIO(void)
   {
     releaseFastXml(mFastXml);
     BlobList::iterator i;
     for (i=mBlobs.begin(); i!=mBlobs.end(); ++i)
     {
         Blob *b = (*i);
-        MEMALLOC_DELETE(block,b);
+        delete b;
     }
-    MEMALLOC_DELETE(Blob,mLastBlob);
+    delete mLastBlob;
   }
 
   // convert a blob of binary data into multiple lines of ascii data
@@ -691,7 +693,7 @@ public:
     data = 0;
     dlen = 0;
 
-    MEMALLOC_DELETE(Blob,mLastBlob);
+    delete mLastBlob;
     mLastBlob = 0;
 
     if ( !mBlobs.empty() )
@@ -720,8 +722,6 @@ public:
   {
 	  bool ret = false;
 
-	  client;
-
 	  if ( strncmp(text,"<telnetBlob",11) == 0 )
 	  {
 		  size_t len = strlen(text);
@@ -744,9 +744,6 @@ public:
                               NxI32         lineno)         // line number in the source XML file
   {
     bool ret = true;
-
-	lineno;
-	elementData;
 
     if ( elementData )
     {
@@ -845,7 +842,7 @@ BlobIO * createBlobIO(BlobIOInterface *iface)
 void     releaseBlobIO(BlobIO *b)
 {
     MyBlobIO *m = static_cast< MyBlobIO *>(b);
-    MEMALLOC_DELETE(MyBlobIO,m);
+    delete m;
 }
 
 
@@ -945,7 +942,7 @@ class OdfThread
 
 	public:
 		OdfThread(void);
-	 ~OdfThread(void);
+	 virtual ~OdfThread(void);
 
 	public:
 		// Start execution of the thread.
@@ -1055,18 +1052,17 @@ typedef std::queue<TelnetLineNode*> TelnetLineNodeQueue;
 class TelnetInterface
 {
 	public:
+   
 		// Called when a connection has been established.
 		virtual void OnConnect(NxU32 uiClient)
 		{
       PushLine("NewConnection", uiClient );
 		}
 
-	public:
 		// Sends text across the telnet connection.
 		// returns false on failure.
 		virtual bool SendText(NxU32 uiClient, const char *pcLine, ...)=0;
 
-	public:
 		// Waits until there is a block ready to be read.
 		bool WaitForBlock(void);
 
@@ -1081,7 +1077,7 @@ class TelnetInterface
 	protected:
 		TelnetInterface(void);
 		TelnetInterface(const TelnetInterface&){}
-	 ~TelnetInterface(void);
+	 virtual ~TelnetInterface(void);
 
 	private:
 		OdfMutex              m_LineMutex;
@@ -1102,7 +1098,7 @@ class TelnetInterface
 //******************************************************
 
 
-class TelnetLineNode
+class TelnetLineNode : public NVSHARE::Memalloc
 {
 	public:
 		char         *pcLine;
@@ -1144,7 +1140,7 @@ const char *TelnetInterface::GetLine(NxU32 &uiClient)
 void TelnetInterface::PushLine(const char *pcLine, NxU32 uiClient)
 {
 	m_LineMutex.Lock();
-	TelnetLineNode *node = new TelnetLineNode;
+	TelnetLineNode *node = MEMALLOC_NEW(TelnetLineNode);
 	node->pcLine = (char*)::malloc(sizeof(char)*(strlen(pcLine)+1));
 	strcpy(node->pcLine, pcLine);
 	node->uiClient = uiClient;
@@ -1419,11 +1415,11 @@ class TelnetParser
 
 
 // Simple Telnet Client.
-class TelnetClient : public TelnetInterface
+class TelnetClient : public TelnetInterface, public NVSHARE::Memalloc
 {
 	public:
 		TelnetClient(void);
-	 ~TelnetClient(void);
+	 virtual ~TelnetClient(void);
 
 	public:
 		// Connect to a remote Telnet server.
@@ -1561,11 +1557,6 @@ bool TelnetClient::Connect(const char *pcAddress, unsigned short uiPort)
 			m_Thread = CreateThread(0, 0, _TelnetClientFunc, this, 0, 0);
 			bRet = true;
 		}
-		else
-		{
-			assert(0);
-		}
-		
 		if(!m_Thread)
 		{
 			NxI32 error = WSAGetLastError();
@@ -1623,7 +1614,7 @@ class TelnetServer_Client;
 typedef std::map<NxU32, TelnetServer_Client*> TelnetServer_ClientMap;
 
 // Simple Telnet Server.
-class TelnetServer : public TelnetInterface
+class TelnetServer : public TelnetInterface, public NVSHARE::Memalloc
 {
 	friend class TelnetServer_Client;
 
@@ -1666,7 +1657,7 @@ class TelnetServer : public TelnetInterface
 //** Telnet server source
 //****************************************************************************
 
-class TelnetServer_Client
+class TelnetServer_Client : public NVSHARE::Memalloc
 {
 	public:
 		TelnetServer *m_pParent;
@@ -1775,7 +1766,7 @@ void TelnetServer::ThreadFunc(void)
 		#endif
 		if(clientSocket != INVALID_SOCKET)
 		{
-			TelnetServer_Client *pClient = new TelnetServer_Client;
+			TelnetServer_Client *pClient = MEMALLOC_NEW(TelnetServer_Client);
 			pClient->m_pParent  = this;
 			pClient->m_uiClient = ++m_uiLastClient;
 			pClient->m_Socket   = clientSocket;
@@ -2450,27 +2441,34 @@ public:
 
 typedef std::queue< BlobLine > BlobLineQueue;
 
-class MyTelnet : public Telnet, public BlobIOInterface
+class MyTelnet : public NVSHARE::Telnet, public BlobIOInterface, public NVSHARE::Memalloc
 {
 public:
-  MyTelnet(const char *address,NxU32 port)
+  MyTelnet(NVSHARE::TelnetType type,const char *address,NxU32 port)
   {
     mBlobIO = createBlobIO(this);
     mParser.DefaultSymbols();
     mClient = 0;
     mInterface = 0;
-    mServer = new TelnetServer;
-    mIsServer = mServer->Listen(port);
-    mHaveConnection = true;
+	mServer = 0;
+	mIsServer = false;
+	mHaveConnection = false;
+
+	if ( type == NVSHARE::TT_SERVER_ONLY || type == NVSHARE::TT_CLIENT_OR_SERVER )
+	{
+      mServer = MEMALLOC_NEW(TelnetServer);
+      mIsServer = mServer->Listen(port);
+      mHaveConnection = true;
+	}
     if ( mIsServer )
     {
       mInterface = static_cast< TelnetInterface *>(mServer);
     }
-    else
+    else if ( type == NVSHARE::TT_CLIENT_ONLY || type == NVSHARE::TT_CLIENT_OR_SERVER )
     {
       delete mServer;
       mServer = 0;
-      mClient = new TelnetClient;
+      mClient = MEMALLOC_NEW(TelnetClient);
       mHaveConnection = mClient->Connect(address,port);
       if ( !mHaveConnection )
       {
@@ -2610,18 +2608,23 @@ private:
   BlobLineQueue mBlobLines;
 };
 
-Telnet * createTelnet(const char *address,NxU32 port)
-{
-  MyTelnet *m = new MyTelnet(address,port);
-  return static_cast< Telnet *>(m);
-}
-
-void     releaseTelnet(Telnet *t)
-{
-  MyTelnet *m = static_cast< MyTelnet *>(t);
-  delete m;
-}
 
 
 }; // end of namespace
 
+namespace NVSHARE
+{
+
+	Telnet * createTelnet(TelnetType type,const char *address,NxU32 port)
+{
+	TELNET_NVSHARE::MyTelnet *m = MEMALLOC_NEW(TELNET_NVSHARE::MyTelnet)(type,address,port);
+	return static_cast< Telnet *>(m);
+}
+
+void     releaseTelnet(Telnet *t)
+{
+	TELNET_NVSHARE::MyTelnet *m = static_cast< TELNET_NVSHARE::MyTelnet *>(t);
+	delete m;
+}
+
+}; // end of namespace

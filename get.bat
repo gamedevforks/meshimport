@@ -47,32 +47,6 @@ copy \GoogleCode\CodeSuppository\include\MeshImport\*.h
 copy \GoogleCode\CodeSuppository\include\MeshImport\*.cpp
 cd ..
 
-md MeshImportPSK
-cd MeshImportPSK
-copy \GoogleCode\CodeSuppository\include\MeshImportPSK\*.h
-cd ..
-
-md MeshImportFBX
-cd MeshImportFBX
-copy \GoogleCode\CodeSuppository\include\MeshImportFBX\*.h
-cd ..
-
-md MeshImportEzm
-cd MeshImportEzm
-copy \GoogleCode\CodeSuppository\include\MeshImportEzm\*.h
-cd ..
-
-
-md MeshImportObj
-cd MeshImportObj
-copy \GoogleCode\CodeSuppository\include\MeshImportObj\*.h
-cd ..
-
-md MeshImportOgre
-cd MeshImportOgre
-copy \GoogleCode\CodeSuppository\include\MeshImportOgre\*.h
-cd ..
-
 md common
 cd common
 
@@ -96,8 +70,6 @@ copy \GoogleCode\CodeSuppository\include\common\snippets\telnet.cpp
 copy \GoogleCode\CodeSuppository\include\common\snippets\FileInterface.h
 copy \GoogleCode\CodeSuppository\include\common\snippets\FileInterface.cpp
 copy \GoogleCode\CodeSuppository\include\common\snippets\FileSystem.h
-copy \GoogleCode\CodeSuppository\include\common\snippets\SystemServices.cpp
-copy \GoogleCode\CodeSuppository\include\common\snippets\SystemServices.h
 copy \GoogleCode\CodeSuppository\include\common\snippets\inparser.h
 copy \GoogleCode\CodeSuppository\include\common\snippets\inparser.cpp
 copy \GoogleCode\CodeSuppository\include\common\snippets\asc2bin.cpp
@@ -117,6 +89,31 @@ copy \GoogleCode\CodeSuppository\include\common\snippets\FloatMath.cpp
 copy \GoogleCode\CodeSuppository\include\common\snippets\FloatMath.h
 copy \GoogleCode\CodeSuppository\include\common\snippets\sutil.h
 copy \GoogleCode\CodeSuppository\include\common\snippets\sutil.cpp
+copy \GoogleCode\CodeSuppository\include\common\snippets\NvAlignedMalloc.h
+copy \GoogleCode\CodeSuppository\include\common\snippets\NvAllocator.h
+copy \GoogleCode\CodeSuppository\include\common\snippets\NvArray.h
+copy \GoogleCode\CodeSuppository\include\common\snippets\NvAtomic.h
+copy \GoogleCode\CodeSuppository\include\common\snippets\NvBasicTemplates.h
+copy \GoogleCode\CodeSuppository\include\common\snippets\NvBitUtils.h
+copy \GoogleCode\CodeSuppository\include\common\snippets\NvFastMemory.h
+
+copy \GoogleCode\CodeSuppository\include\common\snippets\NvHash.h
+copy \GoogleCode\CodeSuppository\include\common\snippets\NvHashInternals.h
+copy \GoogleCode\CodeSuppository\include\common\snippets\NvHashMap.h
+copy \GoogleCode\CodeSuppository\include\common\snippets\NvHashSet.h
+copy \GoogleCode\CodeSuppository\include\common\snippets\NvInlineAllocator.h
+copy \GoogleCode\CodeSuppository\include\common\snippets\NvIntrinsics_Windows.h
+copy \GoogleCode\CodeSuppository\include\common\snippets\NvPool.h
+copy \GoogleCode\CodeSuppository\include\common\snippets\NvSList.h
+copy \GoogleCode\CodeSuppository\include\common\snippets\NvSort.h
+copy \GoogleCode\CodeSuppository\include\common\snippets\NvNoCopy.h
+copy \GoogleCode\CodeSuppository\include\common\snippets\NvSortInternals.h
+copy \GoogleCode\CodeSuppository\include\common\snippets\NvStrideIterator.h
+copy \GoogleCode\CodeSuppository\include\common\snippets\NvUserAllocated.h
+copy \GoogleCode\CodeSuppository\include\common\snippets\NvUtilities.h
+copy \GoogleCode\CodeSuppository\include\common\snippets\NxMath.h
+copy \GoogleCode\CodeSuppository\include\common\snippets\NxUserAllocator.h
+copy \GoogleCode\CodeSuppository\include\common\snippets\nvstl.cpp
 cd ..
 
 cd ..

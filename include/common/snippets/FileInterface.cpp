@@ -76,11 +76,10 @@
 #define DEFAULT_BUFFER_SIZE 8192
 #define BUFFER_GROW_SIZE    1000000 // grow in 1 MB chunks
 
-#if defined(LINUX)
-#include "linux_compat.h"
-#endif
+namespace NVSHARE
+{
 
-class MemoryBlock
+class MemoryBlock : public Memalloc
 {
 public:
   MemoryBlock(size_t size)
@@ -136,7 +135,7 @@ public:
 
 };
 
-class _FILE_INTERFACE
+class _FILE_INTERFACE : public Memalloc
 {
 public:
 	_FILE_INTERFACE(const char *fname,const char *spec,void *mem,size_t len)
@@ -181,7 +180,7 @@ public:
       while ( mb )
       {
         MemoryBlock *next = mb->mNextBlock;
-        MEMALLOC_DELETE(MemoryBlock,mb);
+        delete mb;
         mb = next;
       }
 
@@ -229,7 +228,7 @@ public:
 #ifdef _DEBUG
       validateLen();
 #endif
-      NxU32 remaining;
+      size_t remaining;
       data = mTailBlock->write(data,size,remaining);
       while ( data )
       {
@@ -430,7 +429,7 @@ public:
       {
         dest = mb->getData(dest);
         MemoryBlock *next = mb->mNextBlock;
-        MEMALLOC_DELETE(MemoryBlock,mb);
+        delete mb;
         mb = next;
       }
 
@@ -460,9 +459,6 @@ public:
 
 };
 
-extern "C"
-{
-
 FILE_INTERFACE * fi_fopen(const char *fname,const char *spec,void *mem,size_t len)
 {
 	_FILE_INTERFACE *ret = 0;
@@ -473,7 +469,7 @@ FILE_INTERFACE * fi_fopen(const char *fname,const char *spec,void *mem,size_t le
   {
   	if ( ret->mFph == 0 )
   	{
-      MEMALLOC_DELETE(_FILE_INTERFACE,ret);
+      delete ret;
   		ret = 0;
   	}
   }
@@ -488,7 +484,7 @@ size_t  fi_fclose(FILE_INTERFACE *_file)
   if ( _file )
   {
     _FILE_INTERFACE *file = (_FILE_INTERFACE *)_file;
-    MEMALLOC_DELETE(_FILE_INTERFACE,file);
+    delete file;
   }
   return ret;
 }
@@ -632,5 +628,5 @@ void *     fi_getMemBuffer(FILE_INTERFACE *_fph,size_t *outputLength)
 	return ret;
 }
 
-}; // end of extern C
+}; // end of namespace
 

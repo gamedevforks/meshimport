@@ -70,7 +70,7 @@ inline NxU8 *getLocalFile(const char *filename,NxU32 &len)
     fseek(fph,0L,SEEK_END);
     len = ftell(fph);
     fseek(fph,0L,SEEK_SET);
-    NxU8 *mem = MEMALLOC_NEW_ARRAY(NxU8,len)[len];
+    NxU8 *mem = (NxU8 *)MEMALLOC_MALLOC(len);
     NxU32 l = fread(mem,len,1,fph);
     if ( l == 0 )
     {

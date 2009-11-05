@@ -104,6 +104,9 @@
  *  line of data should be zero-byte terminated.
 */
 
+namespace NVSHARE
+{
+
 class FileSystem;
 
 class InPlaceParserInterface
@@ -254,5 +257,7 @@ private:
 	char           mQuoteChar;
 	const char *argv[MAXARGS];
 };
+
+}; // end of namespace
 
 #endif

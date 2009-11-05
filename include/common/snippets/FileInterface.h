@@ -2,10 +2,10 @@
 
 #define FILE_INTERFACE_H
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+#include "UserMemAlloc.h"
 
+namespace NVSHARE
+{
 
 typedef struct
 {
@@ -28,8 +28,6 @@ void             fi_clearerr(FILE_INTERFACE *fph);
 void *           fi_getMemBuffer(FILE_INTERFACE *fph,size_t *outputLength);  // return the buffer and length of the file.
 
 
-#ifdef __cplusplus
-}
-#endif
+}; // end of namespace
 
 #endif

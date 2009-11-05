@@ -4,6 +4,7 @@
 #include <assert.h>
 #include <math.h>
 
+#include "UserMemAlloc.h"
 #include "FloatMath.h"
 #include "MeshImport.h"
 #include "UserMemAlloc.h"
@@ -11,10 +12,10 @@
 
 #pragma warning(disable:4100 4189 4996)
 
-namespace MESHIMPORT
+namespace NVSHARE
 {
 
-struct AnimInfo
+struct AnimInfo : public Memalloc
 {
 	char	mName[64];
 	char	mGroup[64];    // Animation's group name
@@ -30,14 +31,14 @@ struct AnimInfo
 	NxI32	mNumRawFrames;         // NumRawFrames and AnimRate dictate tracktime...
 };
 
-struct AnimKey
+struct AnimKey : public Memalloc
 {
 	NxF32	mPosition[3];
 	NxF32	mOrientation[4];
 	NxF32	mTime;
 };
 
-struct Header
+struct Header : public Memalloc
 {
     char  mChunkName[20];
     NxI32 mType;
@@ -45,14 +46,14 @@ struct Header
     NxI32 mCount;
 };
 
-struct Vector
+struct Vector : public Memalloc
 {
     NxF32 x;
     NxF32 y;
     NxF32 z;
 };
 
-struct Vertex
+struct Vertex : public Memalloc
 {
     NxU16 mIndex;
     NxF32 mTexel[2];
@@ -60,7 +61,7 @@ struct Vertex
     NxU8  mUnused;
 };
 
-struct Triangle
+struct Triangle : public Memalloc
 {
     NxU16 mWedgeIndex[3];
     NxU8  mMaterialIndex;
@@ -68,7 +69,7 @@ struct Triangle
     NxU32 mSmoothingGroups;
 };
 
-struct Material
+struct Material : public Memalloc
 {
     char mMaterialName[64];
     NxI32 mTextureIndex;
@@ -79,7 +80,7 @@ struct Material
     NxI32 mLodStyle;
 };
 
-struct Bone
+struct Bone : public Memalloc
 {
     char  mName[64];
     NxU32 mFlags;
@@ -93,14 +94,14 @@ struct Bone
     NxF32 mZSize;
 };
 
-struct BoneInfluence
+struct BoneInfluence : public Memalloc
 {
     NxF32 mWeight;
     NxI32 mVertexIndex;
     NxI32 mBoneIndex;
 };
 
-class DeformVector
+class DeformVector : public Memalloc
 {
 public:
     DeformVector(void)
@@ -125,14 +126,14 @@ public:
 
 #define IMPORT_SCALE (1.0f/50.0f)
 
-class MeshImporterPSK : public MeshImporter
+class MeshImporterPSK : public MeshImporter, public Memalloc
 {
 public:
   MeshImporterPSK(void)
   {
   }
 
-  ~MeshImporterPSK(void)
+  virtual ~MeshImporterPSK(void)
   {
   }
 
@@ -266,7 +267,7 @@ public:
            ma.mFrameCount = ainfo->mNumRawFrames;
 		   ma.mDtime = 1.0f / (NxF32)(ainfo->mAnimRate);
            ma.mDuration = ma.mDtime*ainfo->mNumRawFrames;
-           ma.mTracks = MEMALLOC_NEW_ARRAY(MeshAnimTrack *,ma.mTrackCount)[ma.mTrackCount];
+           ma.mTracks = (MeshAnimTrack **)MEMALLOC_MALLOC(sizeof(MeshAnimTrack *)*ma.mTrackCount);
 
            for (NxI32 i=0; i<ma.mTrackCount; i++)
            {
@@ -278,7 +279,7 @@ public:
              track->mFrameCount = ma.mFrameCount;
              track->mDuration   = ma.mDuration;
 			 track->mDtime      = ma.mDtime;
-             track->mPose       = MEMALLOC_NEW_ARRAY(MeshAnimPose,track->mFrameCount)[track->mFrameCount];
+             track->mPose       = MEMALLOC_NEW(MeshAnimPose)[track->mFrameCount];
 
              for (NxI32 j=0; j<ma.mFrameCount; j++)
              {
@@ -311,10 +312,10 @@ public:
           for (NxI32 i=0; i<ma.mTrackCount; i++)
           {
             MeshAnimTrack *track = ma.mTracks[i];
-            MEMALLOC_DELETE_ARRAY(MeshAnimPose,track->mPose);
-            MEMALLOC_DELETE(MeshAnimTrack,track);
+            delete []track->mPose;
+            delete track;
           }
-          MEMALLOC_DELETE_ARRAY(MeshAnimTrack *,ma.mTracks);
+          delete []ma.mTracks;
           appResource->releaseApplicationResource(mem);
         }
       }
@@ -377,7 +378,7 @@ public:
         MeshSkeleton *ms = MEMALLOC_NEW(MeshSkeleton);
         ms->mName = meshName;
         ms->mBoneCount = bonesHeader->mCount;
-        ms->mBones = MEMALLOC_NEW_ARRAY(MeshBone,ms->mBoneCount)[ms->mBoneCount];
+        ms->mBones = MEMALLOC_NEW(MeshBone)[ms->mBoneCount];
         for (NxI32 i=0; i<ms->mBoneCount; i++)
         {
             MeshBone &dest = ms->mBones[i];
@@ -406,13 +407,13 @@ public:
 
         }
         callback->importSkeleton(*ms);
-        MEMALLOC_DELETE_ARRAY(MeshBone,ms->mBones);
-        MEMALLOC_DELETE(MeshSkeleton,ms);
+        delete []ms->mBones;
+        delete ms;
       }
 
       assert( scan == end );
 
-      DeformVector *dvertices = MEMALLOC_NEW_ARRAY(DeformVector,positionsHeader->mCount)[positionsHeader->mCount];
+      DeformVector *dvertices = MEMALLOC_NEW(DeformVector)[positionsHeader->mCount];
 
       for (NxI32 i=0; i<boneInfluencesHeader->mCount; i++)
       {
@@ -506,7 +507,7 @@ public:
       }
 
 
-      MEMALLOC_DELETE_ARRAY(DeformVector,dvertices);
+      delete []dvertices;
       MEMALLOC_FREE(data);
 
 	  return ret;
@@ -524,7 +525,7 @@ MeshImporter * createMeshImportPSK(void)
 void           releaseMeshImportPSK(MeshImporter *iface)
 {
     MeshImporterPSK *p = static_cast< MeshImporterPSK *>(iface);
-    MEMALLOC_DELETE(MeshImporterPSK,p);
+    delete p;
 }
 
 

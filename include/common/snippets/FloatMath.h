@@ -72,6 +72,9 @@
 
 #include <float.h>
 
+namespace NVSHARE
+{
+
 enum FM_ClipState
 {
   FMCS_XMIN       = (1<<0),
@@ -335,8 +338,8 @@ NxF64 fm_distancePointLineSegment(const NxF64 Point[3],const NxF64 LineStart[3],
 bool fm_colinear(const NxF64 p1[3],const NxF64 p2[3],const NxF64 p3[3],NxF64 epsilon=0.999);               // true if these three points in a row are co-linear
 bool fm_colinear(const NxF32  p1[3],const NxF32  p2[3],const NxF32 p3[3],NxF32 epsilon=0.999f);
 
-bool fm_colinear(const NxF32 a1[3],const NxF32 a2[3],const NxF32 b1[3],const NxF32 b2[3]);  // true if these two line segments are co-linear.
-bool fm_colinear(const NxF64 a1[3],const NxF64 a2[3],const NxF64 b1[3],const NxF64 b2[3]);  // true if these two line segments are co-linear.
+bool fm_colinear(const NxF32 a1[3],const NxF32 a2[3],const NxF32 b1[3],const NxF32 b2[3],NxF32 epsilon=0.999f);  // true if these two line segments are co-linear.
+bool fm_colinear(const NxF64 a1[3],const NxF64 a2[3],const NxF64 b1[3],const NxF64 b2[3],NxF64 epsilon=0.999);  // true if these two line segments are co-linear.
 
 enum IntersectResult
 {
@@ -444,6 +447,7 @@ void             fm_releaseVertexIndex(fm_VertexIndex *vindex);
 
 
 
+#if 0 // currently disabled
 
 class fm_LineSegment
 {
@@ -463,6 +467,7 @@ public:
   NxU32 mE2;
 };
 
+
 // LineSweep *only* supports doublees.  As a geometric operation it needs as much precision as possible.
 class fm_LineSweep
 {
@@ -480,6 +485,7 @@ public:
 fm_LineSweep * fm_createLineSweep(void);
 void           fm_releaseLineSweep(fm_LineSweep *sweep);
 
+#endif
 
 class fm_Triangulate
 {
@@ -582,5 +588,7 @@ void fm_computeMeanNormals(NxU32 vcount,       // the number of vertices
 
 bool fm_isValidTriangle(const NxF32 *p1,const NxF32 *p2,const NxF32 *p3,NxF32 epsilon=0.00001f);
 bool fm_isValidTriangle(const NxF64 *p1,const NxF64 *p2,const NxF64 *p3,NxF64 epsilon=0.00001f);
+
+}; // end of namespace
 
 #endif

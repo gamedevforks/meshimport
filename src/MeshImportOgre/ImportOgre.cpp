@@ -3,6 +3,7 @@
 #include <string.h>
 #include <stdarg.h>
 #include <assert.h>
+#include <vector>
 
 #pragma warning(disable:4702) // disabling a warning that only shows up when building VC7
 
@@ -11,16 +12,17 @@
 #include "stringdict.h"
 #include "sutil.h"
 #include "FastXml.h"
+#include "UserMemAlloc.h"
 
 #pragma warning(disable:4100)
 #pragma warning(disable:4996)
 
 #define DEBUG_LOG 1
 
-namespace MESHIMPORT
+namespace NVSHARE
 {
 
-class MyKeyFrame
+class MyKeyFrame : public Memalloc
 {
 public:
   MyKeyFrame(NxF32 t)
@@ -78,9 +80,9 @@ public:
   NxF32  mScale[3];
 };
 
-typedef USER_STL::vector< MyKeyFrame *> MyKeyFrameVector;
+typedef std::vector< MyKeyFrame *> MyKeyFrameVector;
 
-class MyAnimTrack
+class MyAnimTrack : public Memalloc
 {
 public:
   MyAnimTrack(const char *name)
@@ -97,9 +99,9 @@ public:
     for (i=mKeys.begin(); i!=mKeys.end(); ++i)
     {
       MyKeyFrame *m = (*i);
-      MEMALLOC_DELETE(MyKeyFrame,m);
+      delete m;
     }
-    MEMALLOC_DELETE_ARRAY(MeshAnimPose,mTrack.mPose);
+    delete []mTrack.mPose;
   }
 
   void addKey(NxF32 t)
@@ -116,7 +118,7 @@ public:
     mTrack.mFrameCount = mKeys.size();
     mTrack.mDuration = mDuration;
     mTrack.mDtime    = mDtime;
-    mTrack.mPose = MEMALLOC_NEW_ARRAY(MeshAnimPose,mTrack.mFrameCount)[mTrack.mFrameCount];
+    mTrack.mPose = MEMALLOC_NEW(MeshAnimPose)[mTrack.mFrameCount];
     for (NxI32 i=0; i<mTrack.mFrameCount; i++)
     {
       MeshAnimPose &dst = mTrack.mPose[i];
@@ -134,10 +136,10 @@ public:
   NxF32            mDuration;
 };
 
-typedef USER_STL::vector< MeshBone > MeshBoneVector;
-typedef USER_STL::vector< MyAnimTrack * > MyAnimTrackVector;
+typedef std::vector< MeshBone > MeshBoneVector;
+typedef std::vector< MyAnimTrack * > MyAnimTrackVector;
 
-class Face
+class Face : public Memalloc
 {
 public:
   NxI32 v1;
@@ -145,7 +147,7 @@ public:
   NxI32 v3;
 };
 
-class MySubMesh
+class MySubMesh : public Memalloc
 {
 public:
   MySubMesh(NxI32 fcount,const StringRef &material)
@@ -153,11 +155,11 @@ public:
     mMaterial = material;
     mFaceCount = fcount;
     mFaceIndex = -1;
-    mFaces = MEMALLOC_NEW_ARRAY(Face,mFaceCount)[mFaceCount];
+    mFaces = MEMALLOC_NEW(Face)[mFaceCount];
   }
   ~MySubMesh(void)
   {
-    MEMALLOC_DELETE_ARRAY(Face,mFaces);
+    delete []mFaces;
   }
 
   void transmit(const char *fname,MeshImportInterface *callback,const MeshVertex *buffer,NxI32 vertex_count,NxU32 vertex_flags)
@@ -184,7 +186,7 @@ public:
   Face     *mFaces;
 };
 
-typedef USER_STL::vector< MySubMesh *> MySubMeshVector;
+typedef std::vector< MySubMesh *> MySubMeshVector;
 
 enum OperationType
 {
@@ -267,7 +269,7 @@ enum NodeAttribute
 };
 
 
-class MeshImportOgre : public MeshImporter, public FastXmlInterface
+class MeshImportOgre : public MeshImporter, public FastXmlInterface, public Memalloc
 {
 public:
   MeshImportOgre(void)
@@ -362,7 +364,7 @@ public:
 
   }
 
-  ~MeshImportOgre(void)
+  virtual ~MeshImportOgre(void)
   {
     release();
   }
@@ -385,7 +387,7 @@ public:
 
   void release(void)
   {
-    MEMALLOC_DELETE_ARRAY(MeshVertex,mVertexBuffer);
+    delete []mVertexBuffer;
     mVertexBuffer = 0;
     mVertexIndex = 0;
 
@@ -393,7 +395,7 @@ public:
     for (i=mSubMeshes.begin(); i!=mSubMeshes.end(); i++)
     {
       MySubMesh *m = (*i);
-      MEMALLOC_DELETE(MySubMesh,m);
+      delete m;
     }
     mSubMeshes.clear();
     mCurrentSubMesh = 0;
@@ -457,10 +459,10 @@ public:
           MeshSkeleton s;
           s.SetName( mSkeletonName.Get() );
           s.mBoneCount = mBones.size();
-          s.mBones = MEMALLOC_NEW_ARRAY(MeshBone,s.mBoneCount)[s.mBoneCount];
+          s.mBones = MEMALLOC_NEW(MeshBone)[s.mBoneCount];
           memcpy(s.mBones,&mBones[0],sizeof(MeshBone)*s.mBoneCount);
           callback->importSkeleton(s);
-          MEMALLOC_DELETE_ARRAY(MeshBone,s.mBones);
+          delete []s.mBones;
         }
 
         flushAnimation();
@@ -502,7 +504,7 @@ public:
       mAnimation->mTrackCount = mAnimTracks.size();
       if ( !mAnimTracks.empty() )
       {
-        mAnimation->mTracks = MEMALLOC_NEW_ARRAY(MeshAnimTrack *,mAnimation->mTrackCount)[mAnimation->mTrackCount];
+        mAnimation->mTracks = (MeshAnimTrack **)MEMALLOC_MALLOC(sizeof(MeshAnimTrack *)*mAnimation->mTrackCount);
         for (NxI32 i=0; i<mAnimation->mTrackCount; i++)
         {
           MyAnimTrack *mat = mAnimTracks[i];
@@ -513,16 +515,16 @@ public:
 
       mCallback->importAnimation(*mAnimation);
 
-      MEMALLOC_DELETE_ARRAY(MeshAnimTrack *,mAnimation->mTracks);
+      MEMALLOC_FREE(mAnimation->mTracks);
 
     }
-    MEMALLOC_DELETE(MeshAnimation,mAnimation);
+    delete mAnimation;
     mAnimation = 0;
     MyAnimTrackVector::iterator i;
     for (i=mAnimTracks.begin(); i!=mAnimTracks.end(); ++i)
     {
       MyAnimTrack *mat = (*i);
-      MEMALLOC_DELETE(MyAnimTrack,mat);
+      delete mat;
     }
     mAnimTracks.clear();
     mCurrentAnimTrack = 0;
@@ -627,13 +629,13 @@ public:
       case NA_VERTEX_COUNT:
         if ( mElement == NE_SHARED_GEOMETRY )
         {
-          MEMALLOC_DELETE_ARRAY(MeshVertex,mVertexBuffer);
+          delete []mVertexBuffer;
           mVertexBuffer = 0;
           mVertexCount = atoi( savalue );
           if ( mVertexCount > 0 )
           {
             mVertexIndex = -1;
-            mVertexBuffer = MEMALLOC_NEW_ARRAY(MeshVertex,mVertexCount)[mVertexCount];
+            mVertexBuffer = MEMALLOC_NEW(MeshVertex)[mVertexCount];
           }
         }
         break;
@@ -1064,7 +1066,7 @@ MeshImporter * createMeshImportOgre(void)
 void         releaseMeshImportOgre(MeshImporter *iface)
 {
   MeshImportOgre *m = static_cast< MeshImportOgre *>(iface);
-  MEMALLOC_DELETE(MeshImportOgre,m);
+  delete m;
 }
 
 };// end of namespace

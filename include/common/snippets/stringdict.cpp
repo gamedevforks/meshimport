@@ -61,7 +61,11 @@
 
 #include "stringdict.h"
 
+namespace NVSHARE
+{
 
 StringDict *gStringDict=0;
 
 const char *emptystring = "";
+
+}; // end of namespace

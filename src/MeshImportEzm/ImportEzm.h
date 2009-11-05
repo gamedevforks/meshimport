@@ -2,7 +2,9 @@
 
 #define IMPORT_EZM_H
 
-namespace MESHIMPORT
+#include "UserMemAlloc.h"
+
+namespace NVSHARE
 {
 
 class MeshImporter;

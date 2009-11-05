@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <assert.h>
+#include <map>
 
 #include "MeshImportBuilder.h"
 #include "VtxWeld.h"
@@ -13,15 +14,15 @@
 
 #pragma warning(disable:4100 4189)
 
-namespace MESHIMPORT
+namespace NVSHARE
 {
 
-typedef USER_STL::vector< MeshVertex >   MeshVertexVector;
-typedef USER_STL::vector< NxU32 > MeshIndexVector;
-typedef USER_STL::vector< SubMesh * >    SubMeshVector;
-typedef USER_STL::vector< Mesh * >       MeshVector;
-typedef USER_STL::vector< MeshAnimation * > MeshAnimationVector;
-typedef USER_STL::vector< MeshSkeleton * > MeshSkeletonVector;
+typedef std::vector< MeshVertex >   MeshVertexVector;
+typedef std::vector< NxU32 > MeshIndexVector;
+typedef std::vector< SubMesh * >    SubMeshVector;
+typedef std::vector< Mesh * >       MeshVector;
+typedef std::vector< MeshAnimation * > MeshAnimationVector;
+typedef std::vector< MeshSkeleton * > MeshSkeletonVector;
 
 static NxI32 gSerializeFrame=1;
 
@@ -75,7 +76,7 @@ void validate(const MeshVertex &v)
 
 }
 
-class MySubMesh : public SubMesh
+class MySubMesh : public SubMesh, public Memalloc
 {
 public:
   MySubMesh(const char *mat,NxU32 vertexFlags)
@@ -99,7 +100,7 @@ public:
 
   void gather(void)
   {
-    mTriCount = mMyIndices.size()/3;
+    mTriCount = (NxU32)mMyIndices.size()/3;
     mIndices  = &mMyIndices[0];
   }
 
@@ -122,7 +123,7 @@ public:
   VertexPool< MeshVertex > mVertexPool;
 };
 
-class MyMesh : public Mesh
+class MyMesh : public Mesh, public Memalloc
 {
 public:
   MyMesh(const char *meshName,const char *skeletonName)
@@ -132,7 +133,7 @@ public:
     mCurrent = 0;
   }
 
-  ~MyMesh(void)
+  virtual ~MyMesh(void)
   {
     release();
   }
@@ -242,7 +243,7 @@ public:
     mSubMeshCount = 0;
     if ( !mMySubMeshes.empty() )
     {
-      mSubMeshCount = mMySubMeshes.size();
+      mSubMeshCount = (NxU32)mMySubMeshes.size();
       mSubMeshes    = &mMySubMeshes[0];
       for (NxU32 i=0; i<mSubMeshCount; i++)
       {
@@ -273,11 +274,11 @@ public:
   SubMeshVector   mMySubMeshes;
 };
 
-typedef USER_STL::map< StringRef, StringRef > StringRefMap;
-typedef USER_STL::vector< MeshMaterial >      MeshMaterialVector;
-typedef USER_STL::vector< MeshInstance >      MeshInstanceVector;
-typedef USER_STL::vector< MyMesh *>           MyMeshVector;
-typedef USER_STL::vector< MeshCollision * >   MeshCollisionVector;
+typedef std::map< StringRef, StringRef > StringRefMap;
+typedef std::vector< MeshMaterial >      MeshMaterialVector;
+typedef std::vector< MeshInstance >      MeshInstanceVector;
+typedef std::vector< MyMesh *>           MyMeshVector;
+typedef std::vector< MeshCollision * >   MeshCollisionVector;
 
 class MyMeshCollisionRepresentation : public MeshCollisionRepresentation
 {
@@ -296,24 +297,24 @@ public:
       if ( mc->getType() == MCT_CONVEX )
       {
         MeshCollisionConvex *mcc = static_cast< MeshCollisionConvex *>(mc);
-        MEMALLOC_DELETE_ARRAY(NxF32,mcc->mVertices);
-        MEMALLOC_DELETE_ARRAY(NxU32,mcc->mIndices);
+        delete []mcc->mVertices;
+        delete []mcc->mIndices;
       }
     }
   }
 
   void gather(void)
   {
-    mCollisionCount = mGeometries.size();
+    mCollisionCount = (NxU32)mGeometries.size();
     mCollisionGeometry = &mGeometries[0];
   }
 
   MeshCollisionVector mGeometries;
 };
 
-typedef USER_STL::vector< MeshCollisionRepresentation * > MeshCollisionRepresentationVector;
+typedef std::vector< MeshCollisionRepresentation * > MeshCollisionRepresentationVector;
 
-class MyMeshBuilder : public MeshBuilder
+class MyMeshBuilder : public MeshBuilder, public Memalloc
 {
 public:
   MyMeshBuilder(KeyValueIni *ini,const char *meshName,const void *data,NxU32 dlen,MeshImporter *mi,const char *options,MeshImportApplicationResource *appResource)
@@ -338,9 +339,9 @@ public:
   }
 
 
-  ~MyMeshBuilder(void)
+  virtual ~MyMeshBuilder(void)
   {
-    MEMALLOC_DELETE_ARRAY(Mesh *,mMeshes);
+    delete []mMeshes;
     MyMeshVector::iterator i;
     for (i=mMyMeshes.begin(); i!=mMyMeshes.end(); ++i)
     {
@@ -357,11 +358,11 @@ public:
         for (NxI32 j=0; j<a->mTrackCount; j++)
         {
           MeshAnimTrack *ma = a->mTracks[j];
-          MEMALLOC_DELETE_ARRAY(MeshAnimPose,ma->mPose);
-          MEMALLOC_DELETE(MeshAnimTrack,ma);
+          delete []ma->mPose;
+          delete ma;
         }
-        MEMALLOC_DELETE_ARRAY(MeshAnimTrack *,a->mTracks);
-        MEMALLOC_DELETE(MeshAnimation,a);
+        delete []a->mTracks;
+        delete a;
       }
     }
 
@@ -371,8 +372,8 @@ public:
       for (i=mMySkeletons.begin(); i!=mMySkeletons.end(); ++i)
       {
         MeshSkeleton *s = (*i);
-        MEMALLOC_DELETE_ARRAY(MeshBone,s->mBones);
-        MEMALLOC_DELETE(MeshSkeleton,s);
+        delete []s->mBones;
+        delete s;
       }
     }
     if ( !mCollisionReps.empty() )
@@ -391,28 +392,28 @@ public:
 
     gatherMaterials();
     // todo..
-    mMaterialCount = mMyMaterials.size();
+    mMaterialCount = (NxU32)mMyMaterials.size();
 
     if ( mMaterialCount )
       mMaterials     = &mMyMaterials[0];
     else
       mMaterials = 0;
 
-    mMeshInstanceCount = mMyMeshInstances.size();
+    mMeshInstanceCount = (NxU32)mMyMeshInstances.size();
 
     if ( mMeshInstanceCount )
       mMeshInstances = &mMyMeshInstances[0];
     else
       mMeshInstances = 0;
 
-    mAnimationCount = mMyAnimations.size();
+    mAnimationCount = (NxU32)mMyAnimations.size();
     if ( mAnimationCount )
       mAnimations = &mMyAnimations[0];
     else
       mAnimations = 0;
 
     NxI32 bone_count = 0;
-    mSkeletonCount = mMySkeletons.size();
+    mSkeletonCount = (NxU32)mMySkeletons.size();
     if ( mSkeletonCount )
     {
       mSkeletons = &mMySkeletons[0];
@@ -421,11 +422,11 @@ public:
     else
       mSkeletons = 0;
 
-    mMeshCount = mMyMeshes.size();
+    mMeshCount = (NxU32)mMyMeshes.size();
     if ( mMeshCount )
     {
-      MEMALLOC_DELETE_ARRAY(Mesh *,mMeshes);
-      mMeshes    = MEMALLOC_NEW_ARRAY(Mesh *,mMeshCount)[mMeshCount];
+      delete []mMeshes;
+      mMeshes    = (Mesh **)MEMALLOC_MALLOC(sizeof(Mesh *)*mMeshCount);
       Mesh **dst = mMeshes;
       MyMeshVector::iterator i;
       for (i=mMyMeshes.begin(); i!=mMyMeshes.end(); ++i)
@@ -440,7 +441,7 @@ public:
       mMeshes = 0;
     }
 
-    mMeshCollisionCount = mCollisionReps.size();
+    mMeshCollisionCount = (NxU32)mCollisionReps.size();
 
     if ( mMeshCollisionCount )
     {
@@ -462,7 +463,7 @@ public:
   void gatherMaterials(void)
   {
     mMyMaterials.clear();
-    NxU32 mcount = mMaterialMap.size();
+    NxU32 mcount = (NxU32)mMaterialMap.size();
     mMyMaterials.reserve(mcount);
     StringRefMap::iterator i;
     for (i=mMaterialMap.begin(); i!=mMaterialMap.end(); ++i)
@@ -595,7 +596,7 @@ public:
     a->mFrameCount = animation.mFrameCount;
     a->mDuration = animation.mDuration;
     a->mDtime = animation.mDtime;
-    a->mTracks = MEMALLOC_NEW_ARRAY(MeshAnimTrack *,a->mTrackCount)[a->mTrackCount];
+    a->mTracks = (MeshAnimTrack **)MEMALLOC_MALLOC(sizeof(MeshAnimTrack *)*a->mTrackCount);
     for (NxI32 i=0; i<a->mTrackCount; i++)
     {
       const MeshAnimTrack &src =*animation.mTracks[i];
@@ -604,7 +605,7 @@ public:
       t->mFrameCount = src.mFrameCount;
       t->mDuration = src.mDuration;
       t->mDtime = src.mDtime;
-      t->mPose = MEMALLOC_NEW_ARRAY(MeshAnimPose,t->mFrameCount)[t->mFrameCount];
+      t->mPose = MEMALLOC_NEW(MeshAnimPose)[t->mFrameCount];
       memcpy(t->mPose,src.mPose,sizeof(MeshAnimPose)*t->mFrameCount);
       a->mTracks[i] = t;
     }
@@ -619,7 +620,7 @@ public:
     sk->mBones = 0;
     if ( sk->mBoneCount > 0 )
     {
-      sk->mBones = MEMALLOC_NEW_ARRAY(MeshBone,sk->mBoneCount)[sk->mBoneCount];
+      sk->mBones = MEMALLOC_NEW(MeshBone)[sk->mBoneCount];
       MeshBone *dest = sk->mBones;
       const MeshBone *src = skeleton.mBones;
       for (NxU32 i=0; i<(NxU32)sk->mBoneCount; i++)
@@ -785,13 +786,13 @@ public:
     c->mVertexCount = vertex_count;
     if ( c->mVertexCount )
     {
-      c->mVertices = MEMALLOC_NEW_ARRAY(NxF32,vertex_count*3)[vertex_count*3];
+      c->mVertices = (NxF32 *)MEMALLOC_MALLOC(sizeof(NxF32)*vertex_count*3);
       memcpy(c->mVertices,vertices,sizeof(NxF32)*vertex_count*3);
     }
     c->mTriCount = tri_count;
     if ( c->mTriCount )
     {
-      c->mIndices = MEMALLOC_NEW_ARRAY(NxU32,tri_count*3)[tri_count*3];
+      c->mIndices = (NxU32 *)MEMALLOC_MALLOC(sizeof(NxU32)*tri_count*3);
       memcpy(c->mIndices,indices,sizeof(NxU32)*tri_count*3);
     }
     MeshCollision *mc = static_cast< MeshCollision *>(c);
@@ -978,7 +979,7 @@ MeshBuilder * createMeshBuilder(MeshImportApplicationResource *appResource)
 void          releaseMeshBuilder(MeshBuilder *m)
 {
   MyMeshBuilder *b = static_cast< MyMeshBuilder *>(m);
-  MEMALLOC_DELETE(MyMsehImportBuilder,b);
+  delete b;
 }
 
 }; // end of namesapace

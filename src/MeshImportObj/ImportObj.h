@@ -2,8 +2,9 @@
 
 #define IMPORT_OBJ_H
 
+#include "UserMemAlloc.h"
 
-namespace MESHIMPORT
+namespace NVSHARE
 {
 
 class MeshImporter;
