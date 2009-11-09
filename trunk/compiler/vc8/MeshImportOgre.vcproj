@@ -192,22 +192,6 @@
 			</File>
 		</Filter>
 		<Filter
-			Name="Plugin Header Files"
-			>
-			<Filter
-				Name="MeshImport"
-				>
-				<File
-					RelativePath="..\..\include\MeshImport\MeshImport.h"
-					>
-				</File>
-				<File
-					RelativePath="..\..\include\MeshImport\MeshSystem.h"
-					>
-				</File>
-			</Filter>
-		</Filter>
-		<Filter
 			Name="Common Include-Binding Files"
 			>
 			<Filter

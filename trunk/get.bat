@@ -58,6 +58,8 @@ cd ..
 
 md snippets
 cd snippets
+copy \GoogleCode\CodeSuppository\include\common\snippets\MeshImport.cpp
+copy \GoogleCode\CodeSuppository\include\common\snippets\MeshImport.h
 copy \GoogleCode\CodeSuppository\include\common\snippets\UserMemAlloc.h
 copy \GoogleCode\CodeSuppository\include\common\snippets\KeyValue.h
 copy \GoogleCode\CodeSuppository\include\common\snippets\KeyValue.cpp

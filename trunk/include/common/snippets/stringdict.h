@@ -14,7 +14,7 @@ namespace NVSHARE
 
 extern const char *emptystring;
 
-class StringRef
+class StringRef : public Memalloc
 {
 public:
 	StringRef(void)

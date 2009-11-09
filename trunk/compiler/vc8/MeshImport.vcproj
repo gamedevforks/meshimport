@@ -4,7 +4,6 @@
 	Version="8.00"
 	Name="MeshImport"
 	ProjectGUID="{082FBBBD-9532-5712-DF18-A054AE91C0F0}"
-	RootNamespace="MeshImport"
 	>
 	<Platforms>
 		<Platform
@@ -205,18 +204,6 @@
 			</File>
 			<File
 				RelativePath="..\..\src\MeshImport\VtxWeld.h"
-				>
-			</File>
-		</Filter>
-		<Filter
-			Name="Public Header Files"
-			>
-			<File
-				RelativePath="..\..\include\MeshImport\MeshImport.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\include\MeshImport\MeshSystem.h"
 				>
 			</File>
 		</Filter>
