@@ -308,6 +308,7 @@ public:
         v.mInterp1[0] = scan[0];
         v.mInterp1[1] = scan[1];
         v.mInterp1[2] = scan[2];
+        v.mInterp1[3] = scan[3];
         src+=sizeof(NxF32)*3;
       }
       else if ( stricmp(type,"interp2") == 0 )
@@ -316,6 +317,7 @@ public:
         v.mInterp2[0] = scan[0];
         v.mInterp2[1] = scan[1];
         v.mInterp2[2] = scan[2];
+        v.mInterp2[3] = scan[3];
         src+=sizeof(NxF32)*3;
       }
       else if ( stricmp(type,"interp3") == 0 )
@@ -324,6 +326,7 @@ public:
         v.mInterp3[0] = scan[0];
         v.mInterp3[1] = scan[1];
         v.mInterp3[2] = scan[2];
+        v.mInterp3[3] = scan[3];
         src+=sizeof(NxF32)*3;
       }
       else if ( stricmp(type,"interp4") == 0 )
@@ -332,6 +335,7 @@ public:
         v.mInterp4[0] = scan[0];
         v.mInterp4[1] = scan[1];
         v.mInterp4[2] = scan[2];
+        v.mInterp4[3] = scan[3];
         src+=sizeof(NxF32)*3;
       }
       else if ( stricmp(type,"interp5") == 0 )
@@ -340,6 +344,7 @@ public:
         v.mInterp5[0] = scan[0];
         v.mInterp5[1] = scan[1];
         v.mInterp5[2] = scan[2];
+        v.mInterp5[3] = scan[3];
         src+=sizeof(NxF32)*3;
       }
       else if ( stricmp(type,"interp6") == 0 )
@@ -348,6 +353,7 @@ public:
         v.mInterp6[0] = scan[0];
         v.mInterp6[1] = scan[1];
         v.mInterp6[2] = scan[2];
+        v.mInterp6[3] = scan[3];
         src+=sizeof(NxF32)*3;
       }
       else if ( stricmp(type,"interp7") == 0 )
@@ -356,6 +362,7 @@ public:
         v.mInterp7[0] = scan[0];
         v.mInterp7[1] = scan[1];
         v.mInterp7[2] = scan[2];
+        v.mInterp7[3] = scan[3];
         src+=sizeof(NxF32)*3;
       }
       else if ( stricmp(type,"interp8") == 0 )
@@ -364,6 +371,7 @@ public:
         v.mInterp8[0] = scan[0];
         v.mInterp8[1] = scan[1];
         v.mInterp8[2] = scan[2];
+        v.mInterp8[3] = scan[3];
         src+=sizeof(NxF32)*3;
       }
       else if ( stricmp(type,"tangent") == 0 )

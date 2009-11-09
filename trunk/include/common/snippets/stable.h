@@ -6,7 +6,7 @@
 #pragma warning(disable:4995)
 #pragma warning(disable:4996)
 
-
+#include "safestdio.h"
 #include <assert.h>
 #include <string.h>
 
@@ -182,6 +182,9 @@ private:
 };
 
 
+#ifdef __CELLOS_LV2__
+#define stdext std
+#endif
 
 class StringTable : public Memalloc, public CRC32
 {

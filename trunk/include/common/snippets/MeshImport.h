@@ -565,14 +565,14 @@ public:
     mTexel3[0] = mTexel3[1] = 0;
     mTexel4[0] = mTexel4[1] = 0;
 
-	mInterp1[0] = mInterp1[1] = mInterp1[2] = 0;
-	mInterp2[0] = mInterp2[1] = mInterp2[2] = 0;
-	mInterp3[0] = mInterp3[1] = mInterp3[2] = 0;
-	mInterp4[0] = mInterp4[1] = mInterp4[2] = 0;
-	mInterp5[0] = mInterp5[1] = mInterp5[2] = 0;
-	mInterp6[0] = mInterp6[1] = mInterp6[2] = 0;
-	mInterp7[0] = mInterp7[1] = mInterp7[2] = 0;
-	mInterp8[0] = mInterp8[1] = mInterp8[2] = 0;
+	mInterp1[0] = mInterp1[1] = mInterp1[2] = mInterp1[3] =0;
+	mInterp2[0] = mInterp2[1] = mInterp2[2] = mInterp2[3] =0;
+	mInterp3[0] = mInterp3[1] = mInterp3[2] = mInterp3[3] =0;
+	mInterp4[0] = mInterp4[1] = mInterp4[2] = mInterp4[3] =0;
+	mInterp5[0] = mInterp5[1] = mInterp5[2] = mInterp5[3] =0;
+	mInterp6[0] = mInterp6[1] = mInterp6[2] = mInterp6[3] =0;
+	mInterp7[0] = mInterp7[1] = mInterp7[2] = mInterp7[3] =0;
+	mInterp8[0] = mInterp8[1] = mInterp8[2] = mInterp8[3] =0;
 
     mTangent[0] = mTangent[1] = mTangent[2] = 0;
     mBiNormal[0] = mBiNormal[1] = mBiNormal[2] = 0;
@@ -597,14 +597,14 @@ public:
   NxF32          mTexel2[2];
   NxF32          mTexel3[2];
   NxF32          mTexel4[2];
-  NxF32          mInterp1[3];
-  NxF32          mInterp2[3];
-  NxF32          mInterp3[3];
-  NxF32          mInterp4[3];
-  NxF32          mInterp5[3];
-  NxF32          mInterp6[3];
-  NxF32          mInterp7[3];
-  NxF32          mInterp8[3];
+  NxF32          mInterp1[4];
+  NxF32          mInterp2[4];
+  NxF32          mInterp3[4];
+  NxF32          mInterp4[4];
+  NxF32          mInterp5[4];
+  NxF32          mInterp6[4];
+  NxF32          mInterp7[4];
+  NxF32          mInterp8[4];
   NxF32          mTangent[3];
   NxF32          mBiNormal[3];
   NxF32          mWeight[4];
