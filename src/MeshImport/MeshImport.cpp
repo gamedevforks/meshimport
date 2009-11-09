@@ -474,6 +474,14 @@ public:
     if ( flags & MIVF_TANGENT ) { mCtype+="fff ";  };
     if ( flags & MIVF_BINORMAL ) { mCtype+="fff ";  };
     if ( flags & MIVF_BONE_WEIGHTING ) { mCtype+="ffff hhhh ";  };
+    if ( flags & MIVF_INTERP1 ) { mCtype+="fff "; };
+    if ( flags & MIVF_INTERP2 ) { mCtype+="fff "; };
+    if ( flags & MIVF_INTERP3 ) { mCtype+="fff "; };
+    if ( flags & MIVF_INTERP4 ) { mCtype+="fff "; };
+    if ( flags & MIVF_INTERP5 ) { mCtype+="fff "; };
+    if ( flags & MIVF_INTERP6 ) { mCtype+="fff "; };
+    if ( flags & MIVF_INTERP7 ) { mCtype+="fff "; };
+    if ( flags & MIVF_INTERP8 ) { mCtype+="fff "; };
     if ( flags & MIVF_RADIUS ) mCtype+="f ";
 
     if ( !mCtype.empty() )
@@ -503,6 +511,14 @@ public:
     if ( flags & MIVF_TANGENT ) { mSemantic+="tangent ";  };
     if ( flags & MIVF_BINORMAL ) { mSemantic+="binormal ";  };
     if ( flags & MIVF_BONE_WEIGHTING ) { mSemantic+="blendweights blendindices ";  };
+    if ( flags & MIVF_INTERP1 ) { mSemantic+="interp1 "; };
+    if ( flags & MIVF_INTERP2 ) { mSemantic+="interp2 "; };
+    if ( flags & MIVF_INTERP3 ) { mSemantic+="interp3 "; };
+    if ( flags & MIVF_INTERP4 ) { mSemantic+="interp4 "; };
+    if ( flags & MIVF_INTERP5 ) { mSemantic+="interp5 "; };
+    if ( flags & MIVF_INTERP6 ) { mSemantic+="interp6 "; };
+    if ( flags & MIVF_INTERP7 ) { mSemantic+="interp7 "; };
+    if ( flags & MIVF_INTERP8 ) { mSemantic+="interp8 "; };
     if ( flags & MIVF_RADIUS ) mSemantic+="radius ";
 
     if ( !mSemantic.empty() )

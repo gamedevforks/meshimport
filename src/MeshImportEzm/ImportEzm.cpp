@@ -302,6 +302,70 @@ public:
         v.mTexel4[1] = scan[1];
         src+=sizeof(NxF32)*2;
       }
+      else if ( stricmp(type,"interp1") == 0 )
+      {
+        const NxF32 * scan = (const NxF32 *)src;
+        v.mInterp1[0] = scan[0];
+        v.mInterp1[1] = scan[1];
+        v.mInterp1[2] = scan[2];
+        src+=sizeof(NxF32)*3;
+      }
+      else if ( stricmp(type,"interp2") == 0 )
+      {
+        const NxF32 * scan = (const NxF32 *)src;
+        v.mInterp2[0] = scan[0];
+        v.mInterp2[1] = scan[1];
+        v.mInterp2[2] = scan[2];
+        src+=sizeof(NxF32)*3;
+      }
+      else if ( stricmp(type,"interp3") == 0 )
+      {
+        const NxF32 * scan = (const NxF32 *)src;
+        v.mInterp3[0] = scan[0];
+        v.mInterp3[1] = scan[1];
+        v.mInterp3[2] = scan[2];
+        src+=sizeof(NxF32)*3;
+      }
+      else if ( stricmp(type,"interp4") == 0 )
+      {
+        const NxF32 * scan = (const NxF32 *)src;
+        v.mInterp4[0] = scan[0];
+        v.mInterp4[1] = scan[1];
+        v.mInterp4[2] = scan[2];
+        src+=sizeof(NxF32)*3;
+      }
+      else if ( stricmp(type,"interp5") == 0 )
+      {
+        const NxF32 * scan = (const NxF32 *)src;
+        v.mInterp5[0] = scan[0];
+        v.mInterp5[1] = scan[1];
+        v.mInterp5[2] = scan[2];
+        src+=sizeof(NxF32)*3;
+      }
+      else if ( stricmp(type,"interp6") == 0 )
+      {
+        const NxF32 * scan = (const NxF32 *)src;
+        v.mInterp6[0] = scan[0];
+        v.mInterp6[1] = scan[1];
+        v.mInterp6[2] = scan[2];
+        src+=sizeof(NxF32)*3;
+      }
+      else if ( stricmp(type,"interp7") == 0 )
+      {
+        const NxF32 * scan = (const NxF32 *)src;
+        v.mInterp7[0] = scan[0];
+        v.mInterp7[1] = scan[1];
+        v.mInterp7[2] = scan[2];
+        src+=sizeof(NxF32)*3;
+      }
+      else if ( stricmp(type,"interp8") == 0 )
+      {
+        const NxF32 * scan = (const NxF32 *)src;
+        v.mInterp8[0] = scan[0];
+        v.mInterp8[1] = scan[1];
+        v.mInterp8[2] = scan[2];
+        src+=sizeof(NxF32)*3;
+      }
       else if ( stricmp(type,"tangent") == 0 )
       {
         const NxF32 * scan = (const NxF32 *)src;
@@ -384,7 +448,15 @@ public:
       if ( stricmp(t,"position") == 0 ||
            stricmp(t,"normal") == 0 ||
            stricmp(t,"tangent") == 0 ||
-           stricmp(t,"binormal") == 0 )
+           stricmp(t,"binormal") == 0 ||
+           stricmp(t,"interp1") == 0 ||
+           stricmp(t,"interp2") == 0 ||
+           stricmp(t,"interp3") == 0 ||
+           stricmp(t,"interp4") == 0 ||
+           stricmp(t,"interp5") == 0 ||
+           stricmp(t,"interp6") == 0 ||
+           stricmp(t,"interp7") == 0 ||
+           stricmp(t,"interp8") == 0 )
       {
         if ( stricmp(p,"fff") != 0 )
         {
@@ -469,6 +541,14 @@ public:
             flags|=MIVF_TEXEL1;
         }
         else if ( stricmp(t,"tangent") == 0) flags|=MIVF_TANGENT;
+        else if ( stricmp(t,"interp1") == 0) flags|=MIVF_INTERP1;
+        else if ( stricmp(t,"interp2") == 0) flags|=MIVF_INTERP2;
+        else if ( stricmp(t,"interp3") == 0) flags|=MIVF_INTERP3;
+        else if ( stricmp(t,"interp4") == 0) flags|=MIVF_INTERP4;
+        else if ( stricmp(t,"interp5") == 0) flags|=MIVF_INTERP5;
+        else if ( stricmp(t,"interp6") == 0) flags|=MIVF_INTERP6;
+        else if ( stricmp(t,"interp7") == 0) flags|=MIVF_INTERP7;
+        else if ( stricmp(t,"interp8") == 0) flags|=MIVF_INTERP8;
         else if ( stricmp(t,"binormal") == 0 ) flags|=MIVF_BINORMAL;
         else if ( stricmp(t,"blendweights") == 0 ) flags|=MIVF_BONE_WEIGHTING;
         else if ( stricmp(t,"blendindices") == 0 ) flags|=MIVF_BONE_WEIGHTING;
@@ -494,45 +574,45 @@ public:
 
   virtual bool  importMesh(const char *meshName,const void *data,NxU32 dlen,MeshImportInterface *callback,const char *options,MeshImportApplicationResource *appResource)
   {
-    bool ret = false;
+	  bool ret = false;
 
-    mCallback = callback;
+	  mCallback = callback;
 
-    if ( data && mCallback )
-    {
-      FastXml *f = createFastXml();
-      bool ok = f->processXml((const char *)data,dlen,this);
-  		if ( ok )
-  		{
-        mCallback->importAssetName(mStrings.Get(meshName).Get(),0);
-  			ret = true;
-  		}
-  		if ( mAnimation )
-  		{
-  			mCallback->importAnimation(*mAnimation);
-        for (NxI32 i=0; i<mAnimation->mTrackCount; i++)
-        {
-          MeshAnimTrack *t = mAnimation->mTracks[i];
-          delete []t->mPose;
-          delete t;
-        }
-        delete []mAnimation->mTracks;
-        delete mAnimation;
-  		mAnimation = 0;
-		}
+	  if ( data && mCallback )
+	  {
+		  FastXml *f = createFastXml();
+		  bool ok = f->processXml((const char *)data,dlen,this);
+		  if ( ok )
+		  {
+			  mCallback->importAssetName(mAssetName.Get(), mAssetInfo.Get());
+			  ret = true;
+		  }
+		  if ( mAnimation )
+		  {
+			  mCallback->importAnimation(*mAnimation);
+			  for (NxI32 i=0; i<mAnimation->mTrackCount; i++)
+			  {
+				  MeshAnimTrack *t = mAnimation->mTracks[i];
+				  delete []t->mPose;
+				  delete t;
+			  }
+			  delete []mAnimation->mTracks;
+			  delete mAnimation;
+			  mAnimation = 0;
+		  }
 
-      delete mMeshCollisionRepresentation;
-      delete mMeshCollision;
-      delete mMeshCollisionConvex;
-      mMeshCollisionRepresentation = 0;
-      mMeshCollision = 0;
-      mMeshCollisionConvex = 0;
+		  delete mMeshCollisionRepresentation;
+		  delete mMeshCollision;
+		  delete mMeshCollisionConvex;
+		  mMeshCollisionRepresentation = 0;
+		  mMeshCollision = 0;
+		  mMeshCollisionConvex = 0;
 
-      releaseFastXml(f);
+		  releaseFastXml(f);
 
-    }
+	  }
 
-    return ret;
+	  return ret;
   }
 
 	void ProcessNode(const char *svalue)

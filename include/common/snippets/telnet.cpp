@@ -1,3 +1,4 @@
+#ifndef __CELLOS_LV2__
 #include <assert.h>
 #include <ctype.h>
 
@@ -2628,3 +2629,5 @@ void     releaseTelnet(Telnet *t)
 }
 
 }; // end of namespace
+
+#endif

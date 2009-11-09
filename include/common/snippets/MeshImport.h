@@ -532,7 +532,15 @@ enum MeshVertexFlag
   MIVF_BINORMAL       = (1<<8),
   MIVF_BONE_WEIGHTING = (1<<9),
   MIVF_RADIUS         = (1<<10),
-  MIVF_ALL = (MIVF_POSITION | MIVF_NORMAL | MIVF_COLOR | MIVF_TEXEL1 | MIVF_TEXEL2 | MIVF_TEXEL3 | MIVF_TEXEL4 | MIVF_TANGENT | MIVF_BINORMAL | MIVF_BONE_WEIGHTING | MIVF_RADIUS)
+  MIVF_INTERP1        = (1<<11),
+  MIVF_INTERP2        = (1<<12),
+  MIVF_INTERP3        = (1<<13),
+  MIVF_INTERP4        = (1<<14),
+  MIVF_INTERP5        = (1<<15),
+  MIVF_INTERP6        = (1<<16),
+  MIVF_INTERP7        = (1<<17),
+  MIVF_INTERP8        = (1<<18),
+  MIVF_ALL = (MIVF_POSITION | MIVF_NORMAL | MIVF_COLOR | MIVF_TEXEL1 | MIVF_TEXEL2 | MIVF_TEXEL3 | MIVF_TEXEL4 | MIVF_TANGENT | MIVF_BINORMAL | MIVF_BONE_WEIGHTING )
 };
 
 class MeshVertex : public Memalloc
@@ -547,6 +555,16 @@ public:
     mTexel2[0] = mTexel2[1] = 0;
     mTexel3[0] = mTexel3[1] = 0;
     mTexel4[0] = mTexel4[1] = 0;
+
+	mInterp1[0] = mInterp1[1] = mInterp1[2];
+	mInterp2[0] = mInterp2[1] = mInterp2[2];
+	mInterp3[0] = mInterp3[1] = mInterp3[2];
+	mInterp4[0] = mInterp4[1] = mInterp4[2];
+	mInterp5[0] = mInterp5[1] = mInterp5[2];
+	mInterp6[0] = mInterp6[1] = mInterp6[2];
+	mInterp7[0] = mInterp7[1] = mInterp7[2];
+	mInterp8[0] = mInterp8[1] = mInterp8[2];
+
     mTangent[0] = mTangent[1] = mTangent[2] = 0;
     mBiNormal[0] = mBiNormal[1] = mBiNormal[2] = 0;
     mWeight[0] = 1; mWeight[1] = 0; mWeight[2] = 0; mWeight[3] = 0;
@@ -565,11 +583,19 @@ public:
 
   NxF32          mPos[3];
   NxF32          mNormal[3];
-  NxU32   mColor;
+  NxU32   		 mColor;
   NxF32          mTexel1[2];
   NxF32          mTexel2[2];
   NxF32          mTexel3[2];
   NxF32          mTexel4[2];
+  NxF32          mInterp1[3];
+  NxF32          mInterp2[3];
+  NxF32          mInterp3[3];
+  NxF32          mInterp4[3];
+  NxF32          mInterp5[3];
+  NxF32          mInterp6[3];
+  NxF32          mInterp7[3];
+  NxF32          mInterp8[3];
   NxF32          mTangent[3];
   NxF32          mBiNormal[3];
   NxF32          mWeight[4];
@@ -1452,7 +1478,7 @@ protected:
 };
 
 
-#define MESHIMPORT_VERSION 9  // version 0.01  increase this version number whenever an interface change occurs.
+#define MESHIMPORT_VERSION 10  // version 0.01  increase this version number whenever an interface change occurs.
 
 
 extern MeshImport *gMeshImport; // This is an optional global variable that can be used by the application.  If the application uses it, it should define it somewhere in its codespace.

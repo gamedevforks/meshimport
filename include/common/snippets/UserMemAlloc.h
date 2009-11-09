@@ -18,7 +18,11 @@
 #define NVSHARE nvshare
 
 #ifdef _DEBUG
+#ifdef __CELLOS_LV2__
+#define USE_MEMORY_TRACKER 0
+#else
 #define USE_MEMORY_TRACKER 1
+#endif
 #else
 #define USE_MEMORY_TRACKER 0
 #endif
