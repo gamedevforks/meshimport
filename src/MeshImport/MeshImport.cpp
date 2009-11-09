@@ -474,14 +474,14 @@ public:
     if ( flags & MIVF_TANGENT ) { mCtype+="fff ";  };
     if ( flags & MIVF_BINORMAL ) { mCtype+="fff ";  };
     if ( flags & MIVF_BONE_WEIGHTING ) { mCtype+="ffff hhhh ";  };
-    if ( flags & MIVF_INTERP1 ) { mCtype+="fff "; };
-    if ( flags & MIVF_INTERP2 ) { mCtype+="fff "; };
-    if ( flags & MIVF_INTERP3 ) { mCtype+="fff "; };
-    if ( flags & MIVF_INTERP4 ) { mCtype+="fff "; };
-    if ( flags & MIVF_INTERP5 ) { mCtype+="fff "; };
-    if ( flags & MIVF_INTERP6 ) { mCtype+="fff "; };
-    if ( flags & MIVF_INTERP7 ) { mCtype+="fff "; };
-    if ( flags & MIVF_INTERP8 ) { mCtype+="fff "; };
+    if ( flags & MIVF_INTERP1 ) { mCtype+="ffff "; };
+    if ( flags & MIVF_INTERP2 ) { mCtype+="ffff "; };
+    if ( flags & MIVF_INTERP3 ) { mCtype+="ffff "; };
+    if ( flags & MIVF_INTERP4 ) { mCtype+="ffff "; };
+    if ( flags & MIVF_INTERP5 ) { mCtype+="ffff "; };
+    if ( flags & MIVF_INTERP6 ) { mCtype+="ffff "; };
+    if ( flags & MIVF_INTERP7 ) { mCtype+="ffff "; };
+    if ( flags & MIVF_INTERP8 ) { mCtype+="ffff "; };
     if ( flags & MIVF_RADIUS ) mCtype+="f ";
 
     if ( !mCtype.empty() )
@@ -606,42 +606,42 @@ public:
     }
     if ( flags & MIVF_INTERP1 )
     {
-      sprintf(temp,"%s %s %s ", FloatString(v.mInterp1[0]), FloatString(v.mInterp1[1]), FloatString(v.mInterp1[2]) );
+      sprintf(temp,"%s %s %s ", FloatString(v.mInterp1[0]), FloatString(v.mInterp1[1]), FloatString(v.mInterp1[2]) , FloatString(v.mInterp1[3]));
       strcat(scratch,temp);
     }
     if ( flags & MIVF_INTERP2 )
     {
-      sprintf(temp,"%s %s %s ", FloatString(v.mInterp2[0]), FloatString(v.mInterp2[1]), FloatString(v.mInterp2[2]) );
+      sprintf(temp,"%s %s %s ", FloatString(v.mInterp2[0]), FloatString(v.mInterp2[1]), FloatString(v.mInterp2[2]) , FloatString(v.mInterp2[3]));
       strcat(scratch,temp);
     }
     if ( flags & MIVF_INTERP3 )
     {
-      sprintf(temp,"%s %s %s ", FloatString(v.mInterp3[0]), FloatString(v.mInterp3[1]), FloatString(v.mInterp3[2]) );
+      sprintf(temp,"%s %s %s ", FloatString(v.mInterp3[0]), FloatString(v.mInterp3[1]), FloatString(v.mInterp3[2]) , FloatString(v.mInterp3[3]));
       strcat(scratch,temp);
     }
     if ( flags & MIVF_INTERP4 )
     {
-      sprintf(temp,"%s %s %s ", FloatString(v.mInterp4[0]), FloatString(v.mInterp4[1]), FloatString(v.mInterp4[2]) );
+      sprintf(temp,"%s %s %s ", FloatString(v.mInterp4[0]), FloatString(v.mInterp4[1]), FloatString(v.mInterp4[2]) , FloatString(v.mInterp4[3]));
       strcat(scratch,temp);
     }
     if ( flags & MIVF_INTERP5 )
     {
-      sprintf(temp,"%s %s %s ", FloatString(v.mInterp5[0]), FloatString(v.mInterp5[1]), FloatString(v.mInterp5[2]) );
+      sprintf(temp,"%s %s %s ", FloatString(v.mInterp5[0]), FloatString(v.mInterp5[1]), FloatString(v.mInterp5[2]) , FloatString(v.mInterp5[3]));
       strcat(scratch,temp);
     }
     if ( flags & MIVF_INTERP6 )
     {
-      sprintf(temp,"%s %s %s ", FloatString(v.mInterp6[0]), FloatString(v.mInterp6[1]), FloatString(v.mInterp6[2]) );
+      sprintf(temp,"%s %s %s ", FloatString(v.mInterp6[0]), FloatString(v.mInterp6[1]), FloatString(v.mInterp6[2]) , FloatString(v.mInterp6[3]));
       strcat(scratch,temp);
     }
     if ( flags & MIVF_INTERP7 )
     {
-      sprintf(temp,"%s %s %s ", FloatString(v.mInterp7[0]), FloatString(v.mInterp7[1]), FloatString(v.mInterp7[2]) );
+      sprintf(temp,"%s %s %s ", FloatString(v.mInterp7[0]), FloatString(v.mInterp7[1]), FloatString(v.mInterp7[2]) , FloatString(v.mInterp7[3]));
       strcat(scratch,temp);
     }
     if ( flags & MIVF_INTERP8 )
     {
-      sprintf(temp,"%s %s %s ", FloatString(v.mInterp8[0]), FloatString(v.mInterp8[1]), FloatString(v.mInterp8[2]) );
+      sprintf(temp,"%s %s %s ", FloatString(v.mInterp8[0]), FloatString(v.mInterp8[1]), FloatString(v.mInterp8[2]) , FloatString(v.mInterp8[3]));
       strcat(scratch,temp);
     }
     if ( flags & MIVF_RADIUS )
