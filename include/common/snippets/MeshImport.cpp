@@ -224,8 +224,20 @@ NVSHARE::MeshImport * loadMeshImporters(const char * directory,NVSHARE::SystemSe
         else
         {
           printf("Loading '%s'\r\n", scan );
+		  const char *fname;
+
+		  if ( directory && strlen(directory) )
+		  {
+			  sprintf(scratch,"%s%s", directory, scan);
+			  fname = scratch;
+		  }
+		  else
+		  {
+			  fname = name;
+		  }
+
 #ifdef WIN32
-          NVSHARE::MeshImporter *imp = (NVSHARE::MeshImporter *)getMeshBindingInterface(name,MESHIMPORT_VERSION,services);
+          NVSHARE::MeshImporter *imp = (NVSHARE::MeshImporter *)getMeshBindingInterface(fname,MESHIMPORT_VERSION,services);
 #else
 		  NVSHARE::MeshImporter *imp = 0;
 #endif
