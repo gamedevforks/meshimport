@@ -23,7 +23,14 @@
 #include <malloc.h>
 #include <math.h>
 
+#if 1
 #include "UserMemAlloc.h"
+#else
+typedef float NxF32;
+typedef int   NxI32;
+typedef unsigned int NxU32;
+typedef unsigned char NxU8;
+#endif
 
 #pragma warning(push)
 #pragma warning(disable:4996)
@@ -42,6 +49,8 @@
 
 namespace NVSHARE
 {
+
+class SystemServices;
 
 class CommLayer
 {
@@ -556,14 +565,14 @@ public:
     mTexel3[0] = mTexel3[1] = 0;
     mTexel4[0] = mTexel4[1] = 0;
 
-	mInterp1[0] = mInterp1[1] = mInterp1[2];
-	mInterp2[0] = mInterp2[1] = mInterp2[2];
-	mInterp3[0] = mInterp3[1] = mInterp3[2];
-	mInterp4[0] = mInterp4[1] = mInterp4[2];
-	mInterp5[0] = mInterp5[1] = mInterp5[2];
-	mInterp6[0] = mInterp6[1] = mInterp6[2];
-	mInterp7[0] = mInterp7[1] = mInterp7[2];
-	mInterp8[0] = mInterp8[1] = mInterp8[2];
+	mInterp1[0] = mInterp1[1] = mInterp1[2] = 0;
+	mInterp2[0] = mInterp2[1] = mInterp2[2] = 0;
+	mInterp3[0] = mInterp3[1] = mInterp3[2] = 0;
+	mInterp4[0] = mInterp4[1] = mInterp4[2] = 0;
+	mInterp5[0] = mInterp5[1] = mInterp5[2] = 0;
+	mInterp6[0] = mInterp6[1] = mInterp6[2] = 0;
+	mInterp7[0] = mInterp7[1] = mInterp7[2] = 0;
+	mInterp8[0] = mInterp8[1] = mInterp8[2] = 0;
 
     mTangent[0] = mTangent[1] = mTangent[2] = 0;
     mBiNormal[0] = mBiNormal[1] = mBiNormal[2] = 0;

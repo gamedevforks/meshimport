@@ -604,6 +604,46 @@ public:
       sprintf(temp,"%d %d %d %d ", v.mBone[0], v.mBone[1], v.mBone[2], v.mBone[3] );
       strcat(scratch,temp);
     }
+    if ( flags & MIVF_INTERP1 )
+    {
+      sprintf(temp,"%s %s %s ", FloatString(v.mInterp1[0]), FloatString(v.mInterp1[1]), FloatString(v.mInterp1[2]) );
+      strcat(scratch,temp);
+    }
+    if ( flags & MIVF_INTERP2 )
+    {
+      sprintf(temp,"%s %s %s ", FloatString(v.mInterp2[0]), FloatString(v.mInterp2[1]), FloatString(v.mInterp2[2]) );
+      strcat(scratch,temp);
+    }
+    if ( flags & MIVF_INTERP3 )
+    {
+      sprintf(temp,"%s %s %s ", FloatString(v.mInterp3[0]), FloatString(v.mInterp3[1]), FloatString(v.mInterp3[2]) );
+      strcat(scratch,temp);
+    }
+    if ( flags & MIVF_INTERP4 )
+    {
+      sprintf(temp,"%s %s %s ", FloatString(v.mInterp4[0]), FloatString(v.mInterp4[1]), FloatString(v.mInterp4[2]) );
+      strcat(scratch,temp);
+    }
+    if ( flags & MIVF_INTERP5 )
+    {
+      sprintf(temp,"%s %s %s ", FloatString(v.mInterp5[0]), FloatString(v.mInterp5[1]), FloatString(v.mInterp5[2]) );
+      strcat(scratch,temp);
+    }
+    if ( flags & MIVF_INTERP6 )
+    {
+      sprintf(temp,"%s %s %s ", FloatString(v.mInterp6[0]), FloatString(v.mInterp6[1]), FloatString(v.mInterp6[2]) );
+      strcat(scratch,temp);
+    }
+    if ( flags & MIVF_INTERP7 )
+    {
+      sprintf(temp,"%s %s %s ", FloatString(v.mInterp7[0]), FloatString(v.mInterp7[1]), FloatString(v.mInterp7[2]) );
+      strcat(scratch,temp);
+    }
+    if ( flags & MIVF_INTERP8 )
+    {
+      sprintf(temp,"%s %s %s ", FloatString(v.mInterp8[0]), FloatString(v.mInterp8[1]), FloatString(v.mInterp8[2]) );
+      strcat(scratch,temp);
+    }
     if ( flags & MIVF_RADIUS )
     {
       sprintf(temp,"%s ", FloatString(v.mRadius) );
