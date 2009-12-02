@@ -3,12 +3,31 @@
 #include <string.h>
 #include <assert.h>
 #include <direct.h>
+#include <windows.h>
 
 #include "MeshImport.h"
 
 using namespace NVSHARE;
 
 #pragma warning(disable:4996 4100)
+
+static const char *         lastSlash(const char *src) // last forward or backward slash character, null if none found.
+{
+	const char *ret = 0;
+
+	const char *dot = strchr(src,'\\');
+	if  ( dot == 0 )
+		dot = strchr(src,'/');
+	while ( dot )
+	{
+		ret = dot;
+		dot = strchr(ret+1,'\\');
+		if ( dot == 0 )
+			dot = strchr(ret+1,'/');
+	}
+	return ret;
+}
+
 
 static char * findLastDot(char *scan)
 {
@@ -75,6 +94,10 @@ public:
 
 void main(NxI32 argc,const char **argv)
 {
+
+
+
+
     if ( argc < 2 )
     {
         printf("Usage: MeshConvert <name> (options)\r\n");
@@ -176,20 +199,19 @@ void main(NxI32 argc,const char **argv)
         }
 
 
-		char dirname[256];
-		strcpy(dirname,argv[0]);
-		NxI32 len = strlen(dirname);
-		char *scan = &dirname[len-1];
-		while ( len )
+
+		const char *dirname = 0;
+
+		char strExePath [MAX_PATH];
+		GetModuleFileNameA(NULL, strExePath, MAX_PATH);
+
+		char *slash = (char *)lastSlash(strExePath);
+		if ( slash )
 		{
-			if ( *scan == '\\' )
-			{
-				*scan = 0;
-				break;
-			}
-			scan--;
-			len--;
+			*slash = 0;
+			dirname = strExePath;
 		}
+		printf("dirname=%s\r\n", dirname );
 
 		NVSHARE::MeshImport *meshImport = loadMeshImporters(dirname,0); // loads the mesh import library (dll) and all available importers from the same directory.
 		if ( meshImport )
