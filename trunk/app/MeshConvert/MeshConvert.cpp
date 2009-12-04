@@ -186,6 +186,11 @@ void main(NxI32 argc,const char **argv)
                         outputFormat = NVSHARE::MSF_PSK;
                         printf("Setting output format to UE3 PSK\r\n");
                     }
+					else if ( stricmp(value,"fbx") == 0 )
+					{
+						outputFormat = NVSHARE::MSF_FBX;
+						printf("Setting output format to AutoDesk FBX ASCII\r\n");
+					}
                     else
                     {
                         printf("Unknown output format %s, defaulting to EZM\r\n", value );
@@ -295,6 +300,9 @@ void main(NxI32 argc,const char **argv)
                               case NVSHARE::MSF_PSK:
                                 strcat(fname,".psk");
                                 break;
+							  case NVSHARE::MSF_FBX:
+								  strcat(fname,".fbx");
+								  break;
                             }
 
                             NVSHARE::MeshSerialize ms(outputFormat);
