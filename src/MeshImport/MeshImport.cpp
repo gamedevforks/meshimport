@@ -11,6 +11,7 @@
 #include "FloatMath.h"
 #include "KeyValueIni.h"
 #include "CommLayer.h"
+#include "ExportFBX.h"
 
 #pragma warning(disable:4996)
 
@@ -2041,6 +2042,10 @@ public:
       else if ( data.mFormat == MSF_EZMESH )
       {
         serializeEzm(fph,mesh);
+      }
+      else if ( data.mFormat == MSF_FBX )
+      {
+      	serializeFBX(fph,mesh);
       }
       else if ( data.mFormat == MSF_PSK )
       {

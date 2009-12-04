@@ -179,6 +179,14 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\src\MeshImport\ExportFBX.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\src\MeshImport\ExportFBX.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\src\MeshImport\MeshImport.cpp"
 				>
 			</File>
