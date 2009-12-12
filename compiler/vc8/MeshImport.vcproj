@@ -183,11 +183,7 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\MeshImport\ExportFBX.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\src\MeshImport\MeshImport.cpp"
+				RelativePath="..\..\src\MeshImport\meshimport.cpp"
 				>
 			</File>
 			<File
@@ -207,11 +203,23 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\src\MeshImport\ExportFBX.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\src\MeshImport\MeshImportBuilder.h"
 				>
 			</File>
 			<File
 				RelativePath="..\..\src\MeshImport\VtxWeld.h"
+				>
+			</File>
+		</Filter>
+		<Filter
+			Name="Public Header Files"
+			>
+			<File
+				RelativePath="..\..\include\MeshImport\MeshImport.h"
 				>
 			</File>
 		</Filter>

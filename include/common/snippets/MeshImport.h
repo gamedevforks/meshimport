@@ -726,6 +726,30 @@ public:
 
 	void SetBone(NxI32 index,const MeshBone &b) { mBones[index] = b; };
 
+
+	bool getWorldTransform(NxI32 index,NxF32 *transform)
+	{
+		bool ret = false;
+		if ( index >= 0 && index < mBoneCount )
+		{
+			ret = true;
+			MeshBone &b = mBones[index];
+			if ( b.mParentIndex < 0 )
+			{
+				fmi_composeTransform(b.mPosition,b.mOrientation,b.mScale,transform);
+			}
+			else
+			{
+				NxF32 parentTransform[16];
+				NxF32 localTransform[16];
+				getWorldTransform(b.mParentIndex,parentTransform);
+				fmi_composeTransform(b.mPosition,b.mOrientation,b.mScale,localTransform);
+				fmi_multiply(localTransform,parentTransform,transform);
+			}
+		}
+		return ret;
+	}
+
 	const char * GetName(void) const { return mName; };
 
 	const char     *mName;
