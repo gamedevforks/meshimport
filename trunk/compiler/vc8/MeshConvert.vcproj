@@ -173,16 +173,20 @@
 	</References>
 	<Files>
 		<Filter
-			Name="Common Include-Binding Files"
+			Name="MeshImport Files"
 			>
 			<File
-				RelativePath="..\..\include\common\snippets\MeshImport.cpp"
+				RelativePath="..\..\include\MeshImport\MeshImport.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\include\common\snippets\MeshImport.h"
+				RelativePath="..\..\include\MeshImport\MeshImport.h"
 				>
 			</File>
+		</Filter>
+		<Filter
+			Name="Common Include-Binding Files"
+			>
 			<Filter
 				Name="snippets"
 				>

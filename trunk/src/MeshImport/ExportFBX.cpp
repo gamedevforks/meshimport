@@ -1,6 +1,7 @@
 #include "ExportFBX.h"
 
 #include "MeshImport.h"
+#include "FloatMath.h"
 
 #pragma warning(disable:4100)
 
@@ -9,22 +10,6 @@ namespace NVSHARE
 
 void writeVertices(FILE_INTERFACE *fph,Mesh *mesh)
 {
-#if 0 // example
-	fi_fprintf(fph,"        Vertices: -20.132555007935,0,-12.533173561096,-20.132555007935,0,0.123398780823,-32.362655639648,0,0.123398780823,-32.362655639648\r\n");
-	fi_fprintf(fph,"        ,0,-12.533173561096,-7.902453422546,0,-12.533173561096,-7.902453422546,0,0.123398780823,-20.132555007935,0,0.123398780823\r\n");
-	fi_fprintf(fph,"        ,-20.132555007935,0,-12.533173561096,-20.132555007935,6.566093444824,-12.533173561096,-32.362655639648,14.204918861389\r\n");
-	fi_fprintf(fph,"        ,-12.533173561096,-32.362655639648,14.204918861389,0.123398780823,-20.132555007935,6.566093444824,0.123398780823,-7.902453422546\r\n");
-	fi_fprintf(fph,"        ,14.204918861389,-12.533173561096,-20.132555007935,6.566093444824,-12.533173561096,-20.132555007935,6.566093444824\r\n");
-	fi_fprintf(fph,"        ,0.123398780823,-7.902453422546,14.204918861389,0.123398780823,-20.132555007935,6.566093444824,0.123398780823,-32.362655639648\r\n");
-	fi_fprintf(fph,"        ,14.204918861389,0.123398780823,-32.362655639648,0,0.123398780823,-20.132555007935,0,0.123398780823,-7.902453422546\r\n");
-	fi_fprintf(fph,"        ,14.204918861389,0.123398780823,-20.132555007935,6.566093444824,0.123398780823,-20.132555007935,0,0.123398780823,-7.902453422546\r\n");
-	fi_fprintf(fph,"        ,0,0.123398780823,-7.902453422546,14.204918861389,-12.533173561096,-7.902453422546,14.204918861389,0.123398780823\r\n");
-	fi_fprintf(fph,"        ,-7.902453422546,0,0.123398780823,-7.902453422546,0,-12.533173561096,-20.132555007935,6.566093444824,-12.533173561096\r\n");
-	fi_fprintf(fph,"        ,-7.902453422546,14.204918861389,-12.533173561096,-7.902453422546,0,-12.533173561096,-20.132555007935,0,-12.533173561096\r\n");
-	fi_fprintf(fph,"        ,-32.362655639648,14.204918861389,-12.533173561096,-20.132555007935,6.566093444824,-12.533173561096,-20.132555007935\r\n");
-	fi_fprintf(fph,"        ,0,-12.533173561096,-32.362655639648,0,-12.533173561096,-32.362655639648,14.204918861389,0.123398780823,-32.362655639648\r\n");
-	fi_fprintf(fph,"        ,14.204918861389,-12.533173561096,-32.362655639648,0,-12.533173561096,-32.362655639648,0,0.123398780823\r\n");
-#endif
 	if ( mesh->mVertexCount )
 	{
 		fi_fprintf(fph,"        Vertices: ");
@@ -56,10 +41,6 @@ void writeVertices(FILE_INTERFACE *fph,Mesh *mesh)
 
 void writePolygonVertexIndex(FILE_INTERFACE *fph,Mesh *mesh)
 {
-#if 0
-	fi_fprintf(fph,"        PolygonVertexIndex: 0,1,2,-4,4,5,6,-8,8,9,10,-12,12,13,14,-16,16,17,18,-20,20,21,22,-24,24,25,26,-28,28,29,30,-32,32,33,34,-36,36,37,38\r\n");
-	fi_fprintf(fph,"        ,-40\r\n");
-#endif
 	if ( mesh->mSubMeshCount )
 	{
 
@@ -99,6 +80,7 @@ void writePolygonVertexIndex(FILE_INTERFACE *fph,Mesh *mesh)
 
 void writeUV(FILE_INTERFACE *fph,Mesh *mesh)
 {
+
 #if 0
 	fi_fprintf(fph,"        LayerElementUV: 0 {\r\n");
 	fi_fprintf(fph,"            Version: 101\r\n");
@@ -111,6 +93,59 @@ void writeUV(FILE_INTERFACE *fph,Mesh *mesh)
 	fi_fprintf(fph,"\r\n");
 	fi_fprintf(fph,"        }\r\n");
 #endif
+
+	fi_fprintf(fph,"        LayerElementUV: 0 {\r\n");
+	fi_fprintf(fph,"            Version: 101\r\n");
+	fi_fprintf(fph,"            Name: \"\"\r\n");
+	fi_fprintf(fph,"            MappingInformationType: \"ByPolygonVertex\"\r\n");
+	fi_fprintf(fph,"            ReferenceInformationType: \"IndexToDirect\"\r\n");
+	fi_fprintf(fph,"            UV: ");
+
+	NxU32 vcount = mesh->mVertexCount;
+
+	NxU32 col = 0;
+	for (NxU32 i=0; i<vcount; i++)
+	{
+		if ( col == 0 && i > 0 )
+		{
+			fi_fprintf(fph,"            ,");
+		}
+		const MeshVertex &mv = mesh->mVertices[i];
+		fi_fprintf(fph,"%0.6f,%0.6f", mv.mTexel1[0], mv.mTexel1[1] );
+		col++;
+		if ( col == 32 )
+		{
+			fi_fprintf(fph,"\r\n");
+			col = 0;
+		}
+		else if ( (i+1) < vcount )
+		{
+			fi_fprintf(fph,",");
+		}
+	}
+	fi_fprintf(fph,"\r\n");
+
+	fi_fprintf(fph,"            UVIndex: ");
+	col = 0;
+	for (NxU32 i=0; i<vcount; i++)
+	{
+		if ( col == 0 && i > 0 )
+			fi_fprintf(fph,"            ,");
+		fi_fprintf(fph,"%d",i);
+		col++;
+		if ( col == 64 )
+		{
+			fi_fprintf(fph,"\r\n");
+			col = 0;
+		}
+		else if ( (i+1) < vcount )
+		{
+			fi_fprintf(fph,",");
+		}
+	}
+	fi_fprintf(fph,"\r\n");
+	fi_fprintf(fph,"        }\r\n");
+
 }
 
 void serializeFBX(FILE_INTERFACE *fph,MeshSystem *ms)

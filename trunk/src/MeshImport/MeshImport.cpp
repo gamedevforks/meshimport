@@ -124,15 +124,15 @@ extern "C"
 namespace NVSHARE
 {
 
-class MyVertexIndex : public VertexIndex, public Memalloc
+class LocalVertexIndex : public VertexIndex, public Memalloc
 {
 public:
-  MyVertexIndex(NxF32 granularity)
+  LocalVertexIndex(NxF32 granularity)
   {
     mVertexIndex = fm_createVertexIndex(granularity,false);
   }
 
-  virtual ~MyVertexIndex(void)
+  virtual ~LocalVertexIndex(void)
   {
     fm_releaseVertexIndex(mVertexIndex);
   }
@@ -211,13 +211,13 @@ public:
 
   VertexIndex *            createVertexIndex(NxF32 granularity)  // create an indexed vertext system for floats
   {
-    MyVertexIndex *m = MEMALLOC_NEW(MyVertexIndex)(granularity);
+    LocalVertexIndex *m = MEMALLOC_NEW(LocalVertexIndex)(granularity);
     return static_cast< VertexIndex *>(m);
   }
 
   void                     releaseVertexIndex(VertexIndex *vindex)
   {
-    MyVertexIndex *m = static_cast< MyVertexIndex *>(vindex);
+    LocalVertexIndex *m = static_cast< LocalVertexIndex *>(vindex);
     delete m;
   }
 
@@ -2263,33 +2263,61 @@ public:
     t[2] = tz;
   }
 
+  void rotatePoint(const NxF32 v[3],NxF32 t[3],const NxF32 matrix[16])
+  {
+	  NxF32 tx = (matrix[0*4+0] * v[0]) +  (matrix[1*4+0] * v[1]) + (matrix[2*4+0] * v[2]);
+	  NxF32 ty = (matrix[0*4+1] * v[0]) +  (matrix[1*4+1] * v[1]) + (matrix[2*4+1] * v[2]);
+	  NxF32 tz = (matrix[0*4+2] * v[0]) +  (matrix[1*4+2] * v[1]) + (matrix[2*4+2] * v[2]);
+	  t[0] = tx;
+	  t[1] = ty;
+	  t[2] = tz;
+  }
+
+
   void transformVertex(const MeshVertex &src,MeshVertex &dst,MeshSkeletonInstance *skeleton)
   {
     NxI32 bone = src.mBone[0];
     NxF32 weight = src.mWeight[0];
     assert (bone >= 0 && bone < skeleton->mBoneCount );
-
+	memcpy(&dst,&src,sizeof(MeshVertex));
     if ( weight > 0 && bone >= 0 && bone < skeleton->mBoneCount )
     {
-      NxF32 result[3];
-      dst.mPos[0] = 0;
-      dst.mPos[1] = 0;
-      dst.mPos[2] = 0;
-      for (NxI32 i=0; i<4; i++)
-      {
-        bone = src.mBone[i];
-        weight = src.mWeight[i];
-        if ( weight == 0 )
-          break;
-        transformPoint(src.mPos,result,skeleton->mBones[bone].mCompositeAnimTransform);
-        dst.mPos[0]+=result[0]*weight;
-        dst.mPos[1]+=result[1]*weight;
-        dst.mPos[2]+=result[2]*weight;
-      }
-    }
-    else
-    {
-      memcpy(&dst,&src,sizeof(MeshVertex));
+		{
+		  NxF32 result[3];
+		  dst.mPos[0] = 0;
+		  dst.mPos[1] = 0;
+		  dst.mPos[2] = 0;
+		  for (NxI32 i=0; i<4; i++)
+		  {
+			bone = src.mBone[i];
+			weight = src.mWeight[i];
+			if ( weight == 0 )
+			  break;
+			transformPoint(src.mPos,result,skeleton->mBones[bone].mCompositeAnimTransform);
+			dst.mPos[0]+=result[0]*weight;
+			dst.mPos[1]+=result[1]*weight;
+			dst.mPos[2]+=result[2]*weight;
+		  }
+		}
+#if 0
+		{
+			NxF32 result[3];
+			dst.mNormal[0] = 0;
+			dst.mNormal[1] = 0;
+			dst.mNormal[2] = 0;
+			for (NxI32 i=0; i<4; i++)
+			{
+				bone = src.mBone[i];
+				weight = src.mWeight[i];
+				if ( weight == 0 )
+					break;
+				rotatePoint(src.mPos,result,skeleton->mBones[bone].mCompositeAnimTransform);
+				dst.mNormal[0]+=result[0]*weight;
+				dst.mNormal[1]+=result[1]*weight;
+				dst.mNormal[2]+=result[2]*weight;
+			}
+		}
+#endif
     }
   }
 

@@ -66,7 +66,7 @@
 #pragma warning(disable:4996)
 
 #include "UserMemAlloc.h"
-#include "NvArray.h"
+#include "NvHashMap.h"
 
 namespace NVSHARE
 {
