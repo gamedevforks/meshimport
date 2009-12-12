@@ -447,7 +447,7 @@ public:
         Vector &n3 = normals[v3.mIndex];
 
         Vector normal;
-        fm_computePlane( &p1.x, &p2.x, &p3.x, &normal.x );
+        fm_computePlane( &p1.x, &p3.x, &p2.x, &normal.x );
 
         n1.x+=normal.x;
         n1.y+=normal.y;
