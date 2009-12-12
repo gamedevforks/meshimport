@@ -124,7 +124,7 @@ public:
 // [Vertex]
 // Array of Vertices
 
-#define IMPORT_SCALE (1.0f/50.0f)
+#define IMPORT_SCALE 1
 
 class MeshImporterPSK : public MeshImporter, public Memalloc
 {
@@ -296,11 +296,11 @@ public:
                p.mQuat[0] = key.mOrientation[0];
                p.mQuat[1] = -key.mOrientation[1];
                p.mQuat[2] = key.mOrientation[2];
-               p.mQuat[3] = -key.mOrientation[3];
+               p.mQuat[3] = key.mOrientation[3];
 
-			   if ( i )
+			   if ( i == 0)
 			   {
-				   p.mQuat[3]*=-1;
+				   p.mQuat[3] = -p.mQuat[3];
 			   }
 
                index++;
@@ -502,7 +502,7 @@ public:
             material = materials[ t.mMaterialIndex ].mMaterialName;
         }
 
-        callback->importTriangle(meshName,material, MIVF_ALL, mv3, mv2, mv1 );
+        callback->importTriangle(meshName,material, MIVF_ALL, mv1, mv3, mv2 );
 
       }
 
