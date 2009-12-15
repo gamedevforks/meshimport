@@ -12,6 +12,20 @@
 
 #pragma warning(disable:4100 4189 4996)
 
+#define HACK_SKELETON_POSITION 1
+#define HACK_SKELETON_ROTATION 1
+#define HACK_SKELETON_ROOT 1
+
+#define HACK_ANIMATION_POSITION 1
+#define HACK_ANIMATION_ROTATION 1
+#define HACK_ANIMATION_ROOT 1
+
+#define HACK_MESH_POSITION 1
+#define HACK_MESH_WINDING 1
+
+#define IMPORT_SCALE 1
+
+
 namespace NVSHARE
 {
 
@@ -123,8 +137,6 @@ public:
 // Array of Fvectors.
 // [Vertex]
 // Array of Vertices
-
-#define IMPORT_SCALE 1
 
 class MeshImporterPSK : public MeshImporter, public Memalloc
 {
@@ -290,19 +302,28 @@ public:
                MeshAnimPose &p = track->mPose[j];
 
                p.mPos[0] = key.mPosition[0]*IMPORT_SCALE;
+#if HACK_ANIMATION_POSITION
                p.mPos[1] = -key.mPosition[1]*IMPORT_SCALE;
+#else
+               p.mPos[1] = key.mPosition[1]*IMPORT_SCALE;
+#endif
                p.mPos[2] = key.mPosition[2]*IMPORT_SCALE;
 
                p.mQuat[0] = key.mOrientation[0];
+#if HACK_ANIMATION_ROTATION
                p.mQuat[1] = -key.mOrientation[1];
+#else
+               p.mQuat[1] = key.mOrientation[1];
+#endif
                p.mQuat[2] = key.mOrientation[2];
                p.mQuat[3] = key.mOrientation[3];
 
+#if HACK_ANIMATION_ROOT
 			   if ( i == 0)
 			   {
 				   p.mQuat[3] = -p.mQuat[3];
 			   }
-
+#endif
                index++;
             }
           }
@@ -336,13 +357,13 @@ public:
        scan+=sizeof(Header);
        Vector *positions = ( Vector *)scan;
        scan+=h->mLen*h->mCount;
-
+#if HACK_MESH_POSITION
 	   for (NxI32 i=0; i<positionsHeader->mCount; i++)
 	   {
 		   Vector &v = positions[i];
 		   v.y*=-1; // flip the Y-coordinate
 	   }
-
+#endif
        Header *verticesHeader = h = ( Header *)scan;
 	   assert( verticesHeader->mLen == sizeof(Vertex));
        scan+=sizeof(Header);
@@ -388,19 +409,28 @@ public:
             dest.mParentIndex = (i==0) ? -1 : src.mParentIndex;
 
             dest.mPosition[0] = src.mPosition[0]*IMPORT_SCALE;
+#if HACK_SKELETON_POSITION
             dest.mPosition[1] = -src.mPosition[1]*IMPORT_SCALE;
+#else
+            dest.mPosition[1] = src.mPosition[1]*IMPORT_SCALE;
+#endif
             dest.mPosition[2] = src.mPosition[2]*IMPORT_SCALE;
 
             dest.mOrientation[0] = src.mOrientation[0];
+#if HACK_SKELETON_ROTATION
             dest.mOrientation[1] = -src.mOrientation[1];
+#else
+            dest.mOrientation[1] = src.mOrientation[1];
+#endif
             dest.mOrientation[2] = src.mOrientation[2];
-            dest.mOrientation[3] = -src.mOrientation[3];
+            dest.mOrientation[3] = src.mOrientation[3];
 
-			if ( i )
+#if HACK_SKELETON_ROOT
+			if ( i == 0 )
 			{
 				dest.mOrientation[3]*=-1;
 			}
-
+#endif
             dest.mScale[0] = 1; //src.mXSize;
             dest.mScale[1] = 1; //src.mYSize;
             dest.mScale[2] = 1; //src.mZSize;
@@ -501,8 +531,11 @@ public:
         {
             material = materials[ t.mMaterialIndex ].mMaterialName;
         }
-
+#if HACK_MESH_WINDING
         callback->importTriangle(meshName,material, MIVF_ALL, mv1, mv3, mv2 );
+#else
+		callback->importTriangle(meshName,material, MIVF_ALL, mv1, mv2, mv3 );
+#endif
 
       }
 
