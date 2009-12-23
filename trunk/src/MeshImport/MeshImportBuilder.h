@@ -3,6 +3,7 @@
 #define MESH_IMPORT_BUILDER_H
 
 #include "MeshImport.h"
+#include "UserMemAlloc.h"
 
 namespace NVSHARE
 {

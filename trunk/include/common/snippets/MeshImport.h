@@ -552,7 +552,7 @@ enum MeshVertexFlag
   MIVF_ALL = (MIVF_POSITION | MIVF_NORMAL | MIVF_COLOR | MIVF_TEXEL1 | MIVF_TEXEL2 | MIVF_TEXEL3 | MIVF_TEXEL4 | MIVF_TANGENT | MIVF_BINORMAL | MIVF_BONE_WEIGHTING )
 };
 
-class MeshVertex : public Memalloc
+class MeshVertex 
 {
 public:
   MeshVertex(void)
@@ -612,7 +612,7 @@ public:
   NxF32          mRadius;
 };
 
-class MeshBone : public Memalloc
+class MeshBone 
 {
 public:
 	MeshBone(void)
@@ -697,7 +697,7 @@ public:
 	NxI32         mBone;         // bone this mesh is associcated
 };
 
-class MeshSkeleton : public Memalloc
+class MeshSkeleton 
 {
 public:
 	MeshSkeleton(void)
@@ -758,7 +758,7 @@ public:
 };
 
 
-class MeshAnimPose : public Memalloc
+class MeshAnimPose 
 {
 public:
   MeshAnimPose(void)
@@ -813,7 +813,7 @@ public:
   NxF32 mScale[3];
 };
 
-class MeshAnimTrack : public Memalloc
+class MeshAnimTrack 
 {
 public:
   MeshAnimTrack(void)
@@ -854,7 +854,7 @@ public:
 	MeshAnimPose *mPose;
 };
 
-class MeshAnimation : public Memalloc
+class MeshAnimation 
 {
 public:
   MeshAnimation(void)
@@ -1109,7 +1109,7 @@ enum MeshCollisionType
   MCT_LAST
 };
 
-class MeshCollision : public Memalloc
+class MeshCollision 
 {
 public:
   MeshCollision(void)
@@ -1188,7 +1188,7 @@ public:
 
 };
 
-class MeshCollisionRepresentation : public Memalloc
+class MeshCollisionRepresentation 
 {
 public:
   MeshCollisionRepresentation(void)
@@ -1379,7 +1379,7 @@ enum MeshSerializeFormat
 };
 
 
-class MeshBoneInstance : public Memalloc
+class MeshBoneInstance 
 {
 public:
   MeshBoneInstance(void)
@@ -1401,7 +1401,7 @@ public:
   NxF32       mInverseTransform[16];         // the inverse transform
 };
 
-class MeshSkeletonInstance : public Memalloc
+class MeshSkeletonInstance
 {
 public:
   MeshSkeletonInstance(void)

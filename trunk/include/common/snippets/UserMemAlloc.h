@@ -13,7 +13,7 @@
 #define NULL 0
 #endif
 
-#define USE_MEMALLOC 1
+#define USE_MEMALLOC 0
 
 #define NVSHARE nvshare
 
