@@ -14,34 +14,37 @@ int sortPolygonMaterials( const void* a, const void* b );
 void MeshImportFBX::ProcessScene(KFbxNode* subScene)
 {
 	KFbxNode* pNode = subScene;
-	if(subScene == NULL)
+	if ( NULL == subScene )
 		pNode = m_scene->GetRootNode();
 
-    KFbxNodeAttribute* lNodeAttribute = pNode->GetNodeAttribute();
+	KFbxNodeAttribute* lNodeAttribute = pNode->GetNodeAttribute();
     if (lNodeAttribute)
     {
 		if (lNodeAttribute->GetAttributeType() == KFbxNodeAttribute::eMESH)
-        {
-              AddMeshNode(pNode);
-        }
-        else if (lNodeAttribute->GetAttributeType() == KFbxNodeAttribute::eNURB)
-        {
-            // Not supported yet. 
-            // Should have been converted into a mesh in function ConvertNurbsAndPatch().
-        }
-        else if (lNodeAttribute->GetAttributeType() == KFbxNodeAttribute::ePATCH)
-        {
-            // Not supported yet. 
-            // Should have been converted into a mesh in function ConvertNurbsAndPatch().
-        }
+		{
+			if ( pNode->Show.Get() && pNode->Visibility.Get() ) // import in if the Node is set to visible
+				AddMeshNode(pNode);
+		}
+		else if (lNodeAttribute->GetAttributeType() == KFbxNodeAttribute::eNURB)
+		{
+			// Not supported yet. 
+			// Should have been converted into a mesh in function ConvertNurbsAndPatch().
+			//if ( pNode->Show.Get() && pNode->Visibility.Get() ) // import in if the Node is set to visible
+		}
+		else if (lNodeAttribute->GetAttributeType() == KFbxNodeAttribute::ePATCH)
+		{
+			// Not supported yet. 
+			// Should have been converted into a mesh in function ConvertNurbsAndPatch().
+			//if ( pNode->Show.Get() && pNode->Visibility.Get() ) // import in if the Node is set to visible
+		}
     }
 
-	//recurse
-    int i, lCount = pNode->GetChildCount();
-    for (i = 0; i < lCount; i++)
-    {
-        ProcessScene(pNode->GetChild(i));
-    }
+	// recurse
+	int i, lCount = pNode->GetChildCount();
+	for (i = 0; i < lCount; i++)
+	{
+	    ProcessScene(pNode->GetChild(i));
+	}
 }
 
 struct VertexSkinInfo
@@ -181,7 +184,23 @@ void MeshImportFBX::AddMeshNode(KFbxNode* pNode)
 			if(!isBindShapeSet)
 			{
 				KFbxXMatrix bindShapeBaseXform;
-				cluster->GetTransformMatrix(bindShapeBaseXform);
+				KFbxXMatrix bindLinkWorldMat;
+				cluster->GetTransformLinkMatrix( bindLinkWorldMat );
+
+				if ( cluster->GetLinkMode() == KFbxLink::eADDITIVE && cluster->GetAssociateModel() )
+				{
+					cluster->GetTransformAssociateModelMatrix(bindShapeBaseXform);
+				}
+				else
+				{
+					cluster->GetTransformMatrix( bindShapeBaseXform );
+				}
+
+				// multiply by the Geometry local deformation matrix
+				// this matrix is Identity when FBX file is exported from Maya
+				// but is not Identity when exported from Max, which what is causing
+				// the mesh to not skin properly
+				bindShapeBaseXform *= GetGeometry( lMesh->GetNode() );
 
 				bindShapeXform = bindShapeBaseXform;//shapeNodeXform * bindShapeBaseXform * geometryXform;
 
@@ -396,6 +415,18 @@ void MeshImportFBX::AddMeshNode(KFbxNode* pNode)
 				}
 
 #else //!ACCUMULATE_BIND_SHAPE
+				// this mesh has no skin/cluster, means just a static mesh
+				// we have to set the bindshape transform correctly
+				// because it is not set in code above
+				if ( false == isBindShapeSet ) // no skin, no cluster
+				{
+					// in latest version of the sdk, 2011_Beta1
+					// there is this GetEvaluator command to use
+					// "pNode->GetScene()->GetEvaluator()->GetNodeGlobalTransform(pNode, pTime);"
+					// but in the version there is no, so we have to use GetGlobalFromDefaultTake()
+					bindShapeXform = lMesh->GetNode()->GetGlobalFromDefaultTake() * GetGeometry( lMesh->GetNode() );
+				}
+
 				accumVert = bindShapeXform.MultT(sourceVert);
 
 				KFbxXMatrix bindShapeXformWithoutTranslation(bindShapeXform);
@@ -998,7 +1029,6 @@ void MeshImportFBX::ImportSkeleton()
 	int boneAllocator = 0;
 	result = importSkeletonRecursive(m_scene->GetRootNode(), -1, boneAllocator);
 
-
 	meshSkeleton.SetBones((int)meshBones.size(), &meshBones[0]);
 	meshWorldBindPoseXforms.clear();
 	meshWorldBindPoseXforms.resize(meshBones.size());
@@ -1036,7 +1066,8 @@ void MeshImportFBX::ImportSkeleton()
 
 	// PH: This still seems to be leading to the best results
 	//     But some bones don't get a bind pose if they are not referenced by the mesh.
-	for( int n = 0; n < m_scene->GetNodeCount(); n++)
+	int numNode = m_scene->GetNodeCount();
+	for( int n = 0; n < numNode; n++)
 	{
 		KFbxNode* node = m_scene->GetNode(n);
 	    KFbxNodeAttribute* nodeAttribute = node->GetNodeAttribute();
@@ -1084,6 +1115,7 @@ void MeshImportFBX::ImportSkeleton()
 					continue;
 
 				cluster->GetTransformLinkMatrix(meshWorldBindPoseXforms[b]);
+
 				boneInitialized[b] = true;
 				boneImportant[b] = true;
 				//DH:  Removed because we need to update it later anyways if it is bound to two different meshes
@@ -1091,6 +1123,8 @@ void MeshImportFBX::ImportSkeleton()
 			}
 		}
 	}
+#endif
+
 #if 0
 	// PH: this will generate the list of bones that should be initialized
 	//     put a breakpoint where the comment says 'parent should be initialized' and dump the list of 'parent's
@@ -1110,7 +1144,6 @@ void MeshImportFBX::ImportSkeleton()
 			parent = meshBones[parent].mParentIndex;
 		}
 	}
-#endif
 #endif
 
 	for(int b = 0; b < meshBones.size(); b++)
@@ -1155,8 +1188,6 @@ void MeshImportFBX::ImportSkeleton()
 	m_callback->importSkeleton(meshSkeleton);
 }
 
-
-
 int sortPolygonMaterials( const void* a, const void* b )
 {
 	const PolygonMaterial& tmA = *(const PolygonMaterial*)a;
@@ -1171,9 +1202,8 @@ int sortPolygonMaterials( const void* a, const void* b )
 	return tmA.polygonIndex - tmB.polygonIndex;
 }
 
-
-
-
+// Get the geometry deformation local to a node. It is never inherited by the
+// children.
 KFbxXMatrix MeshImportFBX::GetGeometry(KFbxNode* pNode) {
     KFbxVector4 lT, lR, lS;
     KFbxXMatrix lGeometry;
