@@ -176,11 +176,11 @@
 			Name="MeshImport Files"
 			>
 			<File
-				RelativePath="..\..\include\MeshImport\MeshImport.cpp"
+				RelativePath="..\..\include\MeshImport\MeshImport.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\include\MeshImport\MeshImport.h"
+				RelativePath="..\..\include\common\snippets\MeshImportLoader.cpp"
 				>
 			</File>
 		</Filter>
