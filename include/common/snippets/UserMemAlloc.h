@@ -268,11 +268,18 @@ inline void * inline_realloc(void *oldMem,size_t newSize,const char *typeName,co
 #endif
 
 
-
+#if USE_MEMALLOC
 #define MEMALLOC_MALLOC(x) NVSHARE::inline_malloc(x,"malloc",__FILE__,__LINE__)
 #define MEMALLOC_MALLOC_TYPE(x,t,f,l) NVSHARE::inline_malloc(x,t,f,l)
 #define MEMALLOC_FREE(x) NVSHARE::inline_free(x,__FILE__,__LINE__)
 #define MEMALLOC_REALLOC(x,y) NVSHARE::inline_realloc(x,y,"malloc",__FILE__,__LINE__)
+#else
+#define MEMALLOC_MALLOC(x) ::malloc(x)
+#define MEMALLOC_MALLOC_TYPE(x,t,f,l) ::malloc(x)
+#define MEMALLOC_FREE(x) ::free(x)
+#define MEMALLOC_REALLOC(x,y) ::realloc(x,y)
+
+#endif
 
 #pragma warning(push)
 #pragma warning(disable:4100)
