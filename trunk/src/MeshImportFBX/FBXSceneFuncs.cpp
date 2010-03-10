@@ -1,9 +1,12 @@
 #include "UserMemAlloc.h"
 #include "ImportFBX.h"
 
+// Refer to US2085 and US2087 in Rally for details on the use of these defines
+// for using frame 0 of animation instead of real bind pose when rebuilding
+//#define __USE_FRAME_0__ // default to not use first frame
+
 namespace NVSHARE
 {
-
 
 int sortPolygonMaterials( const void* a, const void* b );
 
@@ -203,6 +206,10 @@ void MeshImportFBX::AddMeshNode(KFbxNode* pNode)
 				bindShapeBaseXform *= GetGeometry( lMesh->GetNode() );
 
 				bindShapeXform = bindShapeBaseXform;//shapeNodeXform * bindShapeBaseXform * geometryXform;
+
+#ifdef __USE_FRAME_0__ // skin to frame 0
+				bindShapeXform *= pNode->GetGlobalFromCurrentTake( KTime( 0 ) );
+#endif __USE_FRAME_0__
 
 				meshWorldBindShapeXforms[boneIndex] = bindShapeXform;
 
@@ -423,8 +430,9 @@ void MeshImportFBX::AddMeshNode(KFbxNode* pNode)
 					// in latest version of the sdk, 2011_Beta1
 					// there is this GetEvaluator command to use
 					// "pNode->GetScene()->GetEvaluator()->GetNodeGlobalTransform(pNode, pTime);"
-					// but in the version there is no, so we have to use GetGlobalFromDefaultTake()
-					bindShapeXform = lMesh->GetNode()->GetGlobalFromDefaultTake() * GetGeometry( lMesh->GetNode() );
+					// but in the currently in used version, it is not there, so we have to use GetGlobalFromDefaultTake()
+
+					bindShapeXform = lMesh->GetNode()->GetGlobalFromDefaultTake() * GetGeometry( lMesh->GetNode() ); // get bind pose
 				}
 
 				accumVert = bindShapeXform.MultT(sourceVert);
@@ -946,7 +954,7 @@ void MeshImportFBX::ImportAnimation()
 		for(int b=0;b<meshBones.size();b++)
 		{
 			KFbxNode* node = meshNodes[b];
-			meshWorldAnimXforms[b] = node->GetGlobalFromCurrentTake(keyTime);
+			meshWorldAnimXforms[b] = node->GetGlobalFromCurrentTake( keyTime );
 		}
 
 		//Convert to locals
@@ -956,10 +964,20 @@ void MeshImportFBX::ImportAnimation()
 			NVSHARE::MeshAnimTrack& track = meshTracks[b];
 		
 			KFbxXMatrix localAnimXform;
+			KFbxNode* node = m_scene->GetNode( b );
 			if(bone.mParentIndex == -1)
+			{
 				localAnimXform = meshWorldAnimXforms[b];
+				//localAnimXform = node->GetGlobalFromCurrentTake( KTime( 0 ) ).Inverse() * meshWorldAnimXforms[b];
+			}
 			else
+			{
 				localAnimXform = meshWorldAnimXforms[bone.mParentIndex].Inverse() * meshWorldAnimXforms[b];
+				//localAnimXform = (m_scene->GetNode(bone.mParentIndex)->GetGlobalFromCurrentTake( KTime( 0 ) ).Inverse() * 
+				//				  node->GetGlobalFromCurrentTake( KTime( 0 ) ) )* 
+				//				  meshWorldAnimXforms[bone.mParentIndex].Inverse() * meshWorldAnimXforms[b]; 
+			}
+			//localAnimXform.SetIdentity();
 
 			float localAnimXformF[16];
 			for(int x = 0; x < 16; x++ )
@@ -1114,7 +1132,24 @@ void MeshImportFBX::ImportSkeleton()
 				if(!boneFound)
 					continue;
 
+				// how to handle bone bound to > 1 skin?
+				// this fixes the batman model from being displayed in a garbled state
+				// this is due to the fact that there are bones which are attached to more one skin which.
+				// In the batman case, the order in which the skin is processed when importing makes this fix works
+				// because the offending bones got their "correct" transformation first, before being overwritten by a second "wrong" transformation
+				// so this fix just skips a bone if it has been initialized.
+				// this might break other models if the order of the skin being process is different
+				if ( boneInitialized[b] == true )
+				{
+					//OutputDebugString( "test" );
+					continue;
+				}
+
 				cluster->GetTransformLinkMatrix(meshWorldBindPoseXforms[b]);
+
+#ifdef __USE_FRAME_0__ // make frame 0 are the bind pose
+				meshWorldBindPoseXforms[b] *= node->GetGlobalFromCurrentTake( KTime( 0 ) );
+#endif __USE_FRAME_0__
 
 				boneInitialized[b] = true;
 				boneImportant[b] = true;
@@ -1151,13 +1186,20 @@ void MeshImportFBX::ImportSkeleton()
 		NVSHARE::MeshBone& bone = meshBones[b];
 		KFbxXMatrix& worldBindPose = meshWorldBindPoseXforms[b];
 		KFbxXMatrix localBindPose;
+
+		KFbxNode* node = m_scene->GetNode(b);
+
 		if(bone.mParentIndex == -1)
+		{
 			localBindPose = worldBindPose;
+			//localBindPose *= node->GetGlobalFromCurrentTake( KTime( 0 ) );
+		}
 		else
 		{
 			KFbxXMatrix& parentWorldBindPose = meshWorldBindPoseXforms[bone.mParentIndex];
 
 			localBindPose = parentWorldBindPose.Inverse() * worldBindPose;
+			//localBindPose *= (m_scene->GetNode(bone.mParentIndex)->GetGlobalFromCurrentTake( KTime( 0 ) ).Inverse() * node->GetGlobalFromCurrentTake( KTime( 0 ) ) );
 		}
 
 		float localBindPoseF[16];
