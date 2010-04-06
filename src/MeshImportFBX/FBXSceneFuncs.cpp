@@ -874,13 +874,13 @@ inline void MeshImportFBX::MatrixAdd(KFbxXMatrix& pDstMatrix, KFbxXMatrix& pSrcM
 
   
 
-void MeshImportFBX::ImportAnimation()
+bool MeshImportFBX::ImportAnimation()
 {
 	KArrayTemplate<KString*> takeNames;
 	m_scene->FillTakeNameArray(takeNames);
 	int takeCount = takeNames.GetCount();
 	if(takeCount == 0)
-		return;
+		return true;
 
 	m_takeName = NULL;
 	m_takeInfo = NULL;
@@ -911,7 +911,17 @@ void MeshImportFBX::ImportAnimation()
 
 	KTimeSpan span(start, stop);
 	float dTime = 0.02f;// Magic timestep from clothing tool NX_TIME_STEP
-	int numFrames = (int)(span.GetDuration().GetSecondDouble()/dTime);
+
+	double dDurationSecond = span.GetDuration().GetSecondDouble();
+	if (dDurationSecond > 7200.0f) // more than two hours
+	{
+		char message[OUTPUT_TEXT_BUFFER_SIZE+1] = "";
+		message[OUTPUT_TEXT_BUFFER_SIZE] = '\0';
+		sprintf_s(message, OUTPUT_TEXT_BUFFER_SIZE, "Time span of animation take %s is too long.", m_takeName->Buffer());
+		outputMessage( message );
+		return false;
+	}
+	int numFrames = (int)(dDurationSecond / dTime);
 	float duration = (float)numFrames * dTime;
 
 	meshWorldAnimXforms.clear();
@@ -995,6 +1005,7 @@ void MeshImportFBX::ImportAnimation()
 	}
 
 	m_callback->importAnimation(meshAnimation);
+	return true;
 }
 
 
@@ -1188,6 +1199,13 @@ void MeshImportFBX::ImportSkeleton()
 		KFbxXMatrix localBindPose;
 
 		KFbxNode* node = m_scene->GetNode(b);
+
+		if (boneInitialized[b] == false)
+		{
+			KFbxVector4 defaultRotation;
+			node->GetDefaultR(defaultRotation);
+			worldBindPose.SetR(defaultRotation);
+		}
 
 		if(bone.mParentIndex == -1)
 		{

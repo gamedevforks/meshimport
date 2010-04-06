@@ -235,7 +235,11 @@ bool MeshImportFBX::Import( const char* filename, NVSHARE::MeshImportInterface *
 		m_takeName = m_takeNameArray[tSelected];
 		m_scene->SetCurrentTake( m_takeName->Buffer() );
 
-		ImportAnimation();
+		if (!ImportAnimation())
+		{
+			Release();
+			return false;
+		}
 	}
 
     m_scene->FillMaterialArray(m_MaterialArray);
