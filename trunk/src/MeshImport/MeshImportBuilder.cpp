@@ -325,8 +325,11 @@ public:
     mCurrentCollision = 0;
     mAppResource = appResource;
     importAssetName(meshName,0);
-    mi->importMesh(meshName,data,dlen,this,options,appResource);
-    gather();
+    mImportState = mi->importMesh(meshName,data,dlen,this,options,appResource);
+	if (mImportState)
+	{
+		gather();
+	}
   }
 
   MyMeshBuilder(MeshImportApplicationResource *appResource)
@@ -336,6 +339,7 @@ public:
     mCurrentMesh = 0;
     mCurrentCollision = 0;
     mAppResource = appResource;
+	mImportState = true;
   }
 
 
@@ -947,7 +951,8 @@ public:
     }
     return ret;
   }
-
+	
+  bool getImportState() const { return mImportState; }
 
 private:
   StringDict                          mStrings;
@@ -962,18 +967,25 @@ private:
   MeshCollisionRepresentationVector   mCollisionReps;
   MeshImportApplicationResource      *mAppResource;
   KeyValueIni                        *mINI;
+  bool								  mImportState;
 };
 
 MeshBuilder * createMeshBuilder(KeyValueIni *ini,const char *meshName,const void *data,NxU32 dlen,MeshImporter *mi,const char *options,MeshImportApplicationResource *appResource)
 {
   MyMeshBuilder *b = MEMALLOC_NEW(MyMeshBuilder)(ini,meshName,data,dlen,mi,options,appResource);
+  bool state = b->getImportState();
+  if (!state)
+	  return 0;
   return static_cast< MeshBuilder *>(b);
 }
 
 MeshBuilder * createMeshBuilder(MeshImportApplicationResource *appResource)
 {
-  MyMeshBuilder *b = MEMALLOC_NEW(MyMeshBuilder)(appResource);
-  return static_cast< MeshBuilder *>(b);
+	MyMeshBuilder *b = MEMALLOC_NEW(MyMeshBuilder)(appResource);
+	bool state = b->getImportState();
+	if (!state)
+		return 0;
+	return static_cast< MeshBuilder *>(b);
 }
 
 void          releaseMeshBuilder(MeshBuilder *m)

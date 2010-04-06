@@ -110,7 +110,7 @@ public:
 
 	void ImportSkeleton();
 	bool importSkeletonRecursive(KFbxNode* node, int parentBone, int& boneAllocator);	
-	void ImportAnimation();
+	bool ImportAnimation();
 
 	//void AddSkeletonNode(KFbxNode* pNode, KTime& pTime, KFbxXMatrix& pParentGlobalPosition);
     void AddMeshNode(KFbxNode* pNode);
