@@ -1200,13 +1200,6 @@ void MeshImportFBX::ImportSkeleton()
 
 		KFbxNode* node = m_scene->GetNode(b);
 
-		if (boneInitialized[b] == false)
-		{
-			KFbxVector4 defaultRotation;
-			node->GetDefaultR(defaultRotation);
-			worldBindPose.SetR(defaultRotation);
-		}
-
 		if(bone.mParentIndex == -1)
 		{
 			localBindPose = worldBindPose;
