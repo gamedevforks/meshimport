@@ -899,9 +899,10 @@ bool MeshImportFBX::ImportAnimation()
         start = m_takeInfo->mLocalTimeSpan.GetStart();
         stop = m_takeInfo->mLocalTimeSpan.GetStop();
     }
-    else
+    
+	if ( start < 0 || stop < 0 ) // local data time is not reliable
     {
-		// Take the time line value
+		// get global time
 		KTimeSpan lTimeLine;
 		m_scene->GetGlobalTimeSettings().GetTimelineDefautTimeSpan(lTimeLine);
 
