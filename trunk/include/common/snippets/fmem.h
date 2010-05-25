@@ -61,17 +61,17 @@
 #pragma warning(push)
 #pragma warning(disable:4996)
 
-inline PxU8 *getLocalFile(const char *filename,PxU32 &len)
+inline NxU8 *getLocalFile(const char *filename,NxU32 &len)
 {
-  PxU8 * ret = 0;
+  NxU8 * ret = 0;
   FILE *fph = fopen(filename,"rb");
   if ( fph )
   {
     fseek(fph,0L,SEEK_END);
     len = ftell(fph);
     fseek(fph,0L,SEEK_SET);
-    PxU8 *mem = (PxU8 *)MEMALLOC_MALLOC(len);
-    PxU32 l = fread(mem,len,1,fph);
+    NxU8 *mem = (NxU8 *)MEMALLOC_MALLOC(len);
+    NxU32 l = fread(mem,len,1,fph);
     if ( l == 0 )
     {
       delete mem;
@@ -85,12 +85,12 @@ inline PxU8 *getLocalFile(const char *filename,PxU32 &len)
   return ret;
 }
 
-inline void releaseFmem(PxU8 *mem)
+inline void releaseFmem(NxU8 *mem)
 {
   delete []mem;
 }
 
-inline bool putLocalFile(const char *filename,const void *mem,PxU32 len)
+inline bool putLocalFile(const char *filename,const void *mem,NxU32 len)
 {
   bool ret = false;
 

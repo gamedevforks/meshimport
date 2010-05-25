@@ -24,24 +24,24 @@ public:
   {
     x = y = z = 0;
   }
-  Vec3(const PxF32 *f)
+  Vec3(const NxF32 *f)
   {
     x = f[0];
     y = f[1];
     z = f[2];
   }
-  Vec3(PxF32 _x,PxF32 _y,PxF32 _z)
+  Vec3(NxF32 _x,NxF32 _y,NxF32 _z)
   {
     x = _x;
     y = _y;
     z = _z;
   }
 
-  PxF32 ComputeNormal(const Vec3 &A,
+  NxF32 ComputeNormal(const Vec3 &A,
     const Vec3 &B,
     const Vec3 &C)
   {
-    PxF32 vx,vy,vz,wx,wy,wz,vw_x,vw_y,vw_z,mag;
+    NxF32 vx,vy,vz,wx,wy,wz,vw_x,vw_y,vw_z,mag;
 
     vx = (B.x - C.x);
     vy = (B.y - C.y);
@@ -74,11 +74,11 @@ public:
   }
 
 
-  const PxF32 * Ptr(void) const { return &x; };
+  const NxF32 * Ptr(void) const { return &x; };
 
-  PxF32 x;
-  PxF32 y;
-  PxF32 z;
+  NxF32 x;
+  NxF32 y;
+  NxF32 z;
 };
 
 class Vec2
@@ -88,8 +88,8 @@ public:
   {
     x = y = 0;
   }
-  PxF32 x;
-  PxF32 y;
+  NxF32 x;
+  NxF32 y;
 };
 
 typedef std::vector< Vec2 > Vec2Vector;
@@ -105,7 +105,7 @@ public:
 
 
   StringRef mName; //name of the material
-  PxF32 Ns;
+  NxF32 Ns;
   Vec3          Ka;
   Vec3          Kd;
   Vec3          Ks;
@@ -122,12 +122,12 @@ public:
   virtual ~OBJ(void);
 
 
-  const char * getExtension(PxI32 index) { return ".obj"; };
-  const char * getDescription(PxI32 index) { return "Wavefront OBJ"; };
+  const char * getExtension(NxI32 index) { return ".obj"; };
+  const char * getDescription(NxI32 index) { return "Wavefront OBJ"; };
 
-  bool importMesh(const char *meshName,const void *data,PxU32 len,MeshImportInterface *callback,const char *options,MeshImportApplicationResource *appResource);
+  bool importMesh(const char *meshName,const void *data,NxU32 len,MeshImportInterface *callback,const char *options,MeshImportApplicationResource *appResource);
 
-  PxI32 ParseLine(PxI32 lineno,PxI32 argc,const char **argv);  // return TRUE to continue parsing, return FALSE to abort parsing process
+  NxI32 ParseLine(NxI32 lineno,NxI32 argc,const char **argv);  // return TRUE to continue parsing, return FALSE to abort parsing process
 
   void release(void);
 
@@ -139,7 +139,7 @@ private:
   Vec3Vector  mVerts;
   Vec2Vector  mTexels;
   Vec3Vector  mNormals;
-  PxF32       mPlane[4];
+  NxF32       mPlane[4];
 
   StringRef            mCurrentMesh;
   StringRef            mCurrentMat;
@@ -184,7 +184,7 @@ char * skipDir(char *start)
 
 #pragma warning(disable:4100)
 
-bool OBJ::importMesh(const char *fname,const void *_data,PxU32 len,MeshImportInterface *callback,const char *options,MeshImportApplicationResource *appResource)
+bool OBJ::importMesh(const char *fname,const void *_data,NxU32 len,MeshImportInterface *callback,const char *options,MeshImportApplicationResource *appResource)
 {
   bool ret = false;
 
@@ -206,7 +206,7 @@ bool OBJ::importMesh(const char *fname,const void *_data,PxU32 len,MeshImportInt
   	  *dot = 0;
     strcat(scratch,".mtl");
 
-    PxU32 len;
+    NxU32 len;
     void *mem = appResource->getApplicationResource(fname,scratch,len);
     if ( mem )
     {
@@ -264,7 +264,7 @@ bool OBJ::importMesh(const char *fname,const void *_data,PxU32 len,MeshImportInt
   return ret;
 }
 
-static const char * GetArg(const char **argv,PxI32 i,PxI32 argc)
+static const char * GetArg(const char **argv,NxI32 i,NxI32 argc)
 {
   const char * ret = 0;
   if ( i < argc ) ret = argv[i];
@@ -287,14 +287,14 @@ void OBJ::GetVertex(MeshVertex &v,const char *face,bool minusIndexing) const
   v.mNormal[1] = 1;
   v.mNormal[2] = 0;
 
-  PxI32 index = atoi( face );
+  NxI32 index = atoi( face );
   if ( minusIndexing )
     index--;
 
   if ( index < 0 )
     index = mVerts.size()+index+1;
 
-  if ( index >= 0 && index < (PxI32)mVerts.size() )
+  if ( index >= 0 && index < (NxI32)mVerts.size() )
   {
 
     const Vec3 &p = mVerts[index];
@@ -309,12 +309,12 @@ void OBJ::GetVertex(MeshVertex &v,const char *face,bool minusIndexing) const
 
   if ( texel )
   {
-    PxI32 tindex = atoi( texel+1) - 1;
+    NxI32 tindex = atoi( texel+1) - 1;
 
     if ( tindex < 0 )
       tindex = mTexels.size()+tindex+1;
 
-    if ( tindex >=0 && tindex < (PxI32)mTexels.size() )
+    if ( tindex >=0 && tindex < (NxI32)mTexels.size() )
     {
       v.mTexel1[0] = mTexels[tindex].x;
       v.mTexel1[1] = mTexels[tindex].y;
@@ -327,11 +327,11 @@ void OBJ::GetVertex(MeshVertex &v,const char *face,bool minusIndexing) const
     const char *normal = strstr(texel+1,"/");
     if ( normal )
     {
-      PxI32 nindex = atoi( normal+1 ) - 1;
+      NxI32 nindex = atoi( normal+1 ) - 1;
       if ( nindex < 0 )
         nindex = mNormals.size()+nindex+1;
 
-      if (nindex >= 0 && nindex < (PxI32)mNormals.size() )
+      if (nindex >= 0 && nindex < (NxI32)mNormals.size() )
       {
         v.mNormal[0] = mNormals[nindex].x;
         v.mNormal[1] = mNormals[nindex].y;
@@ -342,9 +342,9 @@ void OBJ::GetVertex(MeshVertex &v,const char *face,bool minusIndexing) const
 
 }
 
-PxI32 OBJ::ParseLine(PxI32 lineno,PxI32 argc,const char **argv)  // return TRUE to continue parsing, return FALSE to abort parsing process
+NxI32 OBJ::ParseLine(NxI32 lineno,NxI32 argc,const char **argv)  // return TRUE to continue parsing, return FALSE to abort parsing process
 {
-  PxI32 ret = 0;
+  NxI32 ret = 0;
 
   if ( argc >= 1 )
   {
@@ -363,25 +363,25 @@ PxI32 OBJ::ParseLine(PxI32 lineno,PxI32 argc,const char **argv)  // return TRUE 
         }
         else if ( mCurrentMaterial && stricmp(foo,"Ns") == 0 && argc >= 2 )
         {
-          mCurrentMaterial->Ns = (PxF32)atof(argv[1]);
+          mCurrentMaterial->Ns = (NxF32)atof(argv[1]);
         }
         else if ( mCurrentMaterial && stricmp(foo,"Ka") == 0 && argc >= 4 )
         {
-          mCurrentMaterial->Ka.x = (PxF32)atof(argv[1]);
-          mCurrentMaterial->Ka.y = (PxF32)atof(argv[2]);
-          mCurrentMaterial->Ka.z = (PxF32)atof(argv[3]);
+          mCurrentMaterial->Ka.x = (NxF32)atof(argv[1]);
+          mCurrentMaterial->Ka.y = (NxF32)atof(argv[2]);
+          mCurrentMaterial->Ka.z = (NxF32)atof(argv[3]);
         }
         else if ( mCurrentMaterial && stricmp(foo,"Kd") == 0 && argc >= 4 )
         {
-          mCurrentMaterial->Kd.x = (PxF32)atof(argv[1]);
-          mCurrentMaterial->Kd.y = (PxF32)atof(argv[2]);
-          mCurrentMaterial->Kd.z = (PxF32)atof(argv[3]);
+          mCurrentMaterial->Kd.x = (NxF32)atof(argv[1]);
+          mCurrentMaterial->Kd.y = (NxF32)atof(argv[2]);
+          mCurrentMaterial->Kd.z = (NxF32)atof(argv[3]);
         }
         else if ( mCurrentMaterial && stricmp(foo,"Ks") == 0 && argc >= 4 )
         {
-          mCurrentMaterial->Ks.x = (PxF32)atof(argv[1]);
-          mCurrentMaterial->Ks.y = (PxF32)atof(argv[2]);
-          mCurrentMaterial->Ks.z = (PxF32)atof(argv[3]);
+          mCurrentMaterial->Ks.x = (NxF32)atof(argv[1]);
+          mCurrentMaterial->Ks.y = (NxF32)atof(argv[2]);
+          mCurrentMaterial->Ks.z = (NxF32)atof(argv[3]);
         }
         else if ( mCurrentMaterial && stricmp(foo,"map_kd") == 0 && argc >= 2 )
         {
@@ -414,26 +414,26 @@ PxI32 OBJ::ParseLine(PxI32 lineno,PxI32 argc,const char **argv)  // return TRUE 
         else if ( stricmp(argv[0],"v") == 0 && argc == 4 )
         {
           Vec3 v;
-          v.x = (PxF32) atof( argv[1] );
-          v.y = (PxF32) atof( argv[2] );
-          v.z = (PxF32) atof( argv[3] );
+          v.x = (NxF32) atof( argv[1] );
+          v.y = (NxF32) atof( argv[2] );
+          v.z = (NxF32) atof( argv[3] );
 
           mVerts.push_back(v);
         }
 		else if ( stricmp(argv[0],"p") == 0 && argc == 5 )
 		{
-			mPlane[0] = (PxF32) atof( argv[1] );
-			mPlane[1] = (PxF32) atof( argv[2] );
-			mPlane[2] = (PxF32) atof( argv[3] );
-			mPlane[3] = (PxF32) atof( argv[4] );
+			mPlane[0] = (NxF32) atof( argv[1] );
+			mPlane[1] = (NxF32) atof( argv[2] );
+			mPlane[2] = (NxF32) atof( argv[3] );
+			mPlane[3] = (NxF32) atof( argv[4] );
 			mCallback->importPlane(mPlane);
 		}
 
         else if ( stricmp(argv[0],"vt") == 0 && argc >= 3 )
         {
           Vec2 t;
-          t.x = (PxF32)atof( argv[1] );
-          t.y = (PxF32)atof( argv[2] );
+          t.x = (NxF32)atof( argv[1] );
+          t.y = (NxF32)atof( argv[2] );
 					t.x = t.x;
 					t.y = t.y;
           mTexels.push_back(t);
@@ -441,9 +441,9 @@ PxI32 OBJ::ParseLine(PxI32 lineno,PxI32 argc,const char **argv)  // return TRUE 
         else if ( stricmp(argv[0],"vn") == 0 && argc == 4 )
         {
           Vec3 normal;
-          normal.x = (PxF32) atof(argv[1]);
-          normal.y = (PxF32) atof(argv[2]);
-          normal.z = (PxF32) atof(argv[3]);
+          normal.x = (NxF32) atof(argv[1]);
+          normal.y = (NxF32) atof(argv[2]);
+          normal.z = (NxF32) atof(argv[3]);
           mNormals.push_back(normal);
         }
         else if ( stricmp(argv[0],"t") == 0 && argc == 5 )
@@ -463,9 +463,9 @@ PxI32 OBJ::ParseLine(PxI32 lineno,PxI32 argc,const char **argv)  // return TRUE 
         {
           MeshVertex v[32];
 
-          PxI32 vcount = argc-1;
+          NxI32 vcount = argc-1;
 
-          for (PxI32 i=1; i<argc; i++)
+          for (NxI32 i=1; i<argc; i++)
           {
             GetVertex(v[i-1],argv[i] );
           }
@@ -480,7 +480,7 @@ PxI32 OBJ::ParseLine(PxI32 lineno,PxI32 argc,const char **argv)  // return TRUE 
             Vec3 n;
             n.ComputeNormal(p3,p2,p1);
 
-            for (PxI32 i=0; i<vcount; i++)
+            for (NxI32 i=0; i<vcount; i++)
             {
               v[i].mNormal[0] = n.x;
               v[i].mNormal[1] = n.y;
@@ -493,7 +493,7 @@ PxI32 OBJ::ParseLine(PxI32 lineno,PxI32 argc,const char **argv)  // return TRUE 
 
           if ( vcount >=3 ) // do the fan
           {
-            for (PxI32 i=2; i<(vcount-1); i++)
+            for (NxI32 i=2; i<(vcount-1); i++)
             {
               sendTri(v[0],v[i],v[i+1]);
             }
@@ -533,7 +533,7 @@ void OBJ::release(void)
 }
 
 
-static void set(PxF32 *d,const Vec3 &t)
+static void set(NxF32 *d,const Vec3 &t)
 {
   d[0] = t.x;
   d[1] = t.y;
@@ -565,16 +565,16 @@ void OBJ::sendTri(const MeshVertex &tv1,const MeshVertex &tv2,const MeshVertex &
   {
   	#define TSCALE1 (1.0f/4.0f)
 
-  	const PxF32 *tp1 = p1.Ptr();
-  	const PxF32 *tp2 = p2.Ptr();
-  	const PxF32 *tp3 = p3.Ptr();
+  	const NxF32 *tp1 = p1.Ptr();
+  	const NxF32 *tp2 = p2.Ptr();
+  	const NxF32 *tp3 = p3.Ptr();
 
-  	PxI32 i1 = 0;
-	  PxI32 i2 = 0;
+  	NxI32 i1 = 0;
+	  NxI32 i2 = 0;
 
-  	PxF32 nx = fabsf(v1.mNormal[0]);
-  	PxF32 ny = fabsf(v1.mNormal[1]);
-  	PxF32 nz = fabsf(v1.mNormal[2]);
+  	NxF32 nx = fabsf(v1.mNormal[0]);
+  	NxF32 ny = fabsf(v1.mNormal[1]);
+  	NxF32 nz = fabsf(v1.mNormal[2]);
 
   	if ( nx <= ny && nx <= nz )
   		i1 = 0;

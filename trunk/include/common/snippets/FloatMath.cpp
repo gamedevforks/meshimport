@@ -54,11 +54,11 @@
 
 #include "FloatMath.h"
 
-#define REAL PxF32
+#define REAL NxF32
 
 #include "FloatMath.inl"
 
 #undef REAL
-#define REAL PxF64
+#define REAL NxF64
 
 #include "FloatMath.inl"

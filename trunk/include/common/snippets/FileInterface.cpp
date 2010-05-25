@@ -108,7 +108,7 @@ public:
     }
     else
     {
-      PxU32 slen = mSize-mLen;
+      NxU32 slen = mSize-mLen;
       if ( slen )
       {
         char *dest = &mMemory[mLen];
@@ -131,8 +131,8 @@ public:
 
   MemoryBlock    *mNextBlock;
   char           *mMemory;
-  PxU32    mLen;
-  PxU32    mSize;
+  NxU32    mLen;
+  NxU32    mSize;
 
 };
 
@@ -208,7 +208,7 @@ public:
   {
     if ( mHeadBlock )
     {
-      PxU32 slen = 0;
+      NxU32 slen = 0;
 
       MemoryBlock *mb = mHeadBlock;
       while ( mb )

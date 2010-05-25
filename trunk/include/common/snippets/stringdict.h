@@ -74,7 +74,7 @@ public:
 
 	bool SamePrefix(const char *prefix) const
 	{
-		PxU32 len = (PxU32)strlen(prefix);
+		NxU32 len = (NxU32)strlen(prefix);
 		if ( len && strncmp(mString,prefix,len) == 0 ) return true;
 		return false;
 	}
@@ -83,8 +83,8 @@ public:
 	{
 		const char *source = mString;
 		const char *suffix = suf.mString;
-		PxU32 len1 = (PxU32)strlen(source);
-		PxU32 len2 = (PxU32)strlen(suffix);
+		NxU32 len1 = (NxU32)strlen(source);
+		NxU32 len2 = (NxU32)strlen(suffix);
 		if ( len1 < len2 ) return false;
 		const char *compare = &source[(len1-len2)];
 		if ( strcmp(compare,suffix) == 0 ) return true;
@@ -92,16 +92,16 @@ public:
 	}
 
 #ifdef NX64
-  PxU64 getHash(void) const
+  NxU64 getHash(void) const
   {
-    return (PxU64) mString;
+    return (NxU64) mString;
   }
 #else
 #pragma warning(push)
 #pragma warning(disable:4311)
-  PxU32 getHash(void) const
+  NxU32 getHash(void) const
   {
-    return (PxU32) mString;
+    return (NxU32) mString;
   }
 #pragma warning(pop)
 #endif
@@ -182,7 +182,7 @@ class StringSortRef : public Memalloc
 	 {
 		 const char *str1 = a.Get();
 		 const char *str2 = b.Get();
-		 PxI32 r = stricmp(str1,str2);
+		 NxI32 r = stricmp(str1,str2);
 		 return r < 0;
 	 }
 };

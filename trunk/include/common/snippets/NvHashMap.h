@@ -108,7 +108,7 @@ NX_INLINE N NxMax(N a, N b)							{	return a<b ? b : a;						}
 \brief The return value is the greater of the two specified values.
 */
 template <>
-NX_INLINE PxF32 NxMax(PxF32 a, PxF32 b)				{	return  a > b ? a : b;	}
+NX_INLINE NxF32 NxMax(NxF32 a, NxF32 b)				{	return  a > b ? a : b;	}
 
 /**
 \brief The return value is the lesser of the two specified values.
@@ -120,7 +120,7 @@ NX_INLINE N NxMin(N a, N b)							{	return a<b ? a : b;						}
 \brief The return value is the lesser of the two specified values.
 */
 template <>
-NX_INLINE PxF32 NxMin(PxF32 a, PxF32 b)				{	return a < b ? a : b;	}
+NX_INLINE NxF32 NxMin(NxF32 a, NxF32 b)				{	return a < b ? a : b;	}
 
 
 
@@ -324,7 +324,7 @@ namespace NVSHARE
 	// SCS: AlignedMalloc with 3 params not found, seems not used on PC either
 	// disabled for now to avoid GCC error
 
-	template<PxU32 N, typename BaseAllocator = Allocator >
+	template<NxU32 N, typename BaseAllocator = Allocator >
 	class AlignedAllocator : public BaseAllocator
 	{
 	public:
@@ -334,9 +334,9 @@ namespace NVSHARE
 		void* allocate(size_t size, const char* file, int line)
 		{
 			size_t pad = N - 1 + sizeof(size_t); // store offset for delete.
-			PxU8* base = (PxU8*)BaseAllocator::allocate(size+pad, file, line);
+			NxU8* base = (NxU8*)BaseAllocator::allocate(size+pad, file, line);
 
-			PxU8* ptr = (PxU8*)(size_t(base + pad) & ~(N - 1)); // aligned pointer
+			NxU8* ptr = (NxU8*)(size_t(base + pad) & ~(N - 1)); // aligned pointer
 			((size_t*)ptr)[-1] = ptr - base; // store offset
 
 			return ptr;
@@ -346,7 +346,7 @@ namespace NVSHARE
 			if(ptr == NULL)
 				return;
 
-			PxU8* base = ((PxU8*)ptr) - ((size_t*)ptr)[-1];
+			NxU8* base = ((NxU8*)ptr) - ((size_t*)ptr)[-1];
 			BaseAllocator::deallocate(base);
 		}
 	};
@@ -362,7 +362,7 @@ namespace NVSHARE
 {
 	// this is used by the array class to allocate some space for a small number
 	// of objects along with the metadata
-	template<PxU32 N, typename BaseAllocator>
+	template<NxU32 N, typename BaseAllocator>
 	class InlineAllocator : private BaseAllocator
 	{
 	public:
@@ -383,7 +383,7 @@ namespace NVSHARE
 		}
 
 	private:
-		PxU8 mBuffer[N];
+		NxU8 mBuffer[N];
 	};
 }
 
@@ -412,7 +412,7 @@ class NvStrideIterator
 	};
 
 public:
-	explicit NX_INLINE NvStrideIterator(T* ptr = NULL, PxU32 stride = sizeof(T)) :
+	explicit NX_INLINE NvStrideIterator(T* ptr = NULL, NxU32 stride = sizeof(T)) :
 		mPtr(ptr), mStride(stride)
 	{
 		NX_ASSERT(mStride == 0 || sizeof(T) <= mStride);
@@ -429,7 +429,7 @@ public:
 		return mPtr;
 	}
 
-	NX_INLINE PxU32 stride() const
+	NX_INLINE NxU32 stride() const
 	{
 		return mStride;
 	}
@@ -505,7 +505,7 @@ public:
 	NX_INLINE int operator-(const NvStrideIterator& other) const
 	{
 		NX_ASSERT(isCompatible(other));
-		int byteDiff = static_cast<int>(reinterpret_cast<const PxU8*>(mPtr) - reinterpret_cast<const PxU8*>(other.mPtr));
+		int byteDiff = static_cast<int>(reinterpret_cast<const NxU8*>(mPtr) - reinterpret_cast<const NxU8*>(other.mPtr));
 		return byteDiff / static_cast<int>(stride());
 	}
 
@@ -546,24 +546,24 @@ public:
 	}
 
 private:
-	NX_INLINE static T* byteAdd(T* ptr, PxU32 bytes) 
+	NX_INLINE static T* byteAdd(T* ptr, NxU32 bytes) 
 	{ 
-		return const_cast<T*>(reinterpret_cast<const T*>(reinterpret_cast<const PxU8*>(ptr) + bytes));
+		return const_cast<T*>(reinterpret_cast<const T*>(reinterpret_cast<const NxU8*>(ptr) + bytes));
 	}
 
-	NX_INLINE static T* byteSub(T* ptr, PxU32 bytes)
+	NX_INLINE static T* byteSub(T* ptr, NxU32 bytes)
 	{ 
-		return const_cast<T*>(reinterpret_cast<const T*>(reinterpret_cast<const PxU8*>(ptr) - bytes));
+		return const_cast<T*>(reinterpret_cast<const T*>(reinterpret_cast<const NxU8*>(ptr) - bytes));
 	}
 
 	NX_INLINE bool isCompatible(const NvStrideIterator& other) const
 	{
-		int byteDiff = static_cast<int>(reinterpret_cast<const PxU8*>(mPtr) - reinterpret_cast<const PxU8*>(other.mPtr));
+		int byteDiff = static_cast<int>(reinterpret_cast<const NxU8*>(mPtr) - reinterpret_cast<const NxU8*>(other.mPtr));
 		return (stride() == other.stride()) && (abs(byteDiff) % stride() == 0);
 	}
 
 	T* mPtr;
-	PxU32 mStride;
+	NxU32 mStride;
 };
 
 
@@ -588,8 +588,8 @@ namespace NVSHARE
 		struct ArrayMetaData
 		{
 			T*					mData;
-			PxU32				mCapacity;
-			PxU32				mSize;
+			NxU32				mCapacity;
+			NxU32				mSize;
 			ArrayMetaData(): mSize(0), mCapacity(0), mData(0) {}
 		};
 
@@ -636,7 +636,7 @@ namespace NVSHARE
 		/*!
 		Initialize array with given length
 		*/
-		NX_INLINE  explicit Array(PxU32 capacity, const Alloc& alloc = Alloc())
+		NX_INLINE  explicit Array(NxU32 capacity, const Alloc& alloc = Alloc())
 		: Alloc(alloc)
 		{
 			if(mCapacity>0)
@@ -690,11 +690,11 @@ namespace NVSHARE
 			}
 			else
 			{
-				PxU32 m = NxMin(t.mSize,mSize);
+				NxU32 m = NxMin(t.mSize,mSize);
 				copy(mData,t.mData,m);
-				for(PxU32 i = m; i < mSize;i++)
+				for(NxU32 i = m; i < mSize;i++)
 					mData[i].~T();
-				for(PxU32 i = m; i < t.mSize; i++)
+				for(NxU32 i = m; i < t.mSize; i++)
 					new(mData+i)T(t.mData[i]);
 			}
 
@@ -709,7 +709,7 @@ namespace NVSHARE
 		\return
 		The element i in the array.
 		*/
-		NX_INLINE const T& operator[] (PxU32 i) const 
+		NX_INLINE const T& operator[] (NxU32 i) const 
 		{
 			return mData[i];
 		}
@@ -721,7 +721,7 @@ namespace NVSHARE
 		\return
 		The element i in the array.
 		*/
-		NX_INLINE T& operator[] (PxU32 i) 
+		NX_INLINE T& operator[] (NxU32 i) 
 		{
 			return mData[i];
 		}
@@ -798,7 +798,7 @@ namespace NVSHARE
 		\return
 		The number of of entries in the array.
 		*/
-		NX_INLINE PxU32 size() const 
+		NX_INLINE NxU32 size() const 
 		{
 			return mSize;
 		}
@@ -831,7 +831,7 @@ namespace NVSHARE
 
 		NX_INLINE Iterator find(const T&a)
 		{
-			PxU32 index;
+			NxU32 index;
 			for(index=0;index<mSize && mData[index]!=a;index++)
 				;
 			return mData+index;
@@ -839,7 +839,7 @@ namespace NVSHARE
 
 		NX_INLINE ConstIterator find(const T&a) const
 		{
-			PxU32 index;
+			NxU32 index;
 			for(index=0;index<mSize && mData[index]!=a;index++)
 				;
 			return mData+index;
@@ -902,7 +902,7 @@ namespace NVSHARE
 		The element that was removed.
 		*/
 		/////////////////////////////////////////////////////////////////////////
-		NX_INLINE void replaceWithLast(PxU32 i)
+		NX_INLINE void replaceWithLast(NxU32 i)
 		{
 			NX_ASSERT(i<mSize);
 			mData[i] = mData[--mSize];
@@ -911,7 +911,7 @@ namespace NVSHARE
 
 		NX_INLINE void replaceWithLast(Iterator i) 
 		{
-			replaceWithLast(static_cast<PxU32>(i-mData));
+			replaceWithLast(static_cast<NxU32>(i-mData));
 		}
 
 		/////////////////////////////////////////////////////////////////////////
@@ -926,7 +926,7 @@ namespace NVSHARE
 
 		NX_INLINE bool findAndReplaceWithLast(const T& a)
 		{
-			PxU32 index;
+			NxU32 index;
 			for(index=0;index<mSize && mData[index]!=a;index++)
 				;
 			if(index >= mSize)
@@ -946,7 +946,7 @@ namespace NVSHARE
 		The element that was removed.
 		*/
 		/////////////////////////////////////////////////////////////////////////
-		NX_INLINE void remove(PxU32 i) 
+		NX_INLINE void remove(NxU32 i) 
 		{
 			NX_ASSERT(i<mSize);
 			while(i+1<mSize)
@@ -967,7 +967,7 @@ namespace NVSHARE
 		memory block which fits the size is allocated and the old one gets freed.
 		*/
 		//////////////////////////////////////////////////////////////////////////
-		NX_INLINE void resize(const PxU32 size, const bool compaction = false, const T& a = T())
+		NX_INLINE void resize(const NxU32 size, const bool compaction = false, const T& a = T())
 		{
 			if(size > mCapacity)
 			{
@@ -978,12 +978,12 @@ namespace NVSHARE
 				recreate(size, NxMin(mSize, size));
 			}
 
-			for(PxU32 i = mSize; i < size; i++)
+			for(NxU32 i = mSize; i < size; i++)
 				::new(mData+i)T(a);
 
 			if (!compaction)  // With compaction, these elements have been deleted already
 			{
-				for(PxU32 i = size; i < mSize; i++)
+				for(NxU32 i = size; i < mSize; i++)
 					mData[i].~T();
 			}
 
@@ -1019,7 +1019,7 @@ namespace NVSHARE
 		Ensure that the array has at least size capacity.
 		*/
 		//////////////////////////////////////////////////////////////////////////
-		NX_INLINE void reserve(const PxU32 size)
+		NX_INLINE void reserve(const NxU32 size)
 		{
 			if(size > mCapacity)
 				grow(size);
@@ -1030,7 +1030,7 @@ namespace NVSHARE
 		Query the capacity(allocated mem) for the array.
 		*/
 		//////////////////////////////////////////////////////////////////////////
-		NX_INLINE PxU32 capacity()	const
+		NX_INLINE NxU32 capacity()	const
 		{
 			return mCapacity;
 		}
@@ -1063,7 +1063,7 @@ namespace NVSHARE
 		// The idea here is to prevent accidental brain-damage with pushBack or insert. Unfortunately
 		// it interacts badly with InlineArrays with smaller inline allocations.
 		// TODO(dsequeira): policy template arg, this is exactly what they're for.
-		NX_INLINE PxU32 capacityIncrement()	const
+		NX_INLINE NxU32 capacityIncrement()	const
 		{
 			return mCapacity == 0 ? 1 : mCapacity * 2;
 		}
@@ -1076,7 +1076,7 @@ namespace NVSHARE
 		\param copyCount
 		The number of entries to copy.
 		*/
-		NX_INLINE void recreate(PxU32 capacity, PxU32 copyCount)
+		NX_INLINE void recreate(NxU32 capacity, NxU32 copyCount)
 		{
 			NX_ASSERT(capacity >= copyCount);
 			NX_ASSERT(mSize >= copyCount);
@@ -1101,7 +1101,7 @@ namespace NVSHARE
 		\param capacity
 		The number of entries that the set should be able to hold.
 		*/	
-		NX_INLINE void grow(PxU32 capacity) 
+		NX_INLINE void grow(NxU32 capacity) 
 		{
 			NX_ASSERT(mCapacity < capacity);
 			recreate(capacity, mSize);
@@ -1109,7 +1109,7 @@ namespace NVSHARE
 	};
 
 	// array that pre-allocates for N elements
-	template <typename T, PxU32 N, typename Alloc = typename Internal::AllocatorTraits<T>::Type>
+	template <typename T, NxU32 N, typename Alloc = typename Internal::AllocatorTraits<T>::Type>
 	class InlineArray : public Array<T, InlineAllocator<N * sizeof(T), Alloc> >
 	{
 		typedef InlineAllocator<N * sizeof(T), Alloc> Allocator;
@@ -1140,20 +1140,20 @@ NX_INLINE NvStrideIterator<const T> getConstStrideIterator(NVSHARE::Array<T>& ar
 
 namespace NVSHARE
 {
-	NX_INLINE PxU32 bitCount32(PxU32 v)
+	NX_INLINE NxU32 bitCount32(NxU32 v)
 	{
 		// from http://graphics.stanford.edu/~seander/bithacks.html#CountBitsSetParallel
-		PxU32 const w = v - ((v >> 1) & 0x55555555);
-		PxU32 const x = (w & 0x33333333) + ((w >> 2) & 0x33333333);
+		NxU32 const w = v - ((v >> 1) & 0x55555555);
+		NxU32 const x = (w & 0x33333333) + ((w >> 2) & 0x33333333);
 		return ((x + (x >> 4) & 0xF0F0F0F) * 0x1010101) >> 24;
 	}
 
 	/*!
 	Return the index of the highest set bit. Or 0 if no bits are set.
 	*/
-	NX_INLINE PxU32 highestSetBit32(PxU32 v)
+	NX_INLINE NxU32 highestSetBit32(NxU32 v)
 	{
-		for(PxU32 j = 32; j-- > 0;)
+		for(NxU32 j = 32; j-- > 0;)
 		{
 			if(v&(1<<j))
 				return j;
@@ -1161,7 +1161,7 @@ namespace NVSHARE
 		return 0;
 	}
 
-	NX_INLINE bool isPowerOfTwo(PxU32 x)
+	NX_INLINE bool isPowerOfTwo(NxU32 x)
 	{
 		return x!=0 && (x & x-1) == 0;
 	}
@@ -1171,7 +1171,7 @@ namespace NVSHARE
 	// that recursively "folds" the upper bits into the lower bits. This process yields a bit vector with
 	// the same most significant 1 as x, but all 1's below it. Adding 1 to that value yields the next
 	// largest power of 2. For a 32-bit value:"
-	NX_INLINE PxU32 nextPowerOfTwo(PxU32 x)
+	NX_INLINE NxU32 nextPowerOfTwo(NxU32 x)
 	{
 		x |= (x >> 1);
 		x |= (x >> 2);
@@ -1182,52 +1182,52 @@ namespace NVSHARE
 	}
 
 	// Helper function to approximate log2 of an integer value (assumes that the input is actually power of two)
-	NX_INLINE PxU32 ilog2(PxU32 num)
+	NX_INLINE NxU32 ilog2(NxU32 num)
 	{
-		for (PxU32 i=0; i<32; i++)
+		for (NxU32 i=0; i<32; i++)
 		{
 			num >>= 1;
 			if (num == 0) return i;
 		}
 
 		NX_ASSERT(0);
-		return (PxU32)-1;
+		return (NxU32)-1;
 	}
 
-	NX_INLINE int intChop(const PxF32& f)
+	NX_INLINE int intChop(const NxF32& f)
 	{
-		PxI32 a			= *reinterpret_cast<const PxI32*>(&f);			// take bit pattern of float into a register
-		PxI32 sign		= (a>>31);										// sign = 0xFFFFFFFF if original value is negative, 0 if positive
-		PxI32 mantissa	= (a&((1<<23)-1))|(1<<23);						// extract mantissa and add the hidden bit
-		PxI32 exponent	= ((a&0x7fffffff)>>23)-127;						// extract the exponent
-		PxI32 r			= ((PxU32)(mantissa)<<8)>>(31-exponent);		// ((1<<exponent)*mantissa)>>24 -- (we know that mantissa > (1<<24))
+		NxI32 a			= *reinterpret_cast<const NxI32*>(&f);			// take bit pattern of float into a register
+		NxI32 sign		= (a>>31);										// sign = 0xFFFFFFFF if original value is negative, 0 if positive
+		NxI32 mantissa	= (a&((1<<23)-1))|(1<<23);						// extract mantissa and add the hidden bit
+		NxI32 exponent	= ((a&0x7fffffff)>>23)-127;						// extract the exponent
+		NxI32 r			= ((NxU32)(mantissa)<<8)>>(31-exponent);		// ((1<<exponent)*mantissa)>>24 -- (we know that mantissa > (1<<24))
 		return ((r ^ (sign)) - sign ) &~ (exponent>>31);				// add original sign. If exponent was negative, make return value 0.
 	}
 
-	NX_INLINE int intFloor(const PxF32& f)
+	NX_INLINE int intFloor(const NxF32& f)
 	{
-		PxI32 a			= *reinterpret_cast<const PxI32*>(&f);									// take bit pattern of float into a register
-		PxI32 sign		= (a>>31);																// sign = 0xFFFFFFFF if original value is negative, 0 if positive
+		NxI32 a			= *reinterpret_cast<const NxI32*>(&f);									// take bit pattern of float into a register
+		NxI32 sign		= (a>>31);																// sign = 0xFFFFFFFF if original value is negative, 0 if positive
 		a&=0x7fffffff;																			// we don't need the sign any more
-		PxI32 exponent	= (a>>23)-127;															// extract the exponent
-		PxI32 expsign   = ~(exponent>>31);														// 0xFFFFFFFF if exponent is positive, 0 otherwise
-		PxI32 imask		= ( (1<<(31-(exponent))))-1;											// mask for true integer values
-		PxI32 mantissa	= (a&((1<<23)-1));														// extract mantissa (without the hidden bit)
-		PxI32 r			= ((PxU32)(mantissa|(1<<23))<<8)>>(31-exponent);						// ((1<<exponent)*(mantissa|hidden bit))>>24 -- (we know that mantissa > (1<<24))
+		NxI32 exponent	= (a>>23)-127;															// extract the exponent
+		NxI32 expsign   = ~(exponent>>31);														// 0xFFFFFFFF if exponent is positive, 0 otherwise
+		NxI32 imask		= ( (1<<(31-(exponent))))-1;											// mask for true integer values
+		NxI32 mantissa	= (a&((1<<23)-1));														// extract mantissa (without the hidden bit)
+		NxI32 r			= ((NxU32)(mantissa|(1<<23))<<8)>>(31-exponent);						// ((1<<exponent)*(mantissa|hidden bit))>>24 -- (we know that mantissa > (1<<24))
 		r = ((r & expsign) ^ (sign)) + ((!((mantissa<<8)&imask)&(expsign^((a-1)>>31)))&sign);	// if (fabs(value)<1.0) value = 0; copy sign; if (value < 0 && value==(int)(value)) value++;
 		return r;
 	}
 
-	NX_INLINE int intCeil(const PxF32& f)
+	NX_INLINE int intCeil(const NxF32& f)
 	{
-		PxI32 a			= *reinterpret_cast<const PxI32*>(&f) ^ 0x80000000;						// take bit pattern of float into a register
-		PxI32 sign		= (a>>31);																// sign = 0xFFFFFFFF if original value is negative, 0 if positive
+		NxI32 a			= *reinterpret_cast<const NxI32*>(&f) ^ 0x80000000;						// take bit pattern of float into a register
+		NxI32 sign		= (a>>31);																// sign = 0xFFFFFFFF if original value is negative, 0 if positive
 		a&=0x7fffffff;																			// we don't need the sign any more
-		PxI32 exponent	= (a>>23)-127;															// extract the exponent
-		PxI32 expsign   = ~(exponent>>31);														// 0xFFFFFFFF if exponent is positive, 0 otherwise
-		PxI32 imask		= ( (1<<(31-(exponent))))-1;											// mask for true integer values
-		PxI32 mantissa	= (a&((1<<23)-1));														// extract mantissa (without the hidden bit)
-		PxI32 r			= ((PxU32)(mantissa|(1<<23))<<8)>>(31-exponent);						// ((1<<exponent)*(mantissa|hidden bit))>>24 -- (we know that mantissa > (1<<24))
+		NxI32 exponent	= (a>>23)-127;															// extract the exponent
+		NxI32 expsign   = ~(exponent>>31);														// 0xFFFFFFFF if exponent is positive, 0 otherwise
+		NxI32 imask		= ( (1<<(31-(exponent))))-1;											// mask for true integer values
+		NxI32 mantissa	= (a&((1<<23)-1));														// extract mantissa (without the hidden bit)
+		NxI32 r			= ((NxU32)(mantissa|(1<<23))<<8)>>(31-exponent);						// ((1<<exponent)*(mantissa|hidden bit))>>24 -- (we know that mantissa > (1<<24))
 		r = ((r & expsign) ^ (sign)) + ((!((mantissa<<8)&imask)&(expsign^((a-1)>>31)))&sign);	// if (fabs(value)<1.0) value = 0; copy sign; if (value < 0 && value==(int)(value)) value++;
 		return -r;
 	}
@@ -1243,38 +1243,38 @@ namespace NVSHARE
 {
 	// Hash functions
 	template<class T>
-	PxU32 hash(const T& key)
+	NxU32 hash(const T& key)
 	{
-		return (PxU32)key;
+		return (NxU32)key;
 	}
 
 	// Thomas Wang's 32 bit mix
 	// http://www.cris.com/~Ttwang/tech/inthash.htm
 	template<>
-	NX_INLINE PxU32 hash<PxU32>(const PxU32& key)
+	NX_INLINE NxU32 hash<NxU32>(const NxU32& key)
 	{
-		PxU32 k = key;
+		NxU32 k = key;
 		k += ~(k << 15);
 		k ^= (k >> 10);
 		k += (k << 3);
 		k ^= (k >> 6);
 		k += ~(k << 11);
 		k ^= (k >> 16);
-		return (PxU32)k;
+		return (NxU32)k;
 	}
 
 	template<>
-	NX_INLINE PxU32 hash<PxI32>(const PxI32& key)
+	NX_INLINE NxU32 hash<NxI32>(const NxI32& key)
 	{
-		return hash((PxU32)key);
+		return hash((NxU32)key);
 	}
 
 	// Thomas Wang's 64 bit mix
 	// http://www.cris.com/~Ttwang/tech/inthash.htm
 	template<>
-	NX_INLINE PxU32 hash<PxU64>(const PxU64& key)
+	NX_INLINE NxU32 hash<NxU64>(const NxU64& key)
 	{
-		PxU64 k = key;
+		NxU64 k = key;
 		k += ~(k << 32);
 		k ^= (k >> 22);
 		k += ~(k << 13);
@@ -1283,29 +1283,29 @@ namespace NVSHARE
 		k ^= (k >> 15);
 		k += ~(k << 27);
 		k ^= (k >> 31);
-		return (PxU32)k;
+		return (NxU32)k;
 	}
 
 	// Helper for pointer hashing
 	template<int size>
-	PxU32 PointerHash(const void* ptr);
+	NxU32 PointerHash(const void* ptr);
 
 	template<>
-	NX_INLINE PxU32 PointerHash<4>(const void* ptr)
+	NX_INLINE NxU32 PointerHash<4>(const void* ptr)
 	{
-		return hash<PxU32>(static_cast<PxU32>(reinterpret_cast<size_t>(ptr)));
+		return hash<NxU32>(static_cast<NxU32>(reinterpret_cast<size_t>(ptr)));
 	}
 
 
 	template<>
-	NX_INLINE PxU32 PointerHash<8>(const void* ptr)
+	NX_INLINE NxU32 PointerHash<8>(const void* ptr)
 	{
-		return hash<PxU64>(reinterpret_cast<size_t>(ptr));
+		return hash<NxU64>(reinterpret_cast<size_t>(ptr));
 	}
 
 	// Hash function for pointers
 	template<class T>
-	NX_INLINE PxU32 hash(T* key)
+	NX_INLINE NxU32 hash(T* key)
 	{
 		return PointerHash<sizeof(const void*)>(key);
 	}
@@ -1314,7 +1314,7 @@ namespace NVSHARE
 	template <class T>
 	struct PointerHashFunctor
 	{
-		PxU32 operator()(const T* t) const
+		NxU32 operator()(const T* t) const
 		{
 			return PointerHash<sizeof(T*)>(t);
 		}
@@ -1353,7 +1353,7 @@ namespace NVSHARE
 	to choose from.  I only looked at a billion or so.
 	--------------------------------------------------------------------
 	*/
-	NX_INLINE PxU32 hashMix(PxU32 &a, PxU32 &b, PxU32 &c)
+	NX_INLINE NxU32 hashMix(NxU32 &a, NxU32 &b, NxU32 &c)
 	{
 		a -= b; a -= c; a ^= (c>>13);
 		b -= c; b -= a; b ^= (a<<8);
@@ -1366,9 +1366,9 @@ namespace NVSHARE
 		c -= a; c -= b; c ^= (b>>15);
 	}
 
-	NX_INLINE PxU32 hash(const PxU32 *k, PxU32 length)
+	NX_INLINE NxU32 hash(const NxU32 *k, NxU32 length)
 	{
-		PxU32 a,b,c,len;
+		NxU32 a,b,c,len;
 
 		/* Set up the internal state */
 		len = length;
@@ -1404,17 +1404,17 @@ namespace NVSHARE
 	class Hash
 	{
 	public:
-		PxU32 operator()(const Key &k) const { return hash<Key>(k); }
+		NxU32 operator()(const Key &k) const { return hash<Key>(k); }
 		bool operator()(const Key &k0, const Key &k1) const { return k0 == k1; }
 	};
 
 	class NvStringHash
 	{
 	public:
-		PxU32 operator()(const char *string) const
+		NxU32 operator()(const char *string) const
 		{
 			// "DJB" string hash 
-			PxU32 h = 5381;
+			NxU32 h = 5381;
 			for(const char *ptr = string; *ptr; ptr++)
 				h = ((h<<5)+h)^*ptr;
 			return h;
@@ -1452,7 +1452,7 @@ namespace NVSHARE
 		public:
 			typedef Entry EntryType;
 
-			HashBase(PxU32 initialTableSize = 64, float loadFactor = 0.75f):
+			HashBase(NxU32 initialTableSize = 64, float loadFactor = 0.75f):
 			mLoadFactor(loadFactor),
 				mFreeList(EOL),
 				mTimestamp(0),
@@ -1467,21 +1467,21 @@ namespace NVSHARE
 
 			~HashBase()
 			{
-				for(PxU32 i = 0;i<mHash.size();i++)
+				for(NxU32 i = 0;i<mHash.size();i++)
 				{				
-					for(PxU32 j = mHash[i]; j != EOL; j = mNext[j])
+					for(NxU32 j = mHash[i]; j != EOL; j = mNext[j])
 						mEntries[j].~Entry();
 				}
 			}
 
-			static const PxU32 EOL = 0xffffffff;
+			static const NxU32 EOL = 0xffffffff;
 
 			NX_INLINE Entry* create(const Key& k, bool& exists)
 			{
-				PxU32 n = HashFn()(k);
+				NxU32 n = HashFn()(k);
 				if(mHash.size())
 				{
-					PxU32 index = mHash[n&(mHash.size()-1)];
+					NxU32 index = mHash[n&(mHash.size()-1)];
 					while(index!=EOL && !HashFn()(GetKey()(mEntries[index]), k))
 						index = mNext[index];
 					exists = index!=EOL;
@@ -1492,9 +1492,9 @@ namespace NVSHARE
 				if(freeListEmpty())
 					grow();
 
-				PxU32 entryIndex = freeListGetNext();
+				NxU32 entryIndex = freeListGetNext();
 
-				PxU32 h = n&(mHash.size()-1);
+				NxU32 h = n&(mHash.size()-1);
 				mNext[entryIndex] = mHash[h];
 				mHash[h] = entryIndex;
 
@@ -1509,8 +1509,8 @@ namespace NVSHARE
 				if(!mHash.size())
 					return false;
 
-				PxU32 h = hash(k);
-				PxU32 index = mHash[h];
+				NxU32 h = hash(k);
+				NxU32 index = mHash[h];
 				while(index!=EOL && !HashFn()(GetKey()(mEntries[index]), k))
 					index = mNext[index];
 				return index != EOL ? &mEntries[index]:0;
@@ -1521,15 +1521,15 @@ namespace NVSHARE
 				if(!mHash.size())
 					return false;
 
-				PxU32 h = hash(k);
-				PxU32* ptr = &mHash[h];
+				NxU32 h = hash(k);
+				NxU32* ptr = &mHash[h];
 				while(*ptr!=EOL && !HashFn()(GetKey()(mEntries[*ptr]), k))
 					ptr = &mNext[*ptr];
 
 				if(*ptr == EOL)
 					return false;
 
-				PxU32 index = *ptr;
+				NxU32 index = *ptr;
 				*ptr = mNext[index];
 
 				mEntries[index].~Entry();
@@ -1545,7 +1545,7 @@ namespace NVSHARE
 				return true;
 			}
 
-			NX_INLINE PxU32 size() const
+			NX_INLINE NxU32 size() const
 			{ 
 				return mSize; 
 			}
@@ -1555,16 +1555,16 @@ namespace NVSHARE
 				if(!mHash.size())
 					return;
 
-				for(PxU32 i = 0;i<mHash.size();i++)
+				for(NxU32 i = 0;i<mHash.size();i++)
 					mHash[i] = EOL;
-				for(PxU32 i = 0;i<mEntries.size()-1;i++)
+				for(NxU32 i = 0;i<mEntries.size()-1;i++)
 					mNext[i] = i+1;
 				mNext[mEntries.size()-1] = EOL;
 				mFreeList = 0;
 				mSize = 0;
 			}
 
-			void reserve(PxU32 size)
+			void reserve(NxU32 size)
 			{
 				if(size>mHash.size())
 					reserveInternal(size);
@@ -1581,7 +1581,7 @@ namespace NVSHARE
 			// the top of the free list and it should always be equal to size(). Otherwise,
 			// we build a free list in the next() pointers.
 
-			NX_INLINE void freeListAdd(PxU32 index)
+			NX_INLINE void freeListAdd(NxU32 index)
 			{
 				if(compacting)
 				{
@@ -1595,18 +1595,18 @@ namespace NVSHARE
 				}
 			}
 
-			NX_INLINE void freeListAdd(PxU32 start, PxU32 end)
+			NX_INLINE void freeListAdd(NxU32 start, NxU32 end)
 			{
 				if(!compacting)
 				{
-					for(PxU32 i = start; i<end-1; i++)	// add the new entries to the free list
+					for(NxU32 i = start; i<end-1; i++)	// add the new entries to the free list
 						mNext[i] = i+1;
 					mNext[end-1] = EOL;
 				}
 				mFreeList = start;
 			}
 
-			NX_INLINE PxU32 freeListGetNext()
+			NX_INLINE NxU32 freeListGetNext()
 			{
 				NX_ASSERT(!freeListEmpty());
 				if(compacting)
@@ -1616,7 +1616,7 @@ namespace NVSHARE
 				}
 				else
 				{
-					PxU32 entryIndex = mFreeList;
+					NxU32 entryIndex = mFreeList;
 					mFreeList = mNext[mFreeList];
 					return entryIndex;
 				}
@@ -1630,37 +1630,37 @@ namespace NVSHARE
 					return mFreeList == EOL;
 			}
 
-			NX_INLINE void replaceWithLast(PxU32 index)
+			NX_INLINE void replaceWithLast(NxU32 index)
 			{
 				new(&mEntries[index])Entry(mEntries[mSize]);
 				mEntries[mSize].~Entry();
 				mNext[index] = mNext[mSize];
 
-				PxU32 h = hash(GetKey()(mEntries[index]));
-				PxU32 *ptr;
+				NxU32 h = hash(GetKey()(mEntries[index]));
+				NxU32 *ptr;
 				for(ptr = &mHash[h]; *ptr!=mSize; ptr = &mNext[*ptr])
 					NX_ASSERT(*ptr!=EOL);
 				*ptr = index;
 			}
 
 
-			NX_INLINE PxU32 hash(const Key& k) const
+			NX_INLINE NxU32 hash(const Key& k) const
 			{
 				return HashFn()(k)&(mHash.size()-1);
 			}
 
-			void reserveInternal(PxU32 size)
+			void reserveInternal(NxU32 size)
 			{
 				size = nextPowerOfTwo(size);
 				// resize the hash and reset
 				mHash.resize(size);
-				for(PxU32 i=0;i<mHash.size();i++)
+				for(NxU32 i=0;i<mHash.size();i++)
 					mHash[i] = EOL;
 
 				NX_ASSERT(!(mHash.size()&(mHash.size()-1)));
 
-				PxU32 oldSize = mEntries.size();
-				PxU32 newSize = PxU32(float(mHash.size())*mLoadFactor);
+				NxU32 oldSize = mEntries.size();
+				NxU32 newSize = NxU32(float(mHash.size())*mLoadFactor);
 
 				mEntries.resize(newSize);
 				mNext.resize(newSize);
@@ -1668,9 +1668,9 @@ namespace NVSHARE
 				freeListAdd(oldSize,newSize);
 
 				// rehash all the existing entries
-				for(PxU32 i=0;i<oldSize;i++)
+				for(NxU32 i=0;i<oldSize;i++)
 				{
-					PxU32 h = hash(GetKey()(mEntries[i]));
+					NxU32 h = hash(GetKey()(mEntries[i]));
 					mNext[i] = mHash[h];
 					mHash[h] = i;
 				}
@@ -1680,18 +1680,18 @@ namespace NVSHARE
 			{
 				NX_ASSERT(mFreeList == EOL || compacting && mSize == mEntries.size());
 
-				PxU32 size = mHash.size()==0 ? 16 : mHash.size()*2;
+				NxU32 size = mHash.size()==0 ? 16 : mHash.size()*2;
 				reserve(size);
 			}
 
 
 			Array<Entry, Allocator>	mEntries;
-			Array<PxU32, Allocator>	mNext;
-			Array<PxU32, Allocator>	mHash;
+			Array<NxU32, Allocator>	mNext;
+			Array<NxU32, Allocator>	mHash;
 			float					mLoadFactor;
-			PxU32					mFreeList;
-			PxU32					mTimestamp;
-			PxU32					mSize;
+			NxU32					mFreeList;
+			NxU32					mTimestamp;
+			NxU32					mSize;
 
 			friend class Iter;
 
@@ -1727,9 +1727,9 @@ namespace NVSHARE
 					}
 				}
 
-				PxU32 mBucket;
-				PxU32 mEntry;
-				PxU32 mTimestamp;
+				NxU32 mBucket;
+				NxU32 mEntry;
+				NxU32 mTimestamp;
 				HashBase &mBase;
 			};
 		};
@@ -1746,7 +1746,7 @@ namespace NVSHARE
 			typedef HashBase<Key, Key, HashFn, GetKey, Allocator, Coalesced> BaseMap;
 			typedef typename BaseMap::Iter Iterator;
 
-			HashSetBase(PxU32 initialTableSize = 64, 
+			HashSetBase(NxU32 initialTableSize = 64, 
 						float loadFactor = 0.75f):	mBase(initialTableSize,loadFactor)	{}
 
 			bool insert(const Key& k)
@@ -1760,8 +1760,8 @@ namespace NVSHARE
 
 			NX_INLINE bool		contains(const Key& k)	const	{	return mBase.find(k)!=0;		}
 			NX_INLINE bool		erase(const Key& k)				{	return mBase.erase(k);			}
-			NX_INLINE PxU32		size()					const	{	return mBase.size();			}
-			NX_INLINE void		reserve(PxU32 size)				{	mBase.reserve(size);			}
+			NX_INLINE NxU32		size()					const	{	return mBase.size();			}
+			NX_INLINE void		reserve(NxU32 size)				{	mBase.reserve(size);			}
 			NX_INLINE void		clear()							{	mBase.clear();					}
 		protected:
 			BaseMap mBase;
@@ -1781,7 +1781,7 @@ namespace NVSHARE
 			typedef HashBase<Pair<const Key,Value>, Key, HashFn, GetKey, Allocator, true> BaseMap;
 			typedef typename BaseMap::Iter Iterator;
 
-			HashMapBase(PxU32 initialTableSize = 64, float loadFactor = 0.75f):	mBase(initialTableSize,loadFactor)	{}
+			HashMapBase(NxU32 initialTableSize = 64, float loadFactor = 0.75f):	mBase(initialTableSize,loadFactor)	{}
 
 			bool insert(const Key& k, const Value& v)
 			{
@@ -1804,9 +1804,9 @@ namespace NVSHARE
 
 			NX_INLINE const Entry*	find(const Key& k)		const	{	return mBase.find(k);			}
 			NX_INLINE bool			erase(const Key& k)				{	return mBase.erase(k);			}
-			NX_INLINE PxU32			size()					const	{	return mBase.size();			}
+			NX_INLINE NxU32			size()					const	{	return mBase.size();			}
 			NX_INLINE Iterator		getIterator()					{	return Iterator(mBase);			}
-			NX_INLINE void			reserve(PxU32 size)				{	mBase.reserve(size);			}
+			NX_INLINE void			reserve(NxU32 size)				{	mBase.reserve(size);			}
 			NX_INLINE void			clear()							{	mBase.clear();					}
 
 		protected:
@@ -1845,8 +1845,8 @@ namespace NVSHARE
 //		Value &			operator[](const Key &k)				O(1) for existing objects, else O(1) amortized
 //		const Entry *	find(const Key &k);						O(1)
 //		bool			erase(const T &k);						O(1)
-//		PxU32			size();									constant
-//		void			reserve(PxU32 size);					O(MAX(currentOccupancy,size))
+//		NxU32			size();									constant
+//		void			reserve(NxU32 size);					O(MAX(currentOccupancy,size))
 //		void			clear();								O(currentOccupancy) (with zero constant for objects without destructors)
 //      Iterator		getIterator();
 //
@@ -1874,7 +1874,7 @@ namespace NVSHARE
 		typedef Internal::HashMapBase<Key, Value, HashFn, Allocator> HashMapBase;
 		typedef typename HashMapBase::Iterator Iterator;
 
-		HashMap(PxU32 initialTableSize = 64, float loadFactor = 0.75f):	HashMapBase(initialTableSize,loadFactor) {}
+		HashMap(NxU32 initialTableSize = 64, float loadFactor = 0.75f):	HashMapBase(initialTableSize,loadFactor) {}
 		Iterator getIterator() { return Iterator(HashMapBase::mBase); }
 	};
 
@@ -1886,7 +1886,7 @@ namespace NVSHARE
 	{
 		typedef Internal::HashMapBase<Key, Value, HashFn, Allocator> HashMapBase;
 
-		CoalescedHashMap(PxU32 initialTableSize = 64, float loadFactor = 0.75f): HashMapBase(initialTableSize,loadFactor){}
+		CoalescedHashMap(NxU32 initialTableSize = 64, float loadFactor = 0.75f): HashMapBase(initialTableSize,loadFactor){}
 		const Key *getEntries() const { return HashMapBase::mBase.getEntries(); }
 	};
 

@@ -54,7 +54,7 @@
 
 // types:
 //
-//          f   : 4 byte PxF32
+//          f   : 4 byte NxF32
 //          d   : 4 byte integer
 //          c   : 1 byte character
 //          b   : 1 byte integer
@@ -70,7 +70,7 @@
 namespace NVSHARE
 {
 
-void * Asc2Bin(const char *source,const PxI32 count,const char *ctype,void *dest=0);
+void * Asc2Bin(const char *source,const NxI32 count,const char *ctype,void *dest=0);
 
 }; //
 
