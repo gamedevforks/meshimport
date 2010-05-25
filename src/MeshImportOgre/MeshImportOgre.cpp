@@ -19,7 +19,7 @@ bool doShutdown(void);
 
 extern "C"
 {
-MESHIMPORTOGRE_API NVSHARE::MeshImporter * getInterface(int version_number,NVSHARE::SystemServices *services);
+MESHIMPORTOGRE_API NVSHARE::MeshImporter * getInterface(int version_number);
 };
 
 namespace NVSHARE
@@ -95,15 +95,11 @@ static MyMeshImportOgre *gInterface=0;
 extern "C"
 {
 #ifdef PLUGINS_EMBEDDED
-  MeshImporter * getInterfaceMeshImportOgre(int version_number,NVSHARE::SystemServices *services)
+  MeshImporter * getInterfaceMeshImportOgre(int version_number)
 #else
-MESHIMPORTOGRE_API MeshImporter * getInterface(int version_number,NVSHARE::SystemServices *services)
+MESHIMPORTOGRE_API MeshImporter * getInterface(int version_number)
 #endif
 {
-  if ( services )
-  {
-    NVSHARE::gSystemServices = services;
-  }
   assert( gInterface == 0 );
   if ( gInterface == 0 && version_number == MESHIMPORT_VERSION )
   {

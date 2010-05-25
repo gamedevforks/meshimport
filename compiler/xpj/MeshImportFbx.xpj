@@ -80,11 +80,11 @@
                  ../../include
                  ../../include/common/snippets
                  ../../include/MeshImport
-                 ../../ext/fbx
+                 ../../ext/fbx/include
 				</SearchPaths>
 				<SearchPaths type="library">
                 ../../lib/win32
-                ../../ext/fbx
+                ../../ext/fbx/lib
 				</SearchPaths>
 				<Dependencies>
 				</Dependencies>

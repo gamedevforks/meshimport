@@ -4,6 +4,9 @@
 	Version="8.00"
 	Name="MeshImportPSK"
 	ProjectGUID="{F65A6A6D-8257-C5DA-9620-9730FA78E23E}"
+	SccProjectName="Perforce Project"
+	SccLocalPath="."
+	SccProvider="MSCCI:Perforce SCM"
 	>
 	<Platforms>
 		<Platform

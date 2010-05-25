@@ -4,6 +4,9 @@
 	Version="8.00"
 	Name="MeshImportEzm"
 	ProjectGUID="{3454184B-5C28-0EE8-A994-F7B09BF0879C}"
+	SccProjectName="Perforce Project"
+	SccLocalPath="."
+	SccProvider="MSCCI:Perforce SCM"
 	>
 	<Platforms>
 		<Platform

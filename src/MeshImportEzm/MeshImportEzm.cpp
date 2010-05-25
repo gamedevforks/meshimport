@@ -19,7 +19,7 @@ bool doShutdown(void);
 
 extern "C"
 {
-MESHIMPORTEZM_API NVSHARE::MeshImporter * getInterface(NxI32 version_number,NVSHARE::SystemServices *services);
+MESHIMPORTEZM_API NVSHARE::MeshImporter * getInterface(PxI32 version_number);
 };
 
 namespace NVSHARE
@@ -40,18 +40,18 @@ public:
     return doShutdown();
   }
 
-  virtual const char * getExtension(NxI32 index)  // report the default file name extension for this mesh type.
+  virtual const char * getExtension(PxI32 index)  // report the default file name extension for this mesh type.
   {
     return ".ezm";
   }
 
-  virtual const char * getDescription(NxI32 index)
+  virtual const char * getDescription(PxI32 index)
   {
     return "PhysX Rocket EZ-Mesh format";
   }
 
 
-  virtual bool importMesh(const char *meshName,const void *data,NxU32 dlen,NVSHARE::MeshImportInterface *callback,const char *options,MeshImportApplicationResource *appResource)
+  virtual bool importMesh(const char *meshName,const void *data,PxU32 dlen,NVSHARE::MeshImportInterface *callback,const char *options,MeshImportApplicationResource *appResource)
   {
     bool ret = false;
 
@@ -81,15 +81,11 @@ static MyMeshImportEzm *gInterface=0;
 extern "C"
 {
 #ifdef PLUGINS_EMBEDDED
-  MeshImporter * getInterfaceMeshImportEzm(NxI32 version_number,NVSHARE::SystemServices *services)
+  MeshImporter * getInterfaceMeshImportEzm(PxI32 version_number)
 #else
-MESHIMPORTEZM_API MeshImporter * getInterface(NxI32 version_number,NVSHARE::SystemServices *services)
+MESHIMPORTEZM_API MeshImporter * getInterface(PxI32 version_number)
 #endif
 {
-  if ( services )
-  {
-    NVSHARE::gSystemServices = services;
-  }
   assert( gInterface == 0 );
   if ( gInterface == 0 && version_number == MESHIMPORT_VERSION )
   {
@@ -126,7 +122,7 @@ BOOL APIENTRY DllMain( HANDLE ,
                        DWORD  ul_reason_for_call,
                        LPVOID )
 {
-  NxI32 ret = 0;
+  PxI32 ret = 0;
 
   switch (ul_reason_for_call)
 	{

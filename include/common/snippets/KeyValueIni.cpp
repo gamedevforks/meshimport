@@ -477,7 +477,7 @@ void *     fi_getMemBuffer(FILE_INTERFACE *fph,size_t &outputLength)
 class InPlaceParserInterface
 {
 public:
-	virtual NxI32 ParseLine(NxI32 lineno,NxI32 argc,const char **argv) =0;  // return TRUE to continue parsing, return FALSE to abort parsing process
+	virtual PxI32 ParseLine(PxI32 lineno,PxI32 argc,const char **argv) =0;  // return TRUE to continue parsing, return FALSE to abort parsing process
 };
 
 enum SeparatorType
@@ -497,7 +497,7 @@ public:
 		Init();
 	}
 
-	InPlaceParser(char *data,NxI32 len)
+	InPlaceParser(char *data,PxI32 len)
 	{
 		Init();
 		SetSourceData(data,len);
@@ -517,7 +517,7 @@ public:
 		mData = 0;
 		mLen  = 0;
 		mMyAlloc = false;
-		for (NxI32 i=0; i<256; i++)
+		for (PxI32 i=0; i<256; i++)
 		{
 			mHard[i] = ST_DATA;
 			mHardString[i*2] = (char)i;
@@ -532,7 +532,7 @@ public:
 
 	void SetFile(const char *fname); // use this file as source data to parse.
 
-	void SetSourceData(char *data,NxI32 len)
+	void SetSourceData(char *data,PxI32 len)
 	{
 		mData = data;
 		mLen  = len;
@@ -540,21 +540,21 @@ public:
 	};
 
 #ifdef _DEBUG
-  void validateMem(const char *data,NxI32 len)
+  void validateMem(const char *data,PxI32 len)
   {
-    for (NxI32 i=0; i<len; i++)
+    for (PxI32 i=0; i<len; i++)
     {
       assert( data[i] );
     }
   }
 #else
-  void validateMem(const char *,NxI32 )
+  void validateMem(const char *,PxI32 )
   {
 
   }
 #endif
 
-	void SetSourceDataCopy(const char *data,NxI32 len)
+	void SetSourceDataCopy(const char *data,PxI32 len)
 	{
     if ( len )
     {
@@ -572,27 +572,27 @@ public:
     }
 	};
 
-	NxI32  Parse(InPlaceParserInterface *callback); // returns true if entire file was parsed, false if it aborted for some reason
+	PxI32  Parse(InPlaceParserInterface *callback); // returns true if entire file was parsed, false if it aborted for some reason
 
-	NxI32 ProcessLine(NxI32 lineno,char *line,InPlaceParserInterface *callback);
+	PxI32 ProcessLine(PxI32 lineno,char *line,InPlaceParserInterface *callback);
 
-	void SetHardSeparator(NxU8 c) // add a hard separator
+	void SetHardSeparator(PxU8 c) // add a hard separator
 	{
 		mHard[c] = ST_HARD;
 	}
 
-	void SetHard(NxU8 c) // add a hard separator
+	void SetHard(PxU8 c) // add a hard separator
 	{
 		mHard[c] = ST_HARD;
 	}
 
 
-	void SetCommentSymbol(NxU8 c) // comment character, treated as 'end of string'
+	void SetCommentSymbol(PxU8 c) // comment character, treated as 'end of string'
 	{
 		mHard[c] = ST_COMMENT;
 	}
 
-	void ClearHardSeparator(NxU8 c)
+	void ClearHardSeparator(PxU8 c)
 	{
 		mHard[c] = ST_DATA;
 	}
@@ -600,7 +600,7 @@ public:
 
 	void DefaultSymbols(void); // set up default symbols for hard seperator and comment symbol of the '#' character.
 
-	bool EOS(NxU8 c)
+	bool EOS(PxU8 c)
 	{
 		if ( mHard[c] == ST_EOS || mHard[c] == ST_COMMENT )
 		{
@@ -615,20 +615,20 @@ public:
 	}
 
 
-  inline bool IsComment(NxU8 c) const;
+  inline bool IsComment(PxU8 c) const;
 
 private:
 
 
-	inline char * AddHard(NxI32 &argc,const char **argv,char *foo);
-	inline bool   IsHard(NxU8 c);
+	inline char * AddHard(PxI32 &argc,const char **argv,char *foo);
+	inline bool   IsHard(PxU8 c);
 	inline char * SkipSpaces(char *foo);
-	inline bool   IsWhiteSpace(NxU8 c);
-	inline bool   IsNonSeparator(NxU8 c); // non seperator,neither hard nor soft
+	inline bool   IsWhiteSpace(PxU8 c);
+	inline bool   IsNonSeparator(PxU8 c); // non seperator,neither hard nor soft
 
 	bool   mMyAlloc; // whether or not *I* allocated the buffer and am responsible for deleting it.
 	char  *mData;  // ascii data to parse.
-	NxI32    mLen;   // length of data
+	PxI32    mLen;   // length of data
 	SeparatorType  mHard[256];
 	char   mHardString[256*2];
 	char           mQuoteChar;
@@ -656,7 +656,7 @@ void InPlaceParser::SetFile(const char *fname)
 		if ( mLen )
 		{
 			mData = (char *) MEMALLOC_MALLOC(sizeof(char)*(mLen+1));
-			NxI32 ok = fread(mData, mLen, 1, fph);
+			PxI32 ok = fread(mData, mLen, 1, fph);
 			if ( !ok )
 			{
 				MEMALLOC_FREE(mData);
@@ -682,16 +682,16 @@ InPlaceParser::~InPlaceParser(void)
 
 #define MAXARGS 512
 
-bool InPlaceParser::IsHard(NxU8 c)
+bool InPlaceParser::IsHard(PxU8 c)
 {
 	return mHard[c] == ST_HARD;
 }
 
-char * InPlaceParser::AddHard(NxI32 &argc,const char **argv,char *foo)
+char * InPlaceParser::AddHard(PxI32 &argc,const char **argv,char *foo)
 {
 	while ( IsHard(*foo) )
 	{
-    NxU8 c = *foo;
+    PxU8 c = *foo;
 		const char *hard = &mHardString[c*2];
 		if ( argc < MAXARGS )
 		{
@@ -702,7 +702,7 @@ char * InPlaceParser::AddHard(NxI32 &argc,const char **argv,char *foo)
 	return foo;
 }
 
-bool   InPlaceParser::IsWhiteSpace(NxU8 c)
+bool   InPlaceParser::IsWhiteSpace(PxU8 c)
 {
 	return mHard[c] == ST_SOFT;
 }
@@ -713,25 +713,25 @@ char * InPlaceParser::SkipSpaces(char *foo)
 	return foo;
 }
 
-bool InPlaceParser::IsNonSeparator(NxU8 c)
+bool InPlaceParser::IsNonSeparator(PxU8 c)
 {
 	if ( !IsHard(c) && !IsWhiteSpace(c) && c != 0 ) return true;
 	return false;
 }
 
 
-bool InPlaceParser::IsComment(NxU8 c) const
+bool InPlaceParser::IsComment(PxU8 c) const
 {
   if ( mHard[c] == ST_COMMENT ) return true;
   return false;
 }
 
-NxI32 InPlaceParser::ProcessLine(NxI32 lineno,char *line,InPlaceParserInterface *callback)
+PxI32 InPlaceParser::ProcessLine(PxI32 lineno,char *line,InPlaceParserInterface *callback)
 {
-	NxI32 ret = 0;
+	PxI32 ret = 0;
 
 	const char *argv[MAXARGS];
-	NxI32 argc = 0;
+	PxI32 argc = 0;
 
   char *foo = SkipSpaces(line); // skip leading spaces...
 
@@ -792,14 +792,14 @@ NxI32 InPlaceParser::ProcessLine(NxI32 lineno,char *line,InPlaceParserInterface 
 	return ret;
 }
 
-NxI32  InPlaceParser::Parse(InPlaceParserInterface *callback) // returns true if entire file was parsed, false if it aborted for some reason
+PxI32  InPlaceParser::Parse(InPlaceParserInterface *callback) // returns true if entire file was parsed, false if it aborted for some reason
 {
 	assert( callback );
 	if ( !mData ) return 0;
 
-	NxI32 ret = 0;
+	PxI32 ret = 0;
 
-	NxI32 lineno = 0;
+	PxI32 lineno = 0;
 
 	char *foo   = mData;
 	char *begin = foo;
@@ -814,7 +814,7 @@ NxI32  InPlaceParser::Parse(InPlaceParserInterface *callback) // returns true if
 
 			if ( *begin ) // if there is any data to parse at all...
 			{
-				NxI32 v = ProcessLine(lineno,begin,callback);
+				PxI32 v = ProcessLine(lineno,begin,callback);
 				if ( v ) ret = v;
 			}
 
@@ -830,7 +830,7 @@ NxI32  InPlaceParser::Parse(InPlaceParserInterface *callback) // returns true if
 
 	lineno++; // lasst line.
 
-	NxI32 v = ProcessLine(lineno,begin,callback);
+	PxI32 v = ProcessLine(lineno,begin,callback);
 	if ( v ) ret = v;
 	return ret;
 }
@@ -860,7 +860,7 @@ using namespace KEYVALUEINI_NVSHARE;
 class KeyValue
 {
 public:
-  KeyValue(const char *key,const char *value,NxU32 lineno)
+  KeyValue(const char *key,const char *value,PxU32 lineno)
   {
     mKey = key;
     mValue = value;
@@ -869,7 +869,7 @@ public:
 
   const char * getKey(void) const { return mKey; };
   const char * getValue(void) const { return mValue; };
-  NxU32 getLineNo(void) const { return mLineNo; };
+  PxU32 getLineNo(void) const { return mLineNo; };
 
   void save(FILE_INTERFACE *fph) const
   {
@@ -882,7 +882,7 @@ public:
   }
 
 private:
-  NxU32 mLineNo;
+  PxU32 mLineNo;
   const char *mKey;
   const char *mValue;
 };
@@ -892,21 +892,21 @@ typedef std::vector< KeyValue > KeyValueVector;
 class KeyValueSection : public NVSHARE::Memalloc
 {
 public:
-  KeyValueSection(const char *section,NxU32 lineno)
+  KeyValueSection(const char *section,PxU32 lineno)
   {
     mSection = section;
     mLineNo  = lineno;
   }
 
-  NxU32 getKeyCount(void) const { return mKeys.size(); };
+  PxU32 getKeyCount(void) const { return mKeys.size(); };
   const char * getSection(void) const { return mSection; };
-  NxU32 getLineNo(void) const { return mLineNo; };
+  PxU32 getLineNo(void) const { return mLineNo; };
 
-  const char * locateValue(const char *key,NxU32 lineno) const
+  const char * locateValue(const char *key,PxU32 lineno) const
   {
     const char *ret = 0;
 
-    for (NxU32 i=0; i<mKeys.size(); i++)
+    for (PxU32 i=0; i<mKeys.size(); i++)
     {
       const KeyValue &v = mKeys[i];
       if ( stricmp(key,v.getKey()) == 0 )
@@ -919,7 +919,7 @@ public:
     return ret;
   }
 
-  const char *getKey(NxU32 index,NxU32 &lineno) const
+  const char *getKey(PxU32 index,PxU32 &lineno) const
   {
     const char * ret  = 0;
     if ( index < mKeys.size() )
@@ -931,7 +931,7 @@ public:
     return ret;
   }
 
-  const char *getValue(NxU32 index,NxU32 &lineno) const
+  const char *getValue(PxU32 index,PxU32 &lineno) const
   {
     const char * ret  = 0;
     if ( index < mKeys.size() )
@@ -943,7 +943,7 @@ public:
     return ret;
   }
 
-  void addKeyValue(const char *key,const char *value,NxU32 lineno)
+  void addKeyValue(const char *key,const char *value,PxU32 lineno)
   {
     KeyValue kv(key,value,lineno);
     mKeys.push_back(kv);
@@ -960,7 +960,7 @@ public:
       fi_fprintf(fph,"\r\n");
       fi_fprintf(fph,"[%s]\r\n", mSection );
     }
-    for (NxU32 i=0; i<mKeys.size(); i++)
+    for (PxU32 i=0; i<mKeys.size(); i++)
     {
       mKeys[i].save(fph);
     }
@@ -971,7 +971,7 @@ public:
   {
     bool ret = false;
 
-    for (NxU32 i=0; i<mKeys.size(); i++)
+    for (PxU32 i=0; i<mKeys.size(); i++)
     {
       KeyValue &kv = mKeys[i];
       if ( strcmp(kv.getKey(),key) == 0 )
@@ -998,7 +998,7 @@ public:
   }
 
 private:
-  NxU32 mLineNo;
+  PxU32 mLineNo;
   const char *mSection;
   KeyValueVector mKeys;
 };
@@ -1021,7 +1021,7 @@ public:
     mData.Parse(this);
   }
 
-  KeyValueIni(const char *mem,NxU32 len)
+  KeyValueIni(const char *mem,PxU32 len)
   {
     if ( len )
     {
@@ -1062,9 +1062,9 @@ public:
     mCurrentSection = 0;
   }
 
-  NxU32 getSectionCount(void) const { return mSections.size(); };
+  PxU32 getSectionCount(void) const { return mSections.size(); };
 
-	NxI32 ParseLine(NxI32 lineno,NxI32 argc,const char **argv)  // return TRUE to continue parsing, return FALSE to abort parsing process
+	PxI32 ParseLine(PxI32 lineno,PxI32 argc,const char **argv)  // return TRUE to continue parsing, return FALSE to abort parsing process
   {
 
     if ( argc )
@@ -1084,12 +1084,12 @@ public:
           scan++;
         }
         mCurrentSection = -1;
-        for (NxU32 i=0; i<mSections.size(); i++)
+        for (PxU32 i=0; i<mSections.size(); i++)
         {
           KeyValueSection &kvs = *mSections[i];
           if ( stricmp(kvs.getSection(),key) == 0 )
           {
-            mCurrentSection = (NxI32) i;
+            mCurrentSection = (PxI32) i;
             break;
           }
         }
@@ -1114,10 +1114,10 @@ public:
     return 0;
   }
 
-  KeyValueSection * locateSection(const char *section,NxU32 &keys,NxU32 &lineno) const
+  KeyValueSection * locateSection(const char *section,PxU32 &keys,PxU32 &lineno) const
   {
     KeyValueSection *ret = 0;
-    for (NxU32 i=0; i<mSections.size(); i++)
+    for (PxU32 i=0; i<mSections.size(); i++)
     {
       KeyValueSection *s = mSections[i];
       if ( stricmp(section,s->getSection()) == 0 )
@@ -1131,7 +1131,7 @@ public:
     return ret;
   }
 
-  const KeyValueSection * getSection(NxU32 index,NxU32 &keys,NxU32 &lineno) const
+  const KeyValueSection * getSection(PxU32 index,PxU32 &keys,PxU32 &lineno) const
   {
     const KeyValueSection *ret=0;
     if ( index < mSections.size() )
@@ -1150,7 +1150,7 @@ public:
     FILE_INTERFACE *fph = fi_fopen(fname,"wb");
     if ( fph )
     {
-      for (NxU32 i=0; i<mSections.size(); i++)
+      for (PxU32 i=0; i<mSections.size(); i++)
       {
         mSections[i]->save(fph);
       }
@@ -1160,20 +1160,20 @@ public:
     return ret;
   }
 
-  void * saveMem(NxU32 &len) const
+  void * saveMem(PxU32 &len) const
   {
     void *ret = 0;
     FILE_INTERFACE *fph = fi_fopen("mem","wmem");
     if ( fph )
     {
-      for (NxU32 i=0; i<mSections.size(); i++)
+      for (PxU32 i=0; i<mSections.size(); i++)
       {
         mSections[i]->save(fph);
       }
 
 	  size_t tmpLen;
       void *temp = fi_getMemBuffer(fph,tmpLen);
-	  len = (NxU32)tmpLen;
+	  len = (PxU32)tmpLen;
       if ( temp )
       {
         ret = MEMALLOC_MALLOC(len);
@@ -1190,7 +1190,7 @@ public:
   {
     KeyValueSection *ret = 0;
 
-    for (NxU32 i=0; i<mSections.size(); i++)
+    for (PxU32 i=0; i<mSections.size(); i++)
     {
       KeyValueSection *kvs = mSections[i];
       if ( strcmp(kvs->getSection(),section_name) == 0 )
@@ -1213,12 +1213,12 @@ public:
   }
 
 private:
-  NxI32                   mCurrentSection;
+  PxI32                   mCurrentSection;
   KeyValueSectionVector mSections;
   InPlaceParser         mData;
 };
 
-KeyValueIni *loadKeyValueIni(const char *fname,NxU32 &sections)
+KeyValueIni *loadKeyValueIni(const char *fname,PxU32 &sections)
 {
   KeyValueIni *ret = 0;
 
@@ -1233,7 +1233,7 @@ KeyValueIni *loadKeyValueIni(const char *fname,NxU32 &sections)
   return ret;
 }
 
-KeyValueIni *     loadKeyValueIni(const char *mem,NxU32 len,NxU32 &sections)
+KeyValueIni *     loadKeyValueIni(const char *mem,PxU32 len,PxU32 &sections)
 {
   KeyValueIni *ret = 0;
 
@@ -1248,7 +1248,7 @@ KeyValueIni *     loadKeyValueIni(const char *mem,NxU32 len,NxU32 &sections)
   return ret;
 }
 
-const KeyValueSection * locateSection(const KeyValueIni *ini,const char *section,NxU32 &keys,NxU32 &lineno)
+const KeyValueSection * locateSection(const KeyValueIni *ini,const char *section,PxU32 &keys,PxU32 &lineno)
 {
   KeyValueSection *ret = 0;
 
@@ -1260,7 +1260,7 @@ const KeyValueSection * locateSection(const KeyValueIni *ini,const char *section
   return ret;
 }
 
-const KeyValueSection * getSection(const KeyValueIni *ini,NxU32 index,NxU32 &keycount,NxU32 &lineno)
+const KeyValueSection * getSection(const KeyValueIni *ini,PxU32 index,PxU32 &keycount,PxU32 &lineno)
 {
   const KeyValueSection *ret = 0;
 
@@ -1272,7 +1272,7 @@ const KeyValueSection * getSection(const KeyValueIni *ini,NxU32 index,NxU32 &key
   return ret;
 }
 
-const char *      locateValue(const KeyValueSection *section,const char *key,NxU32 &lineno)
+const char *      locateValue(const KeyValueSection *section,const char *key,PxU32 &lineno)
 {
   const char *ret = 0;
 
@@ -1284,7 +1284,7 @@ const char *      locateValue(const KeyValueSection *section,const char *key,NxU
   return ret;
 }
 
-const char *      getKey(const KeyValueSection *section,NxU32 keyindex,NxU32 &lineno)
+const char *      getKey(const KeyValueSection *section,PxU32 keyindex,PxU32 &lineno)
 {
   const char *ret = 0;
 
@@ -1296,7 +1296,7 @@ const char *      getKey(const KeyValueSection *section,NxU32 keyindex,NxU32 &li
   return ret;
 }
 
-const char *      getValue(const KeyValueSection *section,NxU32 keyindex,NxU32 &lineno)
+const char *      getValue(const KeyValueSection *section,PxU32 keyindex,PxU32 &lineno)
 {
   const char *ret = 0;
 
@@ -1336,7 +1336,7 @@ bool  saveKeyValueIni(const KeyValueIni *ini,const char *fname)
   return ret;
 }
 
-void *  saveKeyValueIniMem(const KeyValueIni *ini,NxU32 &len)
+void *  saveKeyValueIniMem(const KeyValueIni *ini,PxU32 &len)
 {
   void *ret = 0;
 

@@ -65,7 +65,7 @@
 class KeyValue
 {
 public:
-  const char ** getKeyValues(const char *userProperties,NxU32 &count);
+  const char ** getKeyValues(const char *userProperties,PxU32 &count);
   const char *  getKeyValue(const char *userProperties,const char *key,bool caseSensitive=false);  //
 private:
   char *keyValue[MAXKEYVALUE*2];

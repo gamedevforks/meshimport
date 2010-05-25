@@ -3,7 +3,11 @@
 	ProjectType="Visual C++"
 	Version="8.00"
 	Name="MeshImportFbx"
-	ProjectGUID="{285507B1-ED5C-5646-8C30-665A8583D9F8}"
+	ProjectGUID="{4781D7B8-BA07-413F-9C60-BC7A437171EF}"
+	RootNamespace="MeshImportFbx"
+	SccProjectName="Perforce Project"
+	SccLocalPath="."
+	SccProvider="MSCCI:Perforce SCM"
 	>
 	<Platforms>
 		<Platform
@@ -39,7 +43,7 @@
 				Name="VCCLCompilerTool"
 				AdditionalOptions="/W3 /fp:fast /MDd /Zi "
 				Optimization="4"
-				AdditionalIncludeDirectories="&quot;../../include&quot;;&quot;../../include/common/snippets&quot;;&quot;../../include/MeshImport&quot;;&quot;../../ext/fbx&quot;;"
+				AdditionalIncludeDirectories="&quot;../../include&quot;;&quot;../../include/common/snippets&quot;;&quot;../../include/MeshImport&quot;;&quot;../../ext/fbx/include&quot;;"
 				PreprocessorDefinitions="WIN32;_WINDOWS;_CONSOLE;UNICODE=1;_UNICODE=1;K_PLUGIN;K_FBXSDK;K_NODLL;_CRT_SECURET_NO_DEPRECATE;FBXIMPORTER_EXPORTS;MESHIMPORTFBX_EXPORTS;_DEBUG;"
 				ExceptionHandling="1"
 				WarningLevel="3"
@@ -58,7 +62,7 @@
 				AdditionalOptions="/NODEFAULTLIB:libcp.lib /DEBUG "
 				AdditionalDependencies="&quot;fbxsdk_md2005.lib&quot; &quot;wininet.lib&quot; "
 				OutputFile="$(OutDir)/MeshImportFbx.dll"
-				AdditionalLibraryDirectories="&quot;../../lib/win32&quot;;&quot;../../ext/fbx&quot;;"
+				AdditionalLibraryDirectories="&quot;../../lib/win32&quot;;&quot;../../ext/fbx/lib&quot;;"
 				ProgramDatabaseFile="$(OutDir)/MeshImportFbx.dll.pdb"
 				GenerateMapFile="true"
 				MapFileName="$(OutDir)/MeshImportFbx.dll.map"
@@ -116,7 +120,7 @@
 				Name="VCCLCompilerTool"
 				AdditionalOptions="/Zi /W3 /fp:fast /WX /MD /O2 "
 				Optimization="4"
-				AdditionalIncludeDirectories="&quot;../../include&quot;;&quot;../../include/common/snippets&quot;;&quot;../../include/MeshImport&quot;;&quot;../../ext/fbx&quot;;"
+				AdditionalIncludeDirectories="&quot;../../include&quot;;&quot;../../include/common/snippets&quot;;&quot;../../include/MeshImport&quot;;&quot;../../ext/fbx/include&quot;;"
 				PreprocessorDefinitions="WIN32;_WINDOWS;_CONSOLE;UNICODE=1;_UNICODE=1;K_PLUGIN;K_FBXSDK;K_NODLL;_CRT_SECURET_NO_DEPRECATE;FBXIMPORTER_EXPORTS;MESHIMPORTFBX_EXPORTS;NDEBUG;"
 				ExceptionHandling="1"
 				WarningLevel="3"
@@ -135,7 +139,7 @@
 				AdditionalOptions="/NODEFAULTLIB:libcp.lib /DEBUG "
 				AdditionalDependencies="&quot;fbxsdk_md2005.lib&quot; &quot;wininet.lib&quot; "
 				OutputFile="$(OutDir)/MeshImportFbx.dll"
-				AdditionalLibraryDirectories="&quot;../../lib/win32&quot;;&quot;../../ext/fbx&quot;;"
+				AdditionalLibraryDirectories="&quot;../../lib/win32&quot;;&quot;../../ext/fbx/lib&quot;;"
 				ProgramDatabaseFile="$(OutDir)/MeshImportFbx.dll.pdb"
 				GenerateMapFile="true"
 				MapFileName="$(OutDir)/MeshImportFbx.dll.map"
@@ -322,23 +326,7 @@
 					>
 				</File>
 				<File
-					RelativePath="..\..\include\common\snippets\telnet.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\include\common\snippets\telnet.h"
-					>
-				</File>
-				<File
 					RelativePath="..\..\include\common\snippets\UserMemAlloc.h"
-					>
-				</File>
-				<File
-					RelativePath="..\..\include\common\snippets\winmsg.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\include\common\snippets\winmsg.h"
 					>
 				</File>
 			</Filter>
