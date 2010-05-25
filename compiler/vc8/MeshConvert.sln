@@ -20,6 +20,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MeshImportOgre", "MeshImpor
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MeshImportFbx", "MeshImportFbx.vcproj", "{4781D7B8-BA07-413F-9C60-BC7A437171EF}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MeshImportARM", "MeshImportARM.vcproj", "{E85D2B0E-76C2-504F-66B0-102E6DDB0798}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		debug|Win32 = debug|Win32
@@ -54,6 +56,10 @@ Global
 		{4781D7B8-BA07-413F-9C60-BC7A437171EF}.debug|Win32.Build.0 = debug|Win32
 		{4781D7B8-BA07-413F-9C60-BC7A437171EF}.release|Win32.ActiveCfg = release|Win32
 		{4781D7B8-BA07-413F-9C60-BC7A437171EF}.release|Win32.Build.0 = release|Win32
+		{E85D2B0E-76C2-504F-66B0-102E6DDB0798}.debug|Win32.ActiveCfg = debug|Win32
+		{E85D2B0E-76C2-504F-66B0-102E6DDB0798}.debug|Win32.Build.0 = debug|Win32
+		{E85D2B0E-76C2-504F-66B0-102E6DDB0798}.release|Win32.ActiveCfg = release|Win32
+		{E85D2B0E-76C2-504F-66B0-102E6DDB0798}.release|Win32.Build.0 = release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
