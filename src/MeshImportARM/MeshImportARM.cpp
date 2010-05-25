@@ -19,7 +19,7 @@ bool doShutdown(void);
 
 extern "C"
 {
-MESHIMPORTARM_API NVSHARE::MeshImporter * getInterface(PxI32 version_number);
+MESHIMPORTARM_API NVSHARE::MeshImporter * getInterface(NxI32 version_number);
 };
 
 namespace NVSHARE
@@ -40,19 +40,19 @@ public:
     return doShutdown();
   }
 
-  virtual PxI32              getExtensionCount(void) { return 1; }; // most importers support just one file name extension.
+  virtual NxI32              getExtensionCount(void) { return 1; }; // most importers support just one file name extension.
 
-  virtual const char * getExtension(PxI32 index)  // report the default file name extension for this mesh type.
+  virtual const char * getExtension(NxI32 index)  // report the default file name extension for this mesh type.
   {
     return ".xml";
   }
 
-  virtual const char * getDescription(PxI32 index)  // report the default file name extension for this mesh type.
+  virtual const char * getDescription(NxI32 index)  // report the default file name extension for this mesh type.
   {
     return "APEX Render Mesh";
   }
 
-  virtual bool importMesh(const char *meshName,const void *data,PxU32 dlen,NVSHARE::MeshImportInterface *callback,const char *options,MeshImportApplicationResource *appResource)
+  virtual bool importMesh(const char *meshName,const void *data,NxU32 dlen,NVSHARE::MeshImportInterface *callback,const char *options,MeshImportApplicationResource *appResource)
   {
     bool ret = false;
 
@@ -88,9 +88,9 @@ static MyMeshImportARM *gInterface=0;
 extern "C"
 {
 #ifdef PLUGINS_EMBEDDED
-  MeshImporter * getInterfaceMeshImportARM(PxI32 version_number)
+  MeshImporter * getInterfaceMeshImportARM(NxI32 version_number)
 #else
-MESHIMPORTARM_API MeshImporter * getInterface(PxI32 version_number)
+MESHIMPORTARM_API MeshImporter * getInterface(NxI32 version_number)
 #endif
 {
   assert( gInterface == 0 );
@@ -129,7 +129,7 @@ BOOL APIENTRY DllMain( HANDLE ,
                        DWORD  ul_reason_for_call,
                        LPVOID )
 {
-  PxI32 ret = 0;
+  NxI32 ret = 0;
 
   switch (ul_reason_for_call)
 	{

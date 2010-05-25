@@ -17,18 +17,18 @@ namespace NVSHARE
 class MeshImporterARM : public MeshImporter, public Memalloc
 {
 public:
-  	virtual PxI32              getExtensionCount(void) { return 1; }; // most importers support just one file name extension.
-  	virtual const char *     getExtension(PxI32 index)  // report the default file name extension for this mesh type.
+  	virtual NxI32              getExtensionCount(void) { return 1; }; // most importers support just one file name extension.
+  	virtual const char *     getExtension(NxI32 index)  // report the default file name extension for this mesh type.
   	{
   		return ".xml";
 	}
 
-  	virtual const char *     getDescription(PxI32 index) // report the ascii description of the import type.
+  	virtual const char *     getDescription(NxI32 index) // report the ascii description of the import type.
   	{
   		return "APEX Render Mesh";
 	}
 
-  	virtual bool             importMesh(const char *meshName,const void *data,PxU32 dlen,MeshImportInterface *callback,const char *options,MeshImportApplicationResource *appResource)
+  	virtual bool             importMesh(const char *meshName,const void *data,NxU32 dlen,MeshImportInterface *callback,const char *options,MeshImportApplicationResource *appResource)
   	{
   		bool ret = false;
   		return ret;

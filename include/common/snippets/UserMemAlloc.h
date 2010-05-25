@@ -57,7 +57,7 @@ enum SendTextMessageType
 class SendTextMessage
 {
 public:
-	virtual void sendTextMessage(PxU32 type,const char *fmt,...) = 0;
+	virtual void sendTextMessage(NxU32 type,const char *fmt,...) = 0;
 };
 
 

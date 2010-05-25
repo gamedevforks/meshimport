@@ -22,7 +22,7 @@ namespace NVSHARE
 
 #ifdef WIN32
 
-static void *getMeshBindingInterface(const char *dll,PxI32 version_number) // loads the tetra maker DLL and returns the interface pointer.
+static void *getMeshBindingInterface(const char *dll,NxI32 version_number) // loads the tetra maker DLL and returns the interface pointer.
 {
   void *ret = 0;
 
@@ -36,7 +36,7 @@ static void *getMeshBindingInterface(const char *dll,PxI32 version_number) // lo
     void *proc = GetProcAddress(module,"getInterface");
     if ( proc )
     {
-      typedef void * (__cdecl * NX_GetToolkit)(PxI32 version);
+      typedef void * (__cdecl * NX_GetToolkit)(NxI32 version);
       ret = ((NX_GetToolkit)proc)(version_number);
     }
   }
@@ -158,7 +158,7 @@ private:
 #ifdef WIN32
   WIN32_FIND_DATAA finddata;
   HANDLE hFindNext;
-  PxI32 bFound;
+  NxI32 bFound;
 #endif
 #ifdef LINUX_GENERIC
   DIR      *mDir;

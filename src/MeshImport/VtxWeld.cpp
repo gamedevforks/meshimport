@@ -69,7 +69,7 @@ template<> std::vector<MeshVertex > *VertexLess<MeshVertex>::mList=0;
 
 
 template<>
-bool VertexLess<MeshVertex>::operator()(PxI32 v1,PxI32 v2) const
+bool VertexLess<MeshVertex>::operator()(NxI32 v1,NxI32 v2) const
 {
 
 	const MeshVertex& a = Get(v1);
