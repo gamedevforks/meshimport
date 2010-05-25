@@ -112,8 +112,8 @@ class FileSystem;
 class InPlaceParserInterface
 {
 public:
-	virtual NxI32 ParseLine(NxI32 lineno,NxI32 argc,const char **argv) =0;  // return TRUE to continue parsing, return FALSE to abort parsing process
-  virtual bool preParseLine(NxI32 /* lineno */,const char * /* line */)  { return false; }; // optional chance to pre-parse the line as raw data.  If you return 'true' the line will be skipped assuming you snarfed it.
+	virtual PxI32 ParseLine(PxI32 lineno,PxI32 argc,const char **argv) =0;  // return TRUE to continue parsing, return FALSE to abort parsing process
+  virtual bool preParseLine(PxI32 /* lineno */,const char * /* line */)  { return false; }; // optional chance to pre-parse the line as raw data.  If you return 'true' the line will be skipped assuming you snarfed it.
 };
 
 enum SeparatorType
@@ -133,7 +133,7 @@ public:
 		Init();
 	}
 
-	InPlaceParser(char *data,NxI32 len)
+	InPlaceParser(char *data,PxI32 len)
 	{
 		Init();
 		SetSourceData(data,len);
@@ -153,7 +153,7 @@ public:
 		mData = 0;
 		mLen  = 0;
 		mMyAlloc = false;
-		for (NxI32 i=0; i<256; i++)
+		for (PxI32 i=0; i<256; i++)
 		{
 			mHard[i] = ST_DATA;
 			mHardString[i*2] = (char)i;
@@ -168,19 +168,19 @@ public:
 
 	void SetFile(const char *fname,FileSystem *fsystem);
 
-	void SetSourceData(char *data,NxI32 len)
+	void SetSourceData(char *data,PxI32 len)
 	{
 		mData = data;
 		mLen  = len;
 		mMyAlloc = false;
 	};
 
-	NxI32  Parse(const char *str,InPlaceParserInterface *callback); // returns true if entire file was parsed, false if it aborted for some reason
-	NxI32  Parse(InPlaceParserInterface *callback); // returns true if entire file was parsed, false if it aborted for some reason
+	PxI32  Parse(const char *str,InPlaceParserInterface *callback); // returns true if entire file was parsed, false if it aborted for some reason
+	PxI32  Parse(InPlaceParserInterface *callback); // returns true if entire file was parsed, false if it aborted for some reason
 
-	NxI32 ProcessLine(NxI32 lineno,char *line,InPlaceParserInterface *callback);
+	PxI32 ProcessLine(PxI32 lineno,char *line,InPlaceParserInterface *callback);
 
-	const char ** GetArglist(char *source,NxI32 &count); // convert source string into an arg list, this is a destructive parse.
+	const char ** GetArglist(char *source,PxI32 &count); // convert source string into an arg list, this is a destructive parse.
 
 	void SetHardSeparator(char c) // add a hard separator
 	{
@@ -243,7 +243,7 @@ public:
 
 private:
 
-	inline char * AddHard(NxI32 &argc,const char **argv,char *foo);
+	inline char * AddHard(PxI32 &argc,const char **argv,char *foo);
 	inline bool   IsHard(char c);
 	inline char * SkipSpaces(char *foo);
 	inline bool   IsWhiteSpace(char c);
@@ -251,7 +251,7 @@ private:
 
 	bool   mMyAlloc; // whether or not *I* allocated the buffer and am responsible for deleting it.
 	char  *mData;  // ascii data to parse.
-	NxI32    mLen;   // length of data
+	PxI32    mLen;   // length of data
 	SeparatorType  mHard[256];
 	char   mHardString[256*2];
 	char           mQuoteChar;

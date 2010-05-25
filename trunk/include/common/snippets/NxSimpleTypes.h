@@ -17,87 +17,87 @@
 
 #ifdef WIN32
 	typedef __int64				NxI64;
-	typedef signed int			NxI32;
-	typedef signed short		NxI16;
-	typedef signed char			NxI8;
+	typedef signed int			PxI32;
+	typedef signed short		PxI16;
+	typedef signed char			PxI8;
 
-	typedef unsigned __int64	NxU64;
-	typedef unsigned int		NxU32;
-	typedef unsigned short		NxU16;
-	typedef unsigned char		NxU8;
+	typedef unsigned __int64	PxU64;
+	typedef unsigned int		PxU32;
+	typedef unsigned short		PxU16;
+	typedef unsigned char		PxU8;
 
-	typedef float				NxF32;
-	typedef double				NxF64;
+	typedef float				PxF32;
+	typedef double				PxF64;
 		
 #elif LINUX
 	typedef long long			NxI64;
-	typedef signed int			NxI32;
-	typedef signed short		NxI16;
-	typedef signed char			NxI8;
+	typedef signed int			PxI32;
+	typedef signed short		PxI16;
+	typedef signed char			PxI8;
 
-	typedef unsigned long long	NxU64;
-	typedef unsigned int		NxU32;
-	typedef unsigned short		NxU16;
-	typedef unsigned char		NxU8;
+	typedef unsigned long long	PxU64;
+	typedef unsigned int		PxU32;
+	typedef unsigned short		PxU16;
+	typedef unsigned char		PxU8;
 
-	typedef float				NxF32;
-	typedef double				NxF64;
+	typedef float				PxF32;
+	typedef double				PxF64;
 
 #elif __APPLE__
 	typedef long long			NxI64;
-	typedef signed int			NxI32;
-	typedef signed short		NxI16;
-	typedef signed char			NxI8;
+	typedef signed int			PxI32;
+	typedef signed short		PxI16;
+	typedef signed char			PxI8;
 
-	typedef unsigned long long	NxU64;
-	typedef unsigned int		NxU32;
-	typedef unsigned short		NxU16;
-	typedef unsigned char		NxU8;
+	typedef unsigned long long	PxU64;
+	typedef unsigned int		PxU32;
+	typedef unsigned short		PxU16;
+	typedef unsigned char		PxU8;
 
-	typedef float				NxF32;
-	typedef double				NxF64;
+	typedef float				PxF32;
+	typedef double				PxF64;
 
 #elif __CELLOS_LV2__
 	typedef long long			NxI64;
-	typedef signed int			NxI32;
-	typedef signed short		NxI16;
-	typedef signed char			NxI8;
+	typedef signed int			PxI32;
+	typedef signed short		PxI16;
+	typedef signed char			PxI8;
 
-	typedef unsigned long long	NxU64;
-	typedef unsigned int		NxU32;
-	typedef unsigned short		NxU16;
-	typedef unsigned char		NxU8;
+	typedef unsigned long long	PxU64;
+	typedef unsigned int		PxU32;
+	typedef unsigned short		PxU16;
+	typedef unsigned char		PxU8;
 
-	typedef float				NxF32;
-	typedef double				NxF64;
+	typedef float				PxF32;
+	typedef double				PxF64;
 
 #elif _XBOX
 	typedef __int64				NxI64;
-	typedef signed int			NxI32;
-	typedef signed short		NxI16;
-	typedef signed char			NxI8;
+	typedef signed int			PxI32;
+	typedef signed short		PxI16;
+	typedef signed char			PxI8;
 
-	typedef unsigned __int64	NxU64;
-	typedef unsigned int		NxU32;
-	typedef unsigned short		NxU16;
-	typedef unsigned char		NxU8;
+	typedef unsigned __int64	PxU64;
+	typedef unsigned int		PxU32;
+	typedef unsigned short		PxU16;
+	typedef unsigned char		PxU8;
 
-	typedef float				NxF32;
-	typedef double				NxF64;
+	typedef float				PxF32;
+	typedef double				PxF64;
     
 #elif defined(__PPCGEKKO__)
 	typedef long long			NxI64;
-	typedef signed int			NxI32;
-	typedef signed short		NxI16;
-	typedef signed char			NxI8;
+	typedef signed int			PxI32;
+	typedef signed short		PxI16;
+	typedef signed char			PxI8;
 
-	typedef unsigned long long	NxU64;
-	typedef unsigned int		NxU32;
-	typedef unsigned short		NxU16;
-	typedef unsigned char		NxU8;
+	typedef unsigned long long	PxU64;
+	typedef unsigned int		PxU32;
+	typedef unsigned short		PxU16;
+	typedef unsigned char		PxU8;
 
-	typedef float				NxF32;
-	typedef double				NxF64;
+	typedef float				PxF32;
+	typedef double				PxF64;
 
 #else
 	#error Unknown platform!
@@ -105,8 +105,8 @@
 
 union NxU32F32
 {
-	NxU32 u;
-	NxF32 f;
+	PxU32 u;
+	PxF32 f;
 };
 
 #if __APPLE__
@@ -114,14 +114,14 @@ union NxU32F32
 #else
 	NX_COMPILE_TIME_ASSERT(sizeof(bool)==1);	// ...otherwise things might fail with VC++ 4.2 !
 #endif
-	NX_COMPILE_TIME_ASSERT(sizeof(NxI8)==1);
-	NX_COMPILE_TIME_ASSERT(sizeof(NxU8)==1);
-	NX_COMPILE_TIME_ASSERT(sizeof(NxI16)==2);
-	NX_COMPILE_TIME_ASSERT(sizeof(NxU16)==2);
-	NX_COMPILE_TIME_ASSERT(sizeof(NxI32)==4);
-	NX_COMPILE_TIME_ASSERT(sizeof(NxU32)==4);
+	NX_COMPILE_TIME_ASSERT(sizeof(PxI8)==1);
+	NX_COMPILE_TIME_ASSERT(sizeof(PxU8)==1);
+	NX_COMPILE_TIME_ASSERT(sizeof(PxI16)==2);
+	NX_COMPILE_TIME_ASSERT(sizeof(PxU16)==2);
+	NX_COMPILE_TIME_ASSERT(sizeof(PxI32)==4);
+	NX_COMPILE_TIME_ASSERT(sizeof(PxU32)==4);
 	NX_COMPILE_TIME_ASSERT(sizeof(NxI64)==8);
-	NX_COMPILE_TIME_ASSERT(sizeof(NxU64)==8);
+	NX_COMPILE_TIME_ASSERT(sizeof(PxU64)==8);
 #if defined(NX64)
 	NX_COMPILE_TIME_ASSERT(sizeof(void*)==8);
 #else

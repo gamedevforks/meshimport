@@ -4,6 +4,9 @@
 	Version="8.00"
 	Name="MeshImport"
 	ProjectGUID="{082FBBBD-9532-5712-DF18-A054AE91C0F0}"
+	SccProjectName="Perforce Project"
+	SccLocalPath="."
+	SccProvider="MSCCI:Perforce SCM"
 	>
 	<Platforms>
 		<Platform
@@ -175,15 +178,11 @@
 			Name="Source Files"
 			>
 			<File
-				RelativePath="..\..\src\MeshImport\CommLayer.cpp"
-				>
-			</File>
-			<File
 				RelativePath="..\..\src\MeshImport\ExportFBX.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\src\MeshImport\meshimport.cpp"
+				RelativePath="..\..\src\MeshImport\MeshImport.cpp"
 				>
 			</File>
 			<File
@@ -198,10 +197,6 @@
 		<Filter
 			Name="Header Files"
 			>
-			<File
-				RelativePath="..\..\src\MeshImport\CommLayer.h"
-				>
-			</File>
 			<File
 				RelativePath="..\..\src\MeshImport\ExportFBX.h"
 				>
@@ -318,23 +313,7 @@
 					>
 				</File>
 				<File
-					RelativePath="..\..\include\common\snippets\telnet.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\include\common\snippets\telnet.h"
-					>
-				</File>
-				<File
 					RelativePath="..\..\include\common\snippets\UserMemAlloc.h"
-					>
-				</File>
-				<File
-					RelativePath="..\..\include\common\snippets\winmsg.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\include\common\snippets\winmsg.h"
 					>
 				</File>
 			</Filter>

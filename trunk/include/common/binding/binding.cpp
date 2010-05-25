@@ -70,8 +70,8 @@ void loadModuleInterfaces(const char *dll, void **rmodule) // loads the interfac
     if ( proc )
     {
       const INTERFACE_EXPORT *interfaces;
-      NxI32 num = ((PLUGIN_INTERFACE_LIST_FUNC)proc)(&interfaces);
-      for (NxI32 i = 0; i < num; i++)
+      PxI32 num = ((PLUGIN_INTERFACE_LIST_FUNC)proc)(&interfaces);
+      for (PxI32 i = 0; i < num; i++)
       {
         getHash()[interfaces[i].name] = interfaces[i].func;
         found_exports = true;
@@ -109,7 +109,7 @@ void loadModuleInterfaces(const char *dll, void **rmodule) // loads the interfac
   }
 }
 
-void *getBindingInterface(const char *dll, const char *name, NxI32 version_number, NVSHARE::SystemServices *services, void **rmodule) // loads the dll and grabs the interface
+void *getBindingInterface(const char *dll, const char *name, PxI32 version_number, NVSHARE::SystemServices *services, void **rmodule) // loads the dll and grabs the interface
 {
   if (dll)
     loadModuleInterfaces(dll, rmodule);

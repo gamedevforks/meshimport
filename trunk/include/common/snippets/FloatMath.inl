@@ -49,9 +49,9 @@
 // operations without any vector, matrix, or quaternion
 // classes or templates.
 //
-// a vector (or point) is a 'NxF32 *' to 3 floating point numbers.
-// a matrix is a 'NxF32 *' to an array of 16 floating point numbers representing a 4x4 transformation matrix compatible with D3D or OGL
-// a quaternion is a 'NxF32 *' to 4 floats representing a quaternion x,y,z,w
+// a vector (or point) is a 'PxF32 *' to 3 floating point numbers.
+// a matrix is a 'PxF32 *' to an array of 16 floating point numbers representing a 4x4 transformation matrix compatible with D3D or OGL
+// a quaternion is a 'PxF32 *' to 4 floats representing a quaternion x,y,z,w
 //
 //
 //
@@ -148,10 +148,10 @@ void fm_decomposeTransform(const REAL local_transform[16],REAL trans[3],REAL rot
 
 }
 
-void fm_getSubMatrix(NxI32 ki,NxI32 kj,REAL pDst[16],const REAL matrix[16])
+void fm_getSubMatrix(PxI32 ki,PxI32 kj,REAL pDst[16],const REAL matrix[16])
 {
-	NxI32 row, col;
-	NxI32 dstCol = 0, dstRow = 0;
+	PxI32 row, col;
+	PxI32 dstCol = 0, dstRow = 0;
 
 	for ( col = 0; col < 4; col++ )
 	{
@@ -176,11 +176,11 @@ void  fm_inverseTransform(const REAL matrix[16],REAL inverse_matrix[16])
 {
 	REAL determinant = fm_getDeterminant(matrix);
 	determinant = 1.0f / determinant;
-	for (NxI32 i = 0; i < 4; i++ )
+	for (PxI32 i = 0; i < 4; i++ )
 	{
-		for (NxI32 j = 0; j < 4; j++ )
+		for (PxI32 j = 0; j < 4; j++ )
 		{
-			NxI32 sign = 1 - ( ( i + j ) % 2 ) * 2;
+			PxI32 sign = 1 - ( ( i + j ) % 2 ) * 2;
 			REAL subMat[16];
       fm_identity(subMat);
 			fm_getSubMatrix( i, j, subMat, matrix );
@@ -262,10 +262,10 @@ void fm_eulerToMatrix(REAL ax,REAL ay,REAL az,REAL *matrix) // convert euler (in
   fm_quatToMatrix(quat,matrix);
 }
 
-void fm_getAABB(NxU32 vcount,const REAL *points,NxU32 pstride,REAL *bmin,REAL *bmax)
+void fm_getAABB(PxU32 vcount,const REAL *points,PxU32 pstride,REAL *bmin,REAL *bmax)
 {
 
-  const NxU8 *source = (const NxU8 *) points;
+  const PxU8 *source = (const PxU8 *) points;
 
 	bmin[0] = points[0];
 	bmin[1] = points[1];
@@ -276,7 +276,7 @@ void fm_getAABB(NxU32 vcount,const REAL *points,NxU32 pstride,REAL *bmin,REAL *b
 	bmax[2] = points[2];
 
 
-  for (NxU32 i=1; i<vcount; i++)
+  for (PxU32 i=1; i<vcount; i++)
   {
   	source+=pstride;
   	const REAL *p = (const REAL *) source;
@@ -386,7 +386,7 @@ void fm_matrixToQuat(const REAL *matrix,REAL *quat) // convert the 3x3 portion o
 
 	if (tr > 0.0f )
 	{
-		REAL s = (REAL) sqrt ( (NxF64) (tr + 1.0f) );
+		REAL s = (REAL) sqrt ( (PxF64) (tr + 1.0f) );
 		quat[3] = s * 0.5f;
 		s = 0.5f / s;
 		quat[0] = (matrix[1*4+2] - matrix[2*4+1]) * s;
@@ -397,16 +397,16 @@ void fm_matrixToQuat(const REAL *matrix,REAL *quat) // convert the 3x3 portion o
 	else
 	{
 		// diagonal is negative
-		NxI32 nxt[3] = {1, 2, 0};
+		PxI32 nxt[3] = {1, 2, 0};
 		REAL  qa[4];
 
-		NxI32 i = 0;
+		PxI32 i = 0;
 
 		if (matrix[1*4+1] > matrix[0*4+0]) i = 1;
 		if (matrix[2*4+2] > matrix[i*4+i]) i = 2;
 
-		NxI32 j = nxt[i];
-		NxI32 k = nxt[j];
+		PxI32 j = nxt[i];
+		PxI32 k = nxt[j];
 
 		REAL s = sqrt ( ((matrix[i*4+i] - (matrix[j*4+j] + matrix[k*4+k])) + 1.0f) );
 
@@ -675,9 +675,9 @@ void  fm_matrixMultiply(const REAL *pA,const REAL *pB,REAL *pM)
 
 #else
 	memset(pM, 0, sizeof(REAL)*16);
-	for(NxI32 i=0; i<4; i++ )
-		for(NxI32 j=0; j<4; j++ )
-			for(NxI32 k=0; k<4; k++ )
+	for(PxI32 i=0; i<4; i++ )
+		for(PxI32 j=0; j<4; j++ )
+			for(PxI32 k=0; k<4; k++ )
 				pM[4*i+j] +=  pA[4*i+k] * pB[4*k+j];
 #endif
 }
@@ -881,7 +881,7 @@ bool  fm_insideTriangleXZ(const REAL *p,const REAL *p1,const REAL *p2,const REAL
 {
   bool ret = false;
 
-  NxI32 c = 0;
+  PxI32 c = 0;
   if ( fm_pointTestXZ(p,p1,p2) ) c = !c;
   if ( fm_pointTestXZ(p,p2,p3) ) c = !c;
   if ( fm_pointTestXZ(p,p3,p1) ) c = !c;
@@ -903,9 +903,9 @@ bool  fm_insideAABB(const REAL *pos,const REAL *bmin,const REAL *bmax)
 }
 
 
-NxU32 fm_clipTestPoint(const REAL *bmin,const REAL *bmax,const REAL *pos)
+PxU32 fm_clipTestPoint(const REAL *bmin,const REAL *bmax,const REAL *pos)
 {
-  NxU32 ret = 0;
+  PxU32 ret = 0;
 
   if ( pos[0] < bmin[0] )
     ret|=FMCS_XMIN;
@@ -925,9 +925,9 @@ NxU32 fm_clipTestPoint(const REAL *bmin,const REAL *bmax,const REAL *pos)
   return ret;
 }
 
-NxU32 fm_clipTestPointXZ(const REAL *bmin,const REAL *bmax,const REAL *pos) // only tests X and Z, not Y
+PxU32 fm_clipTestPointXZ(const REAL *bmin,const REAL *bmax,const REAL *pos) // only tests X and Z, not Y
 {
-  NxU32 ret = 0;
+  PxU32 ret = 0;
 
   if ( pos[0] < bmin[0] )
     ret|=FMCS_XMIN;
@@ -942,13 +942,13 @@ NxU32 fm_clipTestPointXZ(const REAL *bmin,const REAL *bmax,const REAL *pos) // o
   return ret;
 }
 
-NxU32 fm_clipTestAABB(const REAL *bmin,const REAL *bmax,const REAL *p1,const REAL *p2,const REAL *p3,NxU32 &andCode)
+PxU32 fm_clipTestAABB(const REAL *bmin,const REAL *bmax,const REAL *p1,const REAL *p2,const REAL *p3,PxU32 &andCode)
 {
-  NxU32 orCode = 0;
+  PxU32 orCode = 0;
 
   andCode = FMCS_XMIN | FMCS_XMAX | FMCS_YMIN | FMCS_YMAX | FMCS_ZMIN | FMCS_ZMAX;
 
-  NxU32 c = fm_clipTestPoint(bmin,bmax,p1);
+  PxU32 c = fm_clipTestPoint(bmin,bmax,p1);
   orCode|=c;
   andCode&=c;
 
@@ -967,7 +967,7 @@ bool intersect(const REAL *si,const REAL *ei,const REAL *bmin,const REAL *bmax,R
 {
   REAL st,et,fst = 0,fet = 1;
 
-  for (NxI32 i = 0; i < 3; i++)
+  for (PxI32 i = 0; i < 3; i++)
   {
     if (*si < *ei)
     {
@@ -1386,14 +1386,14 @@ public:
 
   bool QLAlgorithm(void)
   {
-    const NxI32 iMaxIter = 32;
+    const PxI32 iMaxIter = 32;
 
-    for (NxI32 i0 = 0; i0 <3; i0++)
+    for (PxI32 i0 = 0; i0 <3; i0++)
     {
-      NxI32 i1;
+      PxI32 i1;
       for (i1 = 0; i1 < iMaxIter; i1++)
       {
-        NxI32 i2;
+        PxI32 i2;
         for (i2 = i0; i2 <= (3-2); i2++)
         {
           Type fTmp = fabs(m_afDiag[i2]) + fabs(m_afDiag[i2+1]);
@@ -1416,7 +1416,7 @@ public:
           fG = m_afDiag[i2]-m_afDiag[i0]+m_afSubd[i0]/(fG+fR);
         }
         Type fSin = (Type)1.0, fCos = (Type)1.0, fP = (Type)0.0;
-        for (NxI32 i3 = i2-1; i3 >= i0; i3--)
+        for (PxI32 i3 = i2-1; i3 >= i0; i3--)
         {
           Type fF = fSin*m_afSubd[i3];
           Type fB = fCos*m_afSubd[i3];
@@ -1441,7 +1441,7 @@ public:
           fP = fSin*fR;
           m_afDiag[i3+1] = fG+fP;
           fG = fCos*fR-fB;
-          for (NxI32 i4 = 0; i4 < 3; i4++)
+          for (PxI32 i4 = 0; i4 < 3; i4++)
           {
             fF = mElement[i4][i3+1];
             mElement[i4][i3+1] = fSin*mElement[i4][i3]+fCos*fF;
@@ -1463,12 +1463,12 @@ public:
   void DecreasingSort(void)
   {
     //sort eigenvalues in decreasing order, e[0] >= ... >= e[iSize-1]
-    for (NxI32 i0 = 0, i1; i0 <= 3-2; i0++)
+    for (PxI32 i0 = 0, i1; i0 <= 3-2; i0++)
     {
       // locate maximum eigenvalue
       i1 = i0;
       Type fMax = m_afDiag[i1];
-      NxI32 i2;
+      PxI32 i2;
       for (i2 = i0+1; i2 < 3; i2++)
       {
         if (m_afDiag[i2] > fMax)
@@ -1501,7 +1501,7 @@ public:
     if (!m_bIsRotation)
     {
       // change sign on the first column
-      for (NxI32 iRow = 0; iRow <3; iRow++)
+      for (PxI32 iRow = 0; iRow <3; iRow++)
       {
         mElement[iRow][0] = -mElement[iRow][0];
       }
@@ -1516,11 +1516,11 @@ public:
 
 #endif
 
-bool fm_computeBestFitPlane(NxU32 vcount,
+bool fm_computeBestFitPlane(PxU32 vcount,
                      const REAL *points,
-                     NxU32 vstride,
+                     PxU32 vstride,
                      const REAL *weights,
-                     NxU32 wstride,
+                     PxU32 wstride,
                      REAL *plane)
 {
   bool ret = false;
@@ -1533,7 +1533,7 @@ bool fm_computeBestFitPlane(NxU32 vcount,
     const char *source  = (const char *) points;
     const char *wsource = (const char *) weights;
 
-    for (NxU32 i=0; i<vcount; i++)
+    for (PxU32 i=0; i<vcount; i++)
     {
 
       const REAL *p = (const REAL *) source;
@@ -1577,7 +1577,7 @@ bool fm_computeBestFitPlane(NxU32 vcount,
     const char *source  = (const char *) points;
     const char *wsource = (const char *) weights;
 
-    for (NxU32 i=0; i<vcount; i++)
+    for (PxU32 i=0; i<vcount; i++)
     {
 
       const REAL *p = (const REAL *) source;
@@ -1905,18 +1905,18 @@ public:
   }
 
 
-  NxI32 NumVertices(void) const { return mVcount; };
+  PxI32 NumVertices(void) const { return mVcount; };
 
-  const point<Type>& Vertex(NxI32 index)
+  const point<Type>& Vertex(PxI32 index)
   {
     if ( index < 0 ) index+=mVcount;
     return mVertices[index];
   };
 
 
-  void set(const point<Type> *pts,NxI32 count)
+  void set(const point<Type> *pts,PxI32 count)
   {
-    for (NxI32 i=0; i<count; i++)
+    for (PxI32 i=0; i<count; i++)
     {
       mVertices[i] = pts[i];
     }
@@ -1926,13 +1926,13 @@ public:
 
   void Split_Polygon(polygon<Type> *poly,plane<Type> *part, polygon<Type> &front, polygon<Type> &back)
   {
-    NxI32   count = poly->NumVertices ();
-    NxI32   out_c = 0, in_c = 0;
+    PxI32   count = poly->NumVertices ();
+    PxI32   out_c = 0, in_c = 0;
     point<Type> ptA, ptB,outpts[MAXPTS],inpts[MAXPTS];
     Type sideA, sideB;
     ptA = poly->Vertex (count - 1);
     sideA = part->Classify_Point (ptA);
-    for (NxI32 i = -1; ++i < count;)
+    for (PxI32 i = -1; ++i < count;)
     {
       ptB = poly->Vertex(i);
       sideB = part->Classify_Point(ptB);
@@ -1966,7 +1966,7 @@ public:
     back.set(&inpts[0], in_c);
   }
 
-  NxI32           mVcount;
+  PxI32           mVcount;
   point<Type>   mVertices[MAXPTS];
 };
 
@@ -1974,7 +1974,7 @@ public:
 
 #endif
 
-static inline void add(const REAL *p,REAL *dest,NxU32 tstride,NxU32 &pcount)
+static inline void add(const REAL *p,REAL *dest,PxU32 tstride,PxU32 &pcount)
 {
   char *d = (char *) dest;
   d = d + pcount*tstride;
@@ -1989,12 +1989,12 @@ static inline void add(const REAL *p,REAL *dest,NxU32 tstride,NxU32 &pcount)
 
 PlaneTriResult fm_planeTriIntersection(const REAL *_plane,    // the plane equation in Ax+By+Cz+D format
                                     const REAL *triangle, // the source triangle.
-                                    NxU32 tstride,  // stride in bytes of the input and output *vertices*
+                                    PxU32 tstride,  // stride in bytes of the input and output *vertices*
                                     REAL        epsilon,  // the co-planar epsilon value.
                                     REAL       *front,    // the triangle in front of the
-                                    NxU32 &fcount,  // number of vertices in the 'front' triangle
+                                    PxU32 &fcount,  // number of vertices in the 'front' triangle
                                     REAL       *back,     // the triangle in back of the plane
-                                    NxU32 &bcount) // the number of vertices in the 'back' triangle.
+                                    PxU32 &bcount) // the number of vertices in the 'back' triangle.
 {
 
   fcount = 0;
@@ -2063,12 +2063,12 @@ PlaneTriResult fm_planeTriIntersection(const REAL *_plane,    // the plane equat
 
   pi.Split_Polygon(&pi,&part,pfront,pback);
 
-  for (NxI32 i=0; i<pfront.mVcount; i++)
+  for (PxI32 i=0; i<pfront.mVcount; i++)
   {
     add( &pfront.mVertices[i].x, front, tstride, fcount );
   }
 
-  for (NxI32 i=0; i<pback.mVcount; i++)
+  for (PxI32 i=0; i<pback.mVcount; i++)
   {
     add( &pback.mVertices[i].x, back, tstride, bcount );
   }
@@ -2089,14 +2089,14 @@ PlaneTriResult fm_planeTriIntersection(const REAL *_plane,    // the plane equat
 }
 
 // computes the OBB for this set of points relative to this transform matrix.
-void computeOBB(NxU32 vcount,const REAL *points,NxU32 pstride,REAL *sides,REAL *matrix)
+void computeOBB(PxU32 vcount,const REAL *points,PxU32 pstride,REAL *sides,REAL *matrix)
 {
   const char *src = (const char *) points;
 
   REAL bmin[3] = { 1e9, 1e9, 1e9 };
   REAL bmax[3] = { -1e9, -1e9, -1e9 };
 
-  for (NxU32 i=0; i<vcount; i++)
+  for (PxU32 i=0; i<vcount; i++)
   {
     const REAL *p = (const REAL *) src;
     REAL t[3];
@@ -2134,7 +2134,7 @@ void computeOBB(NxU32 vcount,const REAL *points,NxU32 pstride,REAL *sides,REAL *
 
 }
 
-void fm_computeBestFitOBB(NxU32 vcount,const REAL *points,NxU32 pstride,REAL *sides,REAL *matrix,bool bruteForce)
+void fm_computeBestFitOBB(PxU32 vcount,const REAL *points,PxU32 pstride,REAL *sides,REAL *matrix,bool bruteForce)
 {
   REAL plane[4];
   fm_computeBestFitPlane(vcount,points,pstride,0,0,plane);
@@ -2170,7 +2170,7 @@ void fm_computeBestFitOBB(NxU32 vcount,const REAL *points,NxU32 pstride,REAL *si
   }
 }
 
-void fm_computeBestFitOBB(NxU32 vcount,const REAL *points,NxU32 pstride,REAL *sides,REAL *pos,REAL *quat,bool bruteForce)
+void fm_computeBestFitOBB(PxU32 vcount,const REAL *points,PxU32 pstride,REAL *sides,REAL *pos,REAL *quat,bool bruteForce)
 {
   REAL matrix[16];
   fm_computeBestFitOBB(vcount,points,pstride,sides,matrix,bruteForce);
@@ -2178,7 +2178,7 @@ void fm_computeBestFitOBB(NxU32 vcount,const REAL *points,NxU32 pstride,REAL *si
   fm_matrixToQuat(matrix,quat);
 }
 
-void fm_computeBestFitABB(NxU32 vcount,const REAL *points,NxU32 pstride,REAL *sides,REAL *pos)
+void fm_computeBestFitABB(PxU32 vcount,const REAL *points,PxU32 pstride,REAL *sides,REAL *pos)
 {
 	REAL bmin[3];
 	REAL bmax[3];
@@ -2192,7 +2192,7 @@ void fm_computeBestFitABB(NxU32 vcount,const REAL *points,NxU32 pstride,REAL *si
   bmax[2] = points[2];
 
 	const char *cp = (const char *) points;
-	for (NxU32 i=0; i<vcount; i++)
+	for (PxU32 i=0; i<vcount; i++)
 	{
 		const REAL *p = (const REAL *) cp;
 
@@ -2282,14 +2282,14 @@ public:
     mDistance = 0;
   }
   KdTreeNode  *mNode;
-  NxF64        mDistance;
+  PxF64        mDistance;
 };
 
 class KdTreeInterface
 {
 public:
-  virtual const NxF64 * getPositionDouble(NxU32 index) const = 0;
-  virtual const NxF32  * getPositionFloat(NxU32 index) const = 0;
+  virtual const PxF64 * getPositionDouble(PxU32 index) const = 0;
+  virtual const PxF32  * getPositionFloat(PxU32 index) const = 0;
 };
 
 class KdTreeNode
@@ -2302,7 +2302,7 @@ public:
     mRight = 0;
   }
 
-  KdTreeNode(NxU32 index)
+  KdTreeNode(PxU32 index)
   {
     mIndex = index;
     mLeft = 0;
@@ -2316,8 +2316,8 @@ public:
 
   void addDouble(KdTreeNode *node,Axes dim,const KdTreeInterface *iface)
   {
-    const NxF64 *nodePosition = iface->getPositionDouble( node->mIndex );
-    const NxF64 *position     = iface->getPositionDouble( mIndex );
+    const PxF64 *nodePosition = iface->getPositionDouble( node->mIndex );
+    const PxF64 *position     = iface->getPositionDouble( mIndex );
     switch ( dim )
     {
       case X_AXIS:
@@ -2375,8 +2375,8 @@ public:
 
   void addFloat(KdTreeNode *node,Axes dim,const KdTreeInterface *iface)
   {
-    const NxF32 *nodePosition = iface->getPositionFloat( node->mIndex );
-    const NxF32 *position     = iface->getPositionFloat( mIndex );
+    const PxF32 *nodePosition = iface->getPositionFloat( node->mIndex );
+    const PxF32 *position     = iface->getPositionFloat( mIndex );
     switch ( dim )
     {
       case X_AXIS:
@@ -2432,16 +2432,16 @@ public:
   }
 
 
-  NxU32 getIndex(void) const { return mIndex; };
+  PxU32 getIndex(void) const { return mIndex; };
 
-  void search(Axes axis,const NxF64 *pos,NxF64 radius,NxU32 &count,NxU32 maxObjects,KdTreeFindNode *found,const KdTreeInterface *iface)
+  void search(Axes axis,const PxF64 *pos,PxF64 radius,PxU32 &count,PxU32 maxObjects,KdTreeFindNode *found,const KdTreeInterface *iface)
   {
 
-    const NxF64 *position = iface->getPositionDouble(mIndex);
+    const PxF64 *position = iface->getPositionDouble(mIndex);
 
-    NxF64 dx = pos[0] - position[0];
-    NxF64 dy = pos[1] - position[1];
-    NxF64 dz = pos[2] - position[2];
+    PxF64 dx = pos[0] - position[0];
+    PxF64 dy = pos[1] - position[1];
+    PxF64 dz = pos[2] - position[2];
 
     KdTreeNode *search1 = 0;
     KdTreeNode *search2 = 0;
@@ -2495,8 +2495,8 @@ public:
         break;
     }
 
-    NxF64 r2 = radius*radius;
-    NxF64 m  = dx*dx+dy*dy+dz*dz;
+    PxF64 r2 = radius*radius;
+    PxF64 m  = dx*dx+dy*dy+dz*dz;
 
     if ( m < r2 )
     {
@@ -2531,14 +2531,14 @@ public:
           {
             bool inserted = false;
 
-            for (NxU32 i=0; i<count; i++)
+            for (PxU32 i=0; i<count; i++)
             {
               if ( m < found[i].mDistance ) // if this one is closer than a pre-existing one...
               {
                 // insertion sort...
-                NxU32 scan = count;
+                PxU32 scan = count;
                 if ( scan >= maxObjects ) scan=maxObjects-1;
-                for (NxU32 j=scan; j>i; j--)
+                for (PxU32 j=scan; j>i; j--)
                 {
                   found[j] = found[j-1];
                 }
@@ -2573,14 +2573,14 @@ public:
 
   }
 
-  void search(Axes axis,const NxF32 *pos,NxF32 radius,NxU32 &count,NxU32 maxObjects,KdTreeFindNode *found,const KdTreeInterface *iface)
+  void search(Axes axis,const PxF32 *pos,PxF32 radius,PxU32 &count,PxU32 maxObjects,KdTreeFindNode *found,const KdTreeInterface *iface)
   {
 
-    const NxF32 *position = iface->getPositionFloat(mIndex);
+    const PxF32 *position = iface->getPositionFloat(mIndex);
 
-    NxF32 dx = pos[0] - position[0];
-    NxF32 dy = pos[1] - position[1];
-    NxF32 dz = pos[2] - position[2];
+    PxF32 dx = pos[0] - position[0];
+    PxF32 dy = pos[1] - position[1];
+    PxF32 dz = pos[2] - position[2];
 
     KdTreeNode *search1 = 0;
     KdTreeNode *search2 = 0;
@@ -2634,8 +2634,8 @@ public:
         break;
     }
 
-    NxF32 r2 = radius*radius;
-    NxF32 m  = dx*dx+dy*dy+dz*dz;
+    PxF32 r2 = radius*radius;
+    PxF32 m  = dx*dx+dy*dy+dz*dz;
 
     if ( m < r2 )
     {
@@ -2670,14 +2670,14 @@ public:
           {
             bool inserted = false;
 
-            for (NxU32 i=0; i<count; i++)
+            for (PxU32 i=0; i<count; i++)
             {
               if ( m < found[i].mDistance ) // if this one is closer than a pre-existing one...
               {
                 // insertion sort...
-                NxU32 scan = count;
+                PxU32 scan = count;
                 if ( scan >= maxObjects ) scan=maxObjects-1;
-                for (NxU32 j=scan; j>i; j--)
+                for (PxU32 j=scan; j>i; j--)
                 {
                   found[j] = found[j-1];
                 }
@@ -2720,7 +2720,7 @@ private:
 	KdTreeNode *getLeft(void)         { return mLeft; }
 	KdTreeNode *getRight(void)        { return mRight; }
 
-  NxU32          mIndex;
+  PxU32          mIndex;
   KdTreeNode     *mLeft;
   KdTreeNode     *mRight;
 };
@@ -2752,13 +2752,13 @@ public:
   }
 
   KdTreeNodeBundle  *mNext;
-  NxU32             mIndex;
+  PxU32             mIndex;
   KdTreeNode         mNodes[MAX_BUNDLE_SIZE];
 };
 
 
-typedef NVSHARE::Array< NxF64 > DoubleVector;
-typedef NVSHARE::Array< NxF32 >  FloatVector;
+typedef NVSHARE::Array< PxF64 > DoubleVector;
+typedef NVSHARE::Array< PxF32 >  FloatVector;
 
 class KdTree : public KdTreeInterface, public Memalloc
 {
@@ -2776,34 +2776,34 @@ public:
     reset();
   }
 
-  const NxF64 * getPositionDouble(NxU32 index) const
+  const PxF64 * getPositionDouble(PxU32 index) const
   {
     assert( mUseDouble );
     assert ( index < mVcount );
     return  &mVerticesDouble[index*3];
   }
 
-  const NxF32 * getPositionFloat(NxU32 index) const
+  const PxF32 * getPositionFloat(PxU32 index) const
   {
     assert( !mUseDouble );
     assert ( index < mVcount );
     return  &mVerticesFloat[index*3];
   }
 
-  NxU32 search(const NxF64 *pos,NxF64 radius,NxU32 maxObjects,KdTreeFindNode *found) const
+  PxU32 search(const PxF64 *pos,PxF64 radius,PxU32 maxObjects,KdTreeFindNode *found) const
   {
     assert( mUseDouble );
     if ( !mRoot )	return 0;
-    NxU32 count = 0;
+    PxU32 count = 0;
     mRoot->search(X_AXIS,pos,radius,count,maxObjects,found,this);
     return count;
   }
 
-  NxU32 search(const NxF32 *pos,NxF32 radius,NxU32 maxObjects,KdTreeFindNode *found) const
+  PxU32 search(const PxF32 *pos,PxF32 radius,PxU32 maxObjects,KdTreeFindNode *found) const
   {
     assert( !mUseDouble );
     if ( !mRoot )	return 0;
-    NxU32 count = 0;
+    PxU32 count = 0;
     mRoot->search(X_AXIS,pos,radius,count,maxObjects,found,this);
     return count;
   }
@@ -2824,10 +2824,10 @@ public:
     mVcount = 0;
   }
 
-  NxU32 add(NxF64 x,NxF64 y,NxF64 z)
+  PxU32 add(PxF64 x,PxF64 y,PxF64 z)
   {
     assert(mUseDouble);
-    NxU32 ret = mVcount;
+    PxU32 ret = mVcount;
     mVerticesDouble.pushBack(x);
     mVerticesDouble.pushBack(y);
     mVerticesDouble.pushBack(z);
@@ -2844,10 +2844,10 @@ public:
     return ret;
   }
 
-  NxU32 add(NxF32 x,NxF32 y,NxF32 z)
+  PxU32 add(PxF32 x,PxF32 y,PxF32 z)
   {
     assert(!mUseDouble);
-    NxU32 ret = mVcount;
+    PxU32 ret = mVcount;
     mVerticesFloat.pushBack(x);
     mVerticesFloat.pushBack(y);
     mVerticesFloat.pushBack(z);
@@ -2864,7 +2864,7 @@ public:
     return ret;
   }
 
-  KdTreeNode * getNewNode(NxU32 index)
+  KdTreeNode * getNewNode(PxU32 index)
   {
     if ( mBundle == 0 )
     {
@@ -2881,14 +2881,14 @@ public:
     return node;
   }
 
-  NxU32 getNearest(const NxF64 *pos,NxF64 radius,bool &_found) const // returns the nearest possible neighbor's index.
+  PxU32 getNearest(const PxF64 *pos,PxF64 radius,bool &_found) const // returns the nearest possible neighbor's index.
   {
     assert( mUseDouble );
-    NxU32 ret = 0;
+    PxU32 ret = 0;
 
     _found = false;
     KdTreeFindNode found[1];
-    NxU32 count = search(pos,radius,1,found);
+    PxU32 count = search(pos,radius,1,found);
     if ( count )
     {
       KdTreeNode *node = found[0].mNode;
@@ -2898,14 +2898,14 @@ public:
     return ret;
   }
 
-  NxU32 getNearest(const NxF32 *pos,NxF32 radius,bool &_found) const // returns the nearest possible neighbor's index.
+  PxU32 getNearest(const PxF32 *pos,PxF32 radius,bool &_found) const // returns the nearest possible neighbor's index.
   {
     assert( !mUseDouble );
-    NxU32 ret = 0;
+    PxU32 ret = 0;
 
     _found = false;
     KdTreeFindNode found[1];
-    NxU32 count = search(pos,radius,1,found);
+    PxU32 count = search(pos,radius,1,found);
     if ( count )
     {
       KdTreeNode *node = found[0].mNode;
@@ -2915,10 +2915,10 @@ public:
     return ret;
   }
 
-  const NxF64 * getVerticesDouble(void) const
+  const PxF64 * getVerticesDouble(void) const
   {
     assert( mUseDouble );
-    const NxF64 *ret = 0;
+    const PxF64 *ret = 0;
     if ( !mVerticesDouble.empty() )
     {
       ret = &mVerticesDouble[0];
@@ -2926,10 +2926,10 @@ public:
     return ret;
   }
 
-  const NxF32 * getVerticesFloat(void) const
+  const PxF32 * getVerticesFloat(void) const
   {
     assert( !mUseDouble );
-    const NxF32 * ret = 0;
+    const PxF32 * ret = 0;
     if ( !mVerticesFloat.empty() )
     {
       ret = &mVerticesFloat[0];
@@ -2937,7 +2937,7 @@ public:
     return ret;
   }
 
-  NxU32 getVcount(void) const { return mVcount; };
+  PxU32 getVcount(void) const { return mVcount; };
 
   void setUseDouble(bool useDouble)
   {
@@ -2948,7 +2948,7 @@ private:
   bool                    mUseDouble;
   KdTreeNode             *mRoot;
   KdTreeNodeBundle       *mBundle;
-  NxU32                  mVcount;
+  PxU32                  mVcount;
   DoubleVector            mVerticesDouble;
   FloatVector             mVerticesFloat;
 };
@@ -2958,19 +2958,19 @@ private:
 class MyVertexIndex : public fm_VertexIndex, public Memalloc
 {
 public:
-  MyVertexIndex(NxF64 granularity,bool snapToGrid)
+  MyVertexIndex(PxF64 granularity,bool snapToGrid)
   {
     mDoubleGranularity = granularity;
-    mFloatGranularity  = (NxF32)granularity;
+    mFloatGranularity  = (PxF32)granularity;
     mSnapToGrid        = snapToGrid;
     mUseDouble         = true;
     mKdTree.setUseDouble(true);
   }
 
-  MyVertexIndex(NxF32 granularity,bool snapToGrid)
+  MyVertexIndex(PxF32 granularity,bool snapToGrid)
   {
     mDoubleGranularity = granularity;
-    mFloatGranularity  = (NxF32)granularity;
+    mFloatGranularity  = (PxF32)granularity;
     mSnapToGrid        = snapToGrid;
     mUseDouble         = false;
     mKdTree.setUseDouble(false);
@@ -2982,27 +2982,27 @@ public:
   }
 
 
-  NxF64 snapToGrid(NxF64 p)
+  PxF64 snapToGrid(PxF64 p)
   {
-    NxF64 m = fmod(p,mDoubleGranularity);
+    PxF64 m = fmod(p,mDoubleGranularity);
     p-=m;
     return p;
   }
 
-  NxF32 snapToGrid(NxF32 p)
+  PxF32 snapToGrid(PxF32 p)
   {
-    NxF32 m = fmodf(p,mFloatGranularity);
+    PxF32 m = fmodf(p,mFloatGranularity);
     p-=m;
     return p;
   }
 
-  NxU32    getIndex(const NxF32 *_p,bool &newPos)  // get index for a vector NxF32
+  PxU32    getIndex(const PxF32 *_p,bool &newPos)  // get index for a vector PxF32
   {
-    NxU32 ret;
+    PxU32 ret;
 
     if ( mUseDouble )
     {
-      NxF64 p[3];
+      PxF64 p[3];
       p[0] = _p[0];
       p[1] = _p[1];
       p[2] = _p[2];
@@ -3011,7 +3011,7 @@ public:
 
     newPos = false;
 
-    NxF32 p[3];
+    PxF32 p[3];
 
     if ( mSnapToGrid )
     {
@@ -3038,22 +3038,22 @@ public:
     return ret;
   }
 
-  NxU32    getIndex(const NxF64 *_p,bool &newPos)  // get index for a vector NxF64
+  PxU32    getIndex(const PxF64 *_p,bool &newPos)  // get index for a vector PxF64
   {
-    NxU32 ret;
+    PxU32 ret;
 
     if ( !mUseDouble )
     {
-      NxF32 p[3];
-      p[0] = (NxF32)_p[0];
-      p[1] = (NxF32)_p[1];
-      p[2] = (NxF32)_p[2];
+      PxF32 p[3];
+      p[0] = (PxF32)_p[0];
+      p[1] = (PxF32)_p[1];
+      p[2] = (PxF32)_p[2];
       return getIndex(p,newPos);
     }
 
     newPos = false;
 
-    NxF64 p[3];
+    PxF64 p[3];
 
     if ( mSnapToGrid )
     {
@@ -3080,9 +3080,9 @@ public:
     return ret;
   }
 
-  const NxF32 *   getVerticesFloat(void) const
+  const PxF32 *   getVerticesFloat(void) const
   {
-    const NxF32 * ret = 0;
+    const PxF32 * ret = 0;
 
     assert( !mUseDouble );
 
@@ -3091,9 +3091,9 @@ public:
     return ret;
   }
 
-  const NxF64 *  getVerticesDouble(void) const
+  const PxF64 *  getVerticesDouble(void) const
   {
-    const NxF64 * ret = 0;
+    const PxF64 * ret = 0;
 
     assert( mUseDouble );
 
@@ -3102,12 +3102,12 @@ public:
     return ret;
   }
 
-  const NxF32 *   getVertexFloat(NxU32 index) const
+  const PxF32 *   getVertexFloat(PxU32 index) const
   {
-    const NxF32 * ret  = 0;
+    const PxF32 * ret  = 0;
     assert( !mUseDouble );
 #ifdef _DEBUG
-    NxU32 vcount = mKdTree.getVcount();
+    PxU32 vcount = mKdTree.getVcount();
     assert( index < vcount );
 #endif
     ret =  mKdTree.getVerticesFloat();
@@ -3115,12 +3115,12 @@ public:
     return ret;
   }
 
-  const NxF64 *   getVertexDouble(NxU32 index) const
+  const PxF64 *   getVertexDouble(PxU32 index) const
   {
-    const NxF64 * ret = 0;
+    const PxF64 * ret = 0;
     assert( mUseDouble );
 #ifdef _DEBUG
-    NxU32 vcount = mKdTree.getVcount();
+    PxU32 vcount = mKdTree.getVcount();
     assert( index < vcount );
 #endif
     ret =  mKdTree.getVerticesDouble();
@@ -3129,7 +3129,7 @@ public:
     return ret;
   }
 
-  NxU32    getVcount(void) const
+  PxU32    getVcount(void) const
   {
     return mKdTree.getVcount();
   }
@@ -3140,7 +3140,7 @@ public:
   }
 
 
-  bool            saveAsObj(const char *fname,NxU32 tcount,NxU32 *indices)
+  bool            saveAsObj(const char *fname,PxU32 tcount,PxU32 *indices)
   {
     bool ret = false;
 
@@ -3150,31 +3150,31 @@ public:
     {
       ret = true;
 
-      NxU32 vcount    = getVcount();
+      PxU32 vcount    = getVcount();
       if ( mUseDouble )
       {
-        const NxF64 *v  = getVerticesDouble();
-        for (NxU32 i=0; i<vcount; i++)
+        const PxF64 *v  = getVerticesDouble();
+        for (PxU32 i=0; i<vcount; i++)
         {
-          fprintf(fph,"v %0.9f %0.9f %0.9f\r\n", (NxF32)v[0], (NxF32)v[1], (NxF32)v[2] );
+          fprintf(fph,"v %0.9f %0.9f %0.9f\r\n", (PxF32)v[0], (PxF32)v[1], (PxF32)v[2] );
           v+=3;
         }
       }
       else
       {
-        const NxF32 *v  = getVerticesFloat();
-        for (NxU32 i=0; i<vcount; i++)
+        const PxF32 *v  = getVerticesFloat();
+        for (PxU32 i=0; i<vcount; i++)
         {
           fprintf(fph,"v %0.9f %0.9f %0.9f\r\n", v[0], v[1], v[2] );
           v+=3;
         }
       }
 
-      for (NxU32 i=0; i<tcount; i++)
+      for (PxU32 i=0; i<tcount; i++)
       {
-        NxU32 i1 = *indices++;
-        NxU32 i2 = *indices++;
-        NxU32 i3 = *indices++;
+        PxU32 i1 = *indices++;
+        PxU32 i2 = *indices++;
+        PxU32 i3 = *indices++;
         fprintf(fph,"f %d %d %d\r\n", i1+1, i2+1, i3+1 );
       }
       fclose(fph);
@@ -3186,18 +3186,18 @@ public:
 private:
   bool    mUseDouble:1;
   bool    mSnapToGrid:1;
-  NxF64  mDoubleGranularity;
-  NxF32   mFloatGranularity;
+  PxF64  mDoubleGranularity;
+  PxF32   mFloatGranularity;
   VERTEX_INDEX::KdTree  mKdTree;
 };
 
-fm_VertexIndex * fm_createVertexIndex(NxF64 granularity,bool snapToGrid) // create an indexed vertex system for doubles
+fm_VertexIndex * fm_createVertexIndex(PxF64 granularity,bool snapToGrid) // create an indexed vertex system for doubles
 {
   MyVertexIndex *ret = MEMALLOC_NEW(MyVertexIndex)(granularity,snapToGrid);
   return static_cast< fm_VertexIndex *>(ret);
 }
 
-fm_VertexIndex * fm_createVertexIndex(NxF32 granularity,bool snapToGrid)  // create an indexed vertext system for floats
+fm_VertexIndex * fm_createVertexIndex(PxF32 granularity,bool snapToGrid)  // create an indexed vertext system for floats
 {
   MyVertexIndex *ret = MEMALLOC_NEW(MyVertexIndex)(granularity,snapToGrid);
   return static_cast< fm_VertexIndex *>(ret);
@@ -3226,10 +3226,10 @@ void          fm_releaseVertexIndex(fm_VertexIndex *vindex)
 class fm_quickSort
 {
 public:
-	void qsort(void **base,NxI32 num); // perform the qsort.
+	void qsort(void **base,PxI32 num); // perform the qsort.
 protected:
   // -1 less, 0 equal, +1 greater.
-	virtual NxI32 compare(void **p1,void **p2) = 0;
+	virtual PxI32 compare(void **p1,void **p2) = 0;
 private:
 	void inline swap(char **a,char **b);
 };
@@ -3248,14 +3248,14 @@ void fm_quickSort::swap(char **a,char **b)
 }
 
 
-void fm_quickSort::qsort(void **b,NxI32 num)
+void fm_quickSort::qsort(void **b,PxI32 num)
 {
 	char *lo,*hi;
 	char *mid;
 	char *bottom, *top;
-	NxI32 size;
+	PxI32 size;
 	char *lostk[30], *histk[30];
-	NxI32 stkptr;
+	PxI32 stkptr;
 	char **base = (char **)b;
 
 	if (num < 2 ) return;
@@ -3267,7 +3267,7 @@ void fm_quickSort::qsort(void **b,NxI32 num)
 
 nextone:
 
-	size = (NxI32)(hi - lo) / sizeof(char**) + 1;
+	size = (PxI32)(hi - lo) / sizeof(char**) + 1;
 
 	mid = lo + (size / 2) * sizeof(char **);
 	swap((char **)mid,(char **)lo);
@@ -3337,7 +3337,7 @@ nextone:
 
 typedef NVSHARE::Array< fm_LineSegment > LineSegmentVector;
 
-static inline void setMinMax(NxF64 &vmin,NxF64 &vmax,NxF64 v1,NxF64 v2)
+static inline void setMinMax(PxF64 &vmin,PxF64 &vmax,PxF64 v1,PxF64 v2)
 {
   if ( v1 <= v2 )
   {
@@ -3360,10 +3360,10 @@ public:
     mIndex = 0;
     mTime = 0;
   }
-  Intersection(NxF64 time,const NxF64 *from,const NxF64 *to,fm_VertexIndex *vpool)
+  Intersection(PxF64 time,const PxF64 *from,const PxF64 *to,fm_VertexIndex *vpool)
   {
     mTime = time;
-    NxF64 pos[3];
+    PxF64 pos[3];
     pos[0] = (to[0]-from[0])*time+from[0];
     pos[1] = (to[1]-from[1])*time+from[1];
     pos[2] = (to[2]-from[2])*time+from[2];
@@ -3371,8 +3371,8 @@ public:
     mIndex = vpool->getIndex(pos,newPos);
   }
 
-  NxU32    mIndex;
-  NxF64    mTime;
+  PxU32    mIndex;
+  PxF64    mTime;
 };
 
 
@@ -3382,15 +3382,15 @@ class MyLineSegment : public fm_LineSegment, public Memalloc
 {
 public:
 
-  void init(const fm_LineSegment &s,fm_VertexIndex *vpool,NxU32 x)
+  void init(const fm_LineSegment &s,fm_VertexIndex *vpool,PxU32 x)
   {
     fm_LineSegment *dest = static_cast< fm_LineSegment *>(this);
     *dest = s;
 
     mFlipped = false;
 
-    const NxF64 *p1 = vpool->getVertexDouble(mE1);
-    const NxF64 *p2 = vpool->getVertexDouble(mE2);
+    const PxF64 *p1 = vpool->getVertexDouble(mE1);
+    const PxF64 *p2 = vpool->getVertexDouble(mE2);
 
     setMinMax(mMin[0],mMax[0],p1[0],p2[0]);
     setMinMax(mMin[1],mMax[1],p1[1],p2[1]);
@@ -3424,9 +3424,9 @@ public:
   }
 
   // we already know that the x-extent overlaps or we wouldn't be in this routine..
-  void intersect(MyLineSegment *segment,NxU32 x,NxU32 y,NxU32 /* z */,fm_VertexIndex *vpool)
+  void intersect(MyLineSegment *segment,PxU32 x,PxU32 y,PxU32 /* z */,fm_VertexIndex *vpool)
   {
-    NxU32 count = 0;
+    PxU32 count = 0;
 
     // if the two segments share any start/end points then they cannot intersect at all!
 
@@ -3446,10 +3446,10 @@ public:
       else
       {
 
-        NxF64 a1[2];
-        NxF64 a2[2];
-        NxF64 b1[2];
-        NxF64 b2[2];
+        PxF64 a1[2];
+        PxF64 a2[2];
+        PxF64 b1[2];
+        PxF64 b2[2];
 
         a1[0] = mFrom[x];
         a1[1] = mFrom[y];
@@ -3464,7 +3464,7 @@ public:
         b2[1] = segment->mTo[y];
 
 
-        NxF64 t1,t2;
+        PxF64 t1,t2;
         IntersectResult result = fm_intersectLineSegments2dTime(a1,a2,b1,b2,t1,t2);
 
         if ( result == IR_DO_INTERSECT )
@@ -3478,7 +3478,7 @@ public:
     }
   }
 
-  void addIntersect(NxF64 time,fm_VertexIndex *vpool)
+  void addIntersect(PxF64 time,fm_VertexIndex *vpool)
   {
     Intersection intersect(time,mFrom,mTo,vpool);
 
@@ -3533,7 +3533,7 @@ public:
     }
     else
     {
-      NxU32 prev = mE1;
+      PxU32 prev = mE1;
       IntersectionList::Iterator i;
       for (i=mIntersections.begin(); i!=mIntersections.end(); ++i)
       {
@@ -3555,18 +3555,18 @@ public:
     }
   }
 
-  void swap(NxU32 &a,NxU32 &b)
+  void swap(PxU32 &a,PxU32 &b)
   {
-    NxU32 temp = a;
+    PxU32 temp = a;
     a = b;
     b = temp;
   }
 
   bool             mFlipped;
-  NxF64            mFrom[3];
-  NxF64            mTo[3];
-  NxF64            mMin[3];
-  NxF64            mMax[3];
+  PxF64            mFrom[3];
+  PxF64            mTo[3];
+  PxF64            mMin[3];
+  PxF64            mMax[3];
   IntersectionList mIntersections;
 };
 
@@ -3579,7 +3579,7 @@ public:
   {
 
   }
-  fm_LineSegment * performLineSweep(const fm_LineSegment *segments,NxU32 icount,const NxF64 *planeEquation,fm_VertexIndex *pool,NxU32 &scount)
+  fm_LineSegment * performLineSweep(const fm_LineSegment *segments,PxU32 icount,const PxF64 *planeEquation,fm_VertexIndex *pool,PxU32 &scount)
   {
     fm_LineSegment *ret = 0;
 
@@ -3610,19 +3610,19 @@ public:
     MyLineSegment *mls   = MEMALLOC_NEW(MyLineSegment)[icount];
     MyLineSegment **mptr = (MyLineSegment **)MEMALLOC_MALLOC(sizeof(MyLineSegment *)*icount);
 
-    for (NxU32 i=0; i<icount; i++)
+    for (PxU32 i=0; i<icount; i++)
     {
       mls[i].init(segments[i],pool,mX);
       mptr[i] = &mls[i];
     }
 
-    qsort((void **)mptr,(NxI32)icount);
+    qsort((void **)mptr,(PxI32)icount);
 
-    for (NxU32 i=0; i<icount; i++)
+    for (PxU32 i=0; i<icount; i++)
     {
       MyLineSegment *segment = mptr[i];
-      NxF64 esegment = segment->mTo[mX];
-      for (NxU32 j=i+1; j<icount; j++)
+      PxF64 esegment = segment->mTo[mX];
+      for (PxU32 j=i+1; j<icount; j++)
       {
         MyLineSegment *test = mptr[j];
         if ( test->mFrom[mX] >= esegment )
@@ -3636,7 +3636,7 @@ public:
       }
     }
 
-    for (NxU32 i=0; i<icount; i++)
+    for (PxU32 i=0; i<icount; i++)
     {
       MyLineSegment *segment = mptr[i];
       segment->getResults(mResults);
@@ -3648,16 +3648,16 @@ public:
 
     if ( !mResults.empty() )
     {
-      scount = (NxU32)mResults.size();
+      scount = (PxU32)mResults.size();
       ret = &mResults[0];
     }
 
     return ret;
   }
 
-	NxI32 compare(void **p1,void **p2)
+	PxI32 compare(void **p1,void **p2)
   {
-    NxI32 ret = 0;
+    PxI32 ret = 0;
 
     MyLineSegment **m1 = (MyLineSegment **) p1;
     MyLineSegment **m2 = (MyLineSegment **) p2;
@@ -3677,9 +3677,9 @@ public:
     return ret;
   }
 
-  NxU32              mX;  // index for the x-axis
-  NxU32              mY;  // index for the y-axis
-  NxU32              mZ;
+  PxU32              mX;  // index for the x-axis
+  PxU32              mY;  // index for the y-axis
+  PxU32              mZ;
   fm_VertexIndex        *mfm_VertexIndex;
   LineSegmentVector  mResults;
 };
@@ -3704,10 +3704,10 @@ void        fm_releaseLineSweep(fm_LineSweep *sweep)
 
 
 
-REAL fm_computeBestFitAABB(NxU32 vcount,const REAL *points,NxU32 pstride,REAL *bmin,REAL *bmax) // returns the diagonal distance
+REAL fm_computeBestFitAABB(PxU32 vcount,const REAL *points,PxU32 pstride,REAL *bmin,REAL *bmax) // returns the diagonal distance
 {
 
-  const NxU8 *source = (const NxU8 *) points;
+  const PxU8 *source = (const PxU8 *) points;
 
 	bmin[0] = points[0];
 	bmin[1] = points[1];
@@ -3718,7 +3718,7 @@ REAL fm_computeBestFitAABB(NxU32 vcount,const REAL *points,NxU32 pstride,REAL *b
 	bmax[2] = points[2];
 
 
-  for (NxU32 i=1; i<vcount; i++)
+  for (PxU32 i=1; i<vcount; i++)
   {
   	source+=pstride;
   	const REAL *p = (const REAL *) source;
@@ -3842,11 +3842,11 @@ inline REAL det(const REAL *p1,const REAL *p2,const REAL *p3)
 }
 
 
-REAL  fm_computeMeshVolume(const REAL *vertices,NxU32 tcount,const NxU32 *indices)
+REAL  fm_computeMeshVolume(const REAL *vertices,PxU32 tcount,const PxU32 *indices)
 {
 	REAL volume = 0;
 
-	for (NxU32 i=0; i<tcount; i++,indices+=3)
+	for (PxU32 i=0; i<tcount; i++,indices+=3)
 	{
   	const REAL *p1 = &vertices[ indices[0]*3 ];
 		const REAL *p2 = &vertices[ indices[1]*3 ];
@@ -3861,9 +3861,9 @@ REAL  fm_computeMeshVolume(const REAL *vertices,NxU32 tcount,const NxU32 *indice
 }
 
 
-const REAL * fm_getPoint(const REAL *points,NxU32 pstride,NxU32 index)
+const REAL * fm_getPoint(const REAL *points,PxU32 pstride,PxU32 index)
 {
-  const NxU8 *scan = (const NxU8 *)points;
+  const PxU8 *scan = (const PxU8 *)points;
   scan+=(index*pstride);
   return (REAL *)scan;
 }
@@ -3893,12 +3893,12 @@ bool fm_insideTriangle(REAL Ax, REAL Ay,
 }
 
 
-REAL fm_areaPolygon2d(NxU32 pcount,const REAL *points,NxU32 pstride)
+REAL fm_areaPolygon2d(PxU32 pcount,const REAL *points,PxU32 pstride)
 {
-  NxI32 n = (NxI32)pcount;
+  PxI32 n = (PxI32)pcount;
 
   REAL A=0.0f;
-  for(NxI32 p=n-1,q=0; q<n; p=q++)
+  for(PxI32 p=n-1,q=0; q<n; p=q++)
   {
     const REAL *p1 = fm_getPoint(points,pstride,p);
     const REAL *p2 = fm_getPoint(points,pstride,q);
@@ -3908,15 +3908,15 @@ REAL fm_areaPolygon2d(NxU32 pcount,const REAL *points,NxU32 pstride)
 }
 
 
-bool  fm_pointInsidePolygon2d(NxU32 pcount,const REAL *points,NxU32 pstride,const REAL *point,NxU32 xindex,NxU32 yindex)
+bool  fm_pointInsidePolygon2d(PxU32 pcount,const REAL *points,PxU32 pstride,const REAL *point,PxU32 xindex,PxU32 yindex)
 {
-  NxU32 j = pcount-1;
-  NxI32 oddNodes = 0;
+  PxU32 j = pcount-1;
+  PxI32 oddNodes = 0;
 
   REAL x = point[xindex];
   REAL y = point[yindex];
 
-  for (NxU32 i=0; i<pcount; i++)
+  for (PxU32 i=0; i<pcount; i++)
   {
     const REAL *p1 = fm_getPoint(points,pstride,i);
     const REAL *p2 = fm_getPoint(points,pstride,j);
@@ -3941,9 +3941,9 @@ bool  fm_pointInsidePolygon2d(NxU32 pcount,const REAL *points,NxU32 pstride,cons
 }
 
 
-NxU32 fm_consolidatePolygon(NxU32 pcount,const REAL *points,NxU32 pstride,REAL *_dest,REAL epsilon) // collapses co-linear edges.
+PxU32 fm_consolidatePolygon(PxU32 pcount,const REAL *points,PxU32 pstride,REAL *_dest,REAL epsilon) // collapses co-linear edges.
 {
-  NxU32 ret = 0;
+  PxU32 ret = 0;
 
 
   if ( pcount >= 3 )
@@ -3953,7 +3953,7 @@ NxU32 fm_consolidatePolygon(NxU32 pcount,const REAL *points,NxU32 pstride,REAL *
     const REAL *next    = fm_getPoint(points,pstride,1);
     REAL *dest = _dest;
 
-    for (NxU32 i=0; i<pcount; i++)
+    for (PxU32 i=0; i<pcount; i++)
     {
 
       next = (i+1)==pcount ? points : next;
@@ -4035,7 +4035,7 @@ public:
 
 #endif
 
-void splitRect(NxU32 axis,
+void splitRect(PxU32 axis,
 						   const Rect3d<REAL> &source,
 							 Rect3d<REAL> &b1,
 							 Rect3d<REAL> &b2,
@@ -4070,10 +4070,10 @@ void splitRect(NxU32 axis,
 	}
 }
 
-bool fm_computeSplitPlane(NxU32 vcount,
+bool fm_computeSplitPlane(PxU32 vcount,
                           const REAL *vertices,
-                          NxU32 /* tcount */,
-                          const NxU32 * /* indices */,
+                          PxU32 /* tcount */,
+                          const PxU32 * /* indices */,
                           REAL *plane)
 {
 
@@ -4101,7 +4101,7 @@ bool fm_computeSplitPlane(NxU32 vcount,
 
 	REAL laxis = dx;
 
-	NxU32 axis = 0;
+	PxU32 axis = 0;
 
 	if ( dy > dx )
 	{
@@ -4278,22 +4278,22 @@ void fm_copy3(const REAL *source,REAL *dest)
 }
 
 
-NxU32  fm_copyUniqueVertices(NxU32 vcount,const REAL *input_vertices,REAL *output_vertices,NxU32 tcount,const NxU32 *input_indices,NxU32 *output_indices)
+PxU32  fm_copyUniqueVertices(PxU32 vcount,const REAL *input_vertices,REAL *output_vertices,PxU32 tcount,const PxU32 *input_indices,PxU32 *output_indices)
 {
-  NxU32 ret = 0;
+  PxU32 ret = 0;
 
   REAL *vertices = (REAL *)MEMALLOC_MALLOC(sizeof(REAL)*vcount*3);
   memcpy(vertices,input_vertices,sizeof(REAL)*vcount*3);
   REAL *dest = output_vertices;
 
-  NxU32 *reindex = (NxU32 *)MEMALLOC_MALLOC(sizeof(NxU32)*vcount);
-  memset(reindex,0xFF,sizeof(NxU32)*vcount);
+  PxU32 *reindex = (PxU32 *)MEMALLOC_MALLOC(sizeof(PxU32)*vcount);
+  memset(reindex,0xFF,sizeof(PxU32)*vcount);
 
-  NxU32 icount = tcount*3;
+  PxU32 icount = tcount*3;
 
-  for (NxU32 i=0; i<icount; i++)
+  for (PxU32 i=0; i<icount; i++)
   {
-    NxU32 index = *input_indices++;
+    PxU32 index = *input_indices++;
 
     assert( index < vcount );
 
@@ -4318,22 +4318,22 @@ NxU32  fm_copyUniqueVertices(NxU32 vcount,const REAL *input_vertices,REAL *outpu
   return ret;
 }
 
-bool    fm_isMeshCoplanar(NxU32 tcount,const NxU32 *indices,const REAL *vertices,bool doubleSided) // returns true if this collection of indexed triangles are co-planar!
+bool    fm_isMeshCoplanar(PxU32 tcount,const PxU32 *indices,const REAL *vertices,bool doubleSided) // returns true if this collection of indexed triangles are co-planar!
 {
   bool ret = true;
 
   if ( tcount > 0 )
   {
-    NxU32 i1 = indices[0];
-    NxU32 i2 = indices[1];
-    NxU32 i3 = indices[2];
+    PxU32 i1 = indices[0];
+    PxU32 i2 = indices[1];
+    PxU32 i3 = indices[2];
     const REAL *p1 = &vertices[i1*3];
     const REAL *p2 = &vertices[i2*3];
     const REAL *p3 = &vertices[i3*3];
     REAL plane[4];
     plane[3] = fm_computePlane(p1,p2,p3,plane);
-    const NxU32 *scan = &indices[3];
-    for (NxU32 i=1; i<tcount; i++)
+    const PxU32 *scan = &indices[3];
+    for (PxU32 i=1; i<tcount; i++)
     {
       i1 = *scan++;
       i2 = *scan++;
@@ -4390,7 +4390,7 @@ void  fm_initMinMax(REAL bmin[3],REAL bmax[3])
 
 #define TESSELATE_H
 
-typedef NVSHARE::Array< NxU32 > UintVector;
+typedef NVSHARE::Array< PxU32 > UintVector;
 
 class Myfm_Tesselate : public fm_Tesselate, public Memalloc
 {
@@ -4400,9 +4400,9 @@ public:
 
   }
 
-  const NxU32 * tesselate(fm_VertexIndex *vindex,NxU32 tcount,const NxU32 *indices,NxF32 longEdge,NxU32 maxDepth,NxU32 &outcount)
+  const PxU32 * tesselate(fm_VertexIndex *vindex,PxU32 tcount,const PxU32 *indices,PxF32 longEdge,PxU32 maxDepth,PxU32 &outcount)
   {
-    const NxU32 *ret = 0;
+    const PxU32 *ret = 0;
 
     mMaxDepth = maxDepth;
     mLongEdge  = longEdge*longEdge;
@@ -4411,19 +4411,19 @@ public:
 
     if ( mVertices->isDouble() )
     {
-      NxU32 vcount = mVertices->getVcount();
-      NxF64 *vertices = (NxF64 *)MEMALLOC_MALLOC(sizeof(NxF64)*vcount*3);
-      memcpy(vertices,mVertices->getVerticesDouble(),sizeof(NxF64)*vcount*3);
+      PxU32 vcount = mVertices->getVcount();
+      PxF64 *vertices = (PxF64 *)MEMALLOC_MALLOC(sizeof(PxF64)*vcount*3);
+      memcpy(vertices,mVertices->getVerticesDouble(),sizeof(PxF64)*vcount*3);
 
-      for (NxU32 i=0; i<tcount; i++)
+      for (PxU32 i=0; i<tcount; i++)
       {
-        NxU32 i1 = *indices++;
-        NxU32 i2 = *indices++;
-        NxU32 i3 = *indices++;
+        PxU32 i1 = *indices++;
+        PxU32 i2 = *indices++;
+        PxU32 i3 = *indices++;
 
-        const NxF64 *p1 = &vertices[i1*3];
-        const NxF64 *p2 = &vertices[i2*3];
-        const NxF64 *p3 = &vertices[i3*3];
+        const PxF64 *p1 = &vertices[i1*3];
+        const PxF64 *p2 = &vertices[i2*3];
+        const PxF64 *p3 = &vertices[i3*3];
 
         tesselate(p1,p2,p3,0);
 
@@ -4432,20 +4432,20 @@ public:
     }
     else
     {
-      NxU32 vcount = mVertices->getVcount();
-      NxF32 *vertices = (NxF32 *)MEMALLOC_MALLOC(sizeof(NxF32)*vcount*3);
-      memcpy(vertices,mVertices->getVerticesFloat(),sizeof(NxF32)*vcount*3);
+      PxU32 vcount = mVertices->getVcount();
+      PxF32 *vertices = (PxF32 *)MEMALLOC_MALLOC(sizeof(PxF32)*vcount*3);
+      memcpy(vertices,mVertices->getVerticesFloat(),sizeof(PxF32)*vcount*3);
 
 
-      for (NxU32 i=0; i<tcount; i++)
+      for (PxU32 i=0; i<tcount; i++)
       {
-        NxU32 i1 = *indices++;
-        NxU32 i2 = *indices++;
-        NxU32 i3 = *indices++;
+        PxU32 i1 = *indices++;
+        PxU32 i2 = *indices++;
+        PxU32 i3 = *indices++;
 
-        const NxF32 *p1 = &vertices[i1*3];
-        const NxF32 *p2 = &vertices[i2*3];
-        const NxF32 *p3 = &vertices[i3*3];
+        const PxF32 *p1 = &vertices[i1*3];
+        const PxF32 *p2 = &vertices[i2*3];
+        const PxF32 *p3 = &vertices[i3*3];
 
         tesselate(p1,p2,p3,0);
 
@@ -4453,17 +4453,17 @@ public:
       MEMALLOC_FREE(vertices);
     }
 
-    outcount = (NxU32)(mIndices.size()/3);
+    outcount = (PxU32)(mIndices.size()/3);
     ret = &mIndices[0];
 
 
     return ret;
   }
 
-  void tesselate(const NxF32 *p1,const NxF32 *p2,const NxF32 *p3,NxU32 recurse)
+  void tesselate(const PxF32 *p1,const PxF32 *p2,const PxF32 *p3,PxU32 recurse)
   {
   	bool split = false;
-  	NxF32 l1,l2,l3;
+  	PxF32 l1,l2,l3;
 
     l1 = l2 = l3 = 0;
 
@@ -4480,7 +4480,7 @@ public:
 
     if ( split )
   	{
-  		NxU32 edge;
+  		PxU32 edge;
 
   		if ( l1 >= l2 && l1 >= l3 )
   			edge = 0;
@@ -4489,7 +4489,7 @@ public:
   		else
   			edge = 2;
 
-			NxF32 split[3];
+			PxF32 split[3];
 
   		switch ( edge )
   		{
@@ -4520,9 +4520,9 @@ public:
   	{
       bool newp;
 
-      NxU32 i1 = mVertices->getIndex(p1,newp);
-      NxU32 i2 = mVertices->getIndex(p2,newp);
-      NxU32 i3 = mVertices->getIndex(p3,newp);
+      PxU32 i1 = mVertices->getIndex(p1,newp);
+      PxU32 i2 = mVertices->getIndex(p2,newp);
+      PxU32 i3 = mVertices->getIndex(p3,newp);
 
       mIndices.pushBack(i1);
       mIndices.pushBack(i2);
@@ -4531,10 +4531,10 @@ public:
 
   }
 
-  void tesselate(const NxF64 *p1,const NxF64 *p2,const NxF64 *p3,NxU32 recurse)
+  void tesselate(const PxF64 *p1,const PxF64 *p2,const PxF64 *p3,PxU32 recurse)
   {
   	bool split = false;
-  	NxF64 l1,l2,l3;
+  	PxF64 l1,l2,l3;
 
     l1 = l2 = l3 = 0;
 
@@ -4551,7 +4551,7 @@ public:
 
     if ( split )
   	{
-  		NxU32 edge;
+  		PxU32 edge;
 
   		if ( l1 >= l2 && l1 >= l3 )
   			edge = 0;
@@ -4560,7 +4560,7 @@ public:
   		else
   			edge = 2;
 
-			NxF64 split[3];
+			PxF64 split[3];
 
   		switch ( edge )
   		{
@@ -4591,9 +4591,9 @@ public:
   	{
       bool newp;
 
-      NxU32 i1 = mVertices->getIndex(p1,newp);
-      NxU32 i2 = mVertices->getIndex(p2,newp);
-      NxU32 i3 = mVertices->getIndex(p3,newp);
+      PxU32 i1 = mVertices->getIndex(p1,newp);
+      PxU32 i2 = mVertices->getIndex(p2,newp);
+      PxU32 i3 = mVertices->getIndex(p3,newp);
 
       mIndices.pushBack(i1);
       mIndices.pushBack(i2);
@@ -4603,11 +4603,11 @@ public:
   }
 
 private:
-  NxF32           mLongEdge;
-  NxF64          mLongEdgeD;
+  PxF32           mLongEdge;
+  PxF64          mLongEdgeD;
   fm_VertexIndex *mVertices;
   UintVector    mIndices;
-  NxU32          mMaxDepth;
+  PxU32          mMaxDepth;
 };
 
 fm_Tesselate * fm_createTesselate(void)
@@ -4630,7 +4630,7 @@ void           fm_releaseTesselate(fm_Tesselate *t)
 #define RAY_ABB_INTERSECT
 
 //! Integer representation of a floating-point value.
-#define IR(x)	((NxU32&)x)
+#define IR(x)	((PxU32&)x)
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
@@ -4643,7 +4643,7 @@ void           fm_releaseTesselate(fm_Tesselate *t)
 *
 *	Should work provided:
 *	1) the integer representation of 0.0f is 0x00000000
-*	2) the sign bit of the NxF32 is the most significant one
+*	2) the sign bit of the PxF32 is the most significant one
 *
 *	Report bugs: p.terdiman@codercorner.com
 *
@@ -4655,14 +4655,14 @@ void           fm_releaseTesselate(fm_Tesselate *t)
 */
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 #define RAYAABB_EPSILON 0.00001f
-bool fm_intersectRayAABB(const NxF32 MinB[3],const NxF32 MaxB[3],const NxF32 origin[3],const NxF32 dir[3],NxF32 coord[3])
+bool fm_intersectRayAABB(const PxF32 MinB[3],const PxF32 MaxB[3],const PxF32 origin[3],const PxF32 dir[3],PxF32 coord[3])
 {
   bool Inside = true;
-  NxF32 MaxT[3];
+  PxF32 MaxT[3];
   MaxT[0]=MaxT[1]=MaxT[2]=-1.0f;
 
   // Find candidate planes.
-  for(NxU32 i=0;i<3;i++)
+  for(PxU32 i=0;i<3;i++)
   {
     if(origin[i] < MinB[i])
     {
@@ -4692,14 +4692,14 @@ bool fm_intersectRayAABB(const NxF32 MinB[3],const NxF32 MaxB[3],const NxF32 ori
   }
 
   // Get largest of the maxT's for final choice of intersection
-  NxU32 WhichPlane = 0;
+  PxU32 WhichPlane = 0;
   if(MaxT[1] > MaxT[WhichPlane])	WhichPlane = 1;
   if(MaxT[2] > MaxT[WhichPlane])	WhichPlane = 2;
 
   // Check final candidate actually inside box
   if(IR(MaxT[WhichPlane])&0x80000000) return false;
 
-  for(NxU32 i=0;i<3;i++)
+  for(PxU32 i=0;i<3;i++)
   {
     if(i!=WhichPlane)
     {
@@ -4714,21 +4714,21 @@ bool fm_intersectRayAABB(const NxF32 MinB[3],const NxF32 MaxB[3],const NxF32 ori
   return true;	// ray hits box
 }
 
-bool fm_intersectLineSegmentAABB(const NxF32 bmin[3],const NxF32 bmax[3],const NxF32 p1[3],const NxF32 p2[3],NxF32 intersect[3])
+bool fm_intersectLineSegmentAABB(const PxF32 bmin[3],const PxF32 bmax[3],const PxF32 p1[3],const PxF32 p2[3],PxF32 intersect[3])
 {
   bool ret = false;
 
-  NxF32 dir[3];
+  PxF32 dir[3];
   dir[0] = p2[0] - p1[0];
   dir[1] = p2[1] - p1[1];
   dir[2] = p2[2] - p1[2];
-  NxF32 dist = fm_normalize(dir);
+  PxF32 dist = fm_normalize(dir);
   if ( dist > RAYAABB_EPSILON )
   {
     ret = fm_intersectRayAABB(bmin,bmax,p1,dir,intersect);
     if ( ret )
     {
-      NxF32 d = fm_distanceSquared(p1,intersect);
+      PxF32 d = fm_distanceSquared(p1,intersect);
       if ( d  > (dist*dist) )
       {
         ret = false;
@@ -4745,20 +4745,20 @@ bool fm_intersectLineSegmentAABB(const NxF32 bmin[3],const NxF32 bmax[3],const N
 #define OBB_TO_AABB
 
 #pragma warning(disable:4100)
-void    fm_OBBtoAABB(const NxF32 obmin[3],const NxF32 obmax[3],const NxF32 matrix[16],NxF32 abmin[3],NxF32 abmax[3])
+void    fm_OBBtoAABB(const PxF32 obmin[3],const PxF32 obmax[3],const PxF32 matrix[16],PxF32 abmin[3],PxF32 abmax[3])
 {
   assert(0); // not yet implemented.
 }
 
 
-const REAL * computePos(NxU32 index,const REAL *vertices,NxU32 vstride)
+const REAL * computePos(PxU32 index,const REAL *vertices,PxU32 vstride)
 {
   const char *tmp = (const char *)vertices;
   tmp+=(index*vstride);
   return (const REAL*)tmp;
 }
 
-void computeNormal(NxU32 index,REAL *normals,NxU32 nstride,const REAL *normal)
+void computeNormal(PxU32 index,REAL *normals,PxU32 nstride,const REAL *normal)
 {
   char *tmp = (char *)normals;
   tmp+=(index*nstride);
@@ -4768,18 +4768,18 @@ void computeNormal(NxU32 index,REAL *normals,NxU32 nstride,const REAL *normal)
   dest[2]+=normal[2];
 }
 
-void fm_computeMeanNormals(NxU32 vcount,       // the number of vertices
+void fm_computeMeanNormals(PxU32 vcount,       // the number of vertices
                            const REAL *vertices,     // the base address of the vertex position data.
-                           NxU32 vstride,      // the stride between position data.
+                           PxU32 vstride,      // the stride between position data.
                            REAL *normals,            // the base address  of the destination for mean vector normals
-                           NxU32 nstride,      // the stride between normals
-                           NxU32 tcount,       // the number of triangles
-                           const NxU32 *indices)     // the triangle indices
+                           PxU32 nstride,      // the stride between normals
+                           PxU32 tcount,       // the number of triangles
+                           const PxU32 *indices)     // the triangle indices
 {
 
   // Step #1 : Zero out the vertex normals
   char *dest = (char *)normals;
-  for (NxU32 i=0; i<vcount; i++)
+  for (PxU32 i=0; i<vcount; i++)
   {
     REAL *n = (REAL *)dest;
     n[0] = 0;
@@ -4789,13 +4789,13 @@ void fm_computeMeanNormals(NxU32 vcount,       // the number of vertices
   }
 
   // Step #2 : Compute the face normals and accumulate them
-  const NxU32 *scan = indices;
-  for (NxU32 i=0; i<tcount; i++)
+  const PxU32 *scan = indices;
+  for (PxU32 i=0; i<tcount; i++)
   {
 
-    NxU32 i1 = *scan++;
-    NxU32 i2 = *scan++;
-    NxU32 i3 = *scan++;
+    PxU32 i1 = *scan++;
+    PxU32 i2 = *scan++;
+    PxU32 i3 = *scan++;
 
     const REAL *p1 = computePos(i1,vertices,vstride);
     const REAL *p2 = computePos(i2,vertices,vstride);
@@ -4812,7 +4812,7 @@ void fm_computeMeanNormals(NxU32 vcount,       // the number of vertices
 
   // Normalize the accumulated normals
   dest = (char *)normals;
-  for (NxU32 i=0; i<vcount; i++)
+  for (PxU32 i=0; i<vcount; i++)
   {
     REAL *n = (REAL *)dest;
     fm_normalize(n);
@@ -4841,7 +4841,7 @@ static inline void Copy(REAL *dest,const REAL *source)
 }
 
 
-REAL  fm_computeBestFitSphere(NxU32 vcount,const REAL *points,NxU32 pstride,REAL *center)
+REAL  fm_computeBestFitSphere(PxU32 vcount,const REAL *points,PxU32 pstride,REAL *center)
 {
   REAL radius;
   REAL radius2;
@@ -4866,7 +4866,7 @@ REAL  fm_computeBestFitSphere(NxU32 vcount,const REAL *points,NxU32 pstride,REAL
   const char *scan = (const char *)points;
 
 
-  for (NxU32 i=0; i<vcount; i++)
+  for (PxU32 i=0; i<vcount; i++)
 	{
 		const REAL *caller_p = (const REAL *)scan;
 
@@ -4940,7 +4940,7 @@ REAL  fm_computeBestFitSphere(NxU32 vcount,const REAL *points,NxU32 pstride,REAL
   /* SECOND PASS: increment current sphere */
   {
     const char *scan = (const char *)points;
-	  for (NxU32 i=0; i<vcount; i++)
+	  for (PxU32 i=0; i<vcount; i++)
 		{
 			const REAL *caller_p = (const REAL *)scan;
 
@@ -4977,13 +4977,13 @@ REAL  fm_computeBestFitSphere(NxU32 vcount,const REAL *points,NxU32 pstride,REAL
 }
 
 
-void fm_computeBestFitCapsule(NxU32 vcount,const REAL *points,NxU32 pstride,REAL &radius,REAL &height,REAL matrix[16],bool bruteForce)
+void fm_computeBestFitCapsule(PxU32 vcount,const REAL *points,PxU32 pstride,REAL &radius,REAL &height,REAL matrix[16],bool bruteForce)
 {
   REAL sides[3];
   REAL omatrix[16];
   fm_computeBestFitOBB(vcount,points,pstride,sides,omatrix,bruteForce);
 
-  NxI32 axis = 0;
+  PxI32 axis = 0;
   if ( sides[0] > sides[1] && sides[0] > sides[2] )
     axis = 0;
   else if ( sides[1] > sides[0] && sides[1] > sides[2] )
@@ -5003,8 +5003,8 @@ void fm_computeBestFitCapsule(NxU32 vcount,const REAL *points,NxU32 pstride,REAL
         fm_eulerMatrix(0,0,FM_PI/2,localTransform);
         fm_matrixMultiply(localTransform,omatrix,matrix);
 
-        const NxU8 *scan = (const NxU8 *)points;
-        for (NxU32 i=0; i<vcount; i++)
+        const PxU8 *scan = (const PxU8 *)points;
+        for (PxU32 i=0; i<vcount; i++)
         {
           const REAL *p = (const REAL *)scan;
           REAL t[3];
@@ -5029,8 +5029,8 @@ void fm_computeBestFitCapsule(NxU32 vcount,const REAL *points,NxU32 pstride,REAL
         fm_eulerMatrix(0,FM_PI/2,0,localTransform);
         fm_matrixMultiply(localTransform,omatrix,matrix);
 
-        const NxU8 *scan = (const NxU8 *)points;
-        for (NxU32 i=0; i<vcount; i++)
+        const PxU8 *scan = (const PxU8 *)points;
+        for (PxU32 i=0; i<vcount; i++)
         {
           const REAL *p = (const REAL *)scan;
           REAL t[3];
@@ -5055,8 +5055,8 @@ void fm_computeBestFitCapsule(NxU32 vcount,const REAL *points,NxU32 pstride,REAL
         fm_eulerMatrix(FM_PI/2,0,0,localTransform);
         fm_matrixMultiply(localTransform,omatrix,matrix);
 
-        const NxU8 *scan = (const NxU8 *)points;
-        for (NxU32 i=0; i<vcount; i++)
+        const PxU8 *scan = (const PxU8 *)points;
+        for (PxU32 i=0; i<vcount; i++)
         {
           const REAL *p = (const REAL *)scan;
           REAL t[3];
@@ -5088,17 +5088,17 @@ void fm_computeBestFitCapsule(NxU32 vcount,const REAL *points,NxU32 pstride,REAL
 
 #define TRIANGULATE_H
 
-typedef NxU32 TU32;
+typedef PxU32 TU32;
 
 class TVec
 {
 public:
-	TVec(NxF64 _x,NxF64 _y,NxF64 _z) { x = _x; y = _y; z = _z; };
+	TVec(PxF64 _x,PxF64 _y,PxF64 _z) { x = _x; y = _y; z = _z; };
 	TVec(void) { };
 
-  NxF64 x;
-  NxF64 y;
-  NxF64 z;
+  PxF64 x;
+  PxF64 y;
+  PxF64 z;
 };
 
 typedef NVSHARE::Array< TVec >  TVecVector;
@@ -5126,7 +5126,7 @@ public:
         mIndices.clear();
     }
 
-    virtual void addPoint(NxF64 x,NxF64 y,NxF64 z)
+    virtual void addPoint(PxF64 x,PxF64 y,PxF64 z)
     {
         TVec v(x,y,z);
         // update bounding box...
@@ -5150,9 +5150,9 @@ public:
 
     // Triangulation happens in 2d.  We could inverse transform the polygon around the normal direction, or we just use the two most signficant axes
     // Here we find the two longest axes and use them to triangulate.  Inverse transforming them would introduce more doubleing point error and isn't worth it.
-    virtual NxU32 * triangulate(NxU32 &tcount,NxF64 epsilon)
+    virtual PxU32 * triangulate(PxU32 &tcount,PxF64 epsilon)
     {
-        NxU32 *ret = 0;
+        PxU32 *ret = 0;
         tcount = 0;
         mEpsilon = epsilon;
 
@@ -5160,11 +5160,11 @@ public:
         {
             mPoints.clear();
 
-          NxF64 dx = mMax.x - mMin.x; // locate the first, second and third longest edges and store them in i1, i2, i3
-          NxF64 dy = mMax.y - mMin.y;
-          NxF64 dz = mMax.z - mMin.z;
+          PxF64 dx = mMax.x - mMin.x; // locate the first, second and third longest edges and store them in i1, i2, i3
+          PxF64 dy = mMax.y - mMin.y;
+          PxF64 dz = mMax.z - mMin.z;
 
-          NxU32 i1,i2,i3;
+          PxU32 i1,i2,i3;
 
           if ( dx > dy && dx > dz )
           {
@@ -5209,9 +5209,9 @@ public:
               }
           }
 
-          NxU32 pcount = (NxU32)mInputPoints.size();
-          const NxF64 *points = &mInputPoints[0].x;
-          for (NxU32 i=0; i<pcount; i++)
+          PxU32 pcount = (PxU32)mInputPoints.size();
+          const PxF64 *points = &mInputPoints[0].x;
+          for (PxU32 i=0; i<pcount; i++)
           {
             TVec v( points[i1], points[i2], points[i3] );
             mPoints.pushBack(v);
@@ -5220,7 +5220,7 @@ public:
 
           mIndices.clear();
           triangulate(mIndices);
-          tcount = (NxU32)mIndices.size()/3;
+          tcount = (PxU32)mIndices.size()/3;
           if ( tcount )
           {
               ret = &mIndices[0];
@@ -5229,14 +5229,14 @@ public:
         return ret;
     }
 
-    virtual const NxF64 * getPoint(NxU32 index)
+    virtual const PxF64 * getPoint(PxU32 index)
     {
         return &mInputPoints[index].x;
     }
 
 
 private:
-    NxF64                  mEpsilon;
+    PxF64                  mEpsilon;
     TVec                   mMin;
     TVec                   mMax;
     TVecVector             mInputPoints;
@@ -5247,9 +5247,9 @@ private:
     bool _insideTriangle(const TVec& A, const TVec& B, const TVec& C,const TVec& P);
 
     ///     Returns the area of the contour
-    NxF64 _area();
+    PxF64 _area();
 
-    bool _snip(NxI32 u, NxI32 v, NxI32 w, NxI32 n, NxI32 *V);
+    bool _snip(PxI32 u, PxI32 v, PxI32 w, PxI32 n, PxI32 *V);
 
     ///     Processes the triangulation
     void _process(TU32Vector &indices);
@@ -5275,45 +5275,45 @@ void CTriangulator::triangulate(TU32Vector &indices)
 ///     Processes the triangulation
 void CTriangulator::_process(TU32Vector &indices)
 {
-    const NxI32 n = (const NxI32)mPoints.size();
+    const PxI32 n = (const PxI32)mPoints.size();
     if (n < 3)
         return;
-    NxI32 *V = (NxI32 *)MEMALLOC_MALLOC(sizeof(NxI32)*n);
+    PxI32 *V = (PxI32 *)MEMALLOC_MALLOC(sizeof(PxI32)*n);
 
 	bool flipped = false;
 
     if (0.0f < _area())
     {
-        for (NxI32 v = 0; v < n; v++)
+        for (PxI32 v = 0; v < n; v++)
             V[v] = v;
     }
     else
     {
 		flipped = true;
-        for (NxI32 v = 0; v < n; v++)
+        for (PxI32 v = 0; v < n; v++)
             V[v] = (n - 1) - v;
     }
 
-    NxI32 nv = n;
-    NxI32 count = 2 * nv;
-    for (NxI32 m = 0, v = nv - 1; nv > 2;)
+    PxI32 nv = n;
+    PxI32 count = 2 * nv;
+    for (PxI32 m = 0, v = nv - 1; nv > 2;)
     {
         if (0 >= (count--))
             return;
 
-        NxI32 u = v;
+        PxI32 u = v;
         if (nv <= u)
             u = 0;
         v = u + 1;
         if (nv <= v)
             v = 0;
-        NxI32 w = v + 1;
+        PxI32 w = v + 1;
         if (nv <= w)
             w = 0;
 
         if (_snip(u, v, w, nv, V))
         {
-            NxI32 a, b, c, s, t;
+            PxI32 a, b, c, s, t;
             a = V[u];
             b = V[v];
             c = V[w];
@@ -5341,11 +5341,11 @@ void CTriangulator::_process(TU32Vector &indices)
 }
 
 ///     Returns the area of the contour
-NxF64 CTriangulator::_area()
+PxF64 CTriangulator::_area()
 {
-    NxI32 n = (NxU32)mPoints.size();
-    NxF64 A = 0.0f;
-    for (NxI32 p = n - 1, q = 0; q < n; p = q++)
+    PxI32 n = (PxU32)mPoints.size();
+    PxF64 A = 0.0f;
+    for (PxI32 p = n - 1, q = 0; q < n; p = q++)
     {
         const TVec &pval = mPoints[p];
         const TVec &qval = mPoints[q];
@@ -5355,9 +5355,9 @@ NxF64 CTriangulator::_area()
     return A;
 }
 
-bool CTriangulator::_snip(NxI32 u, NxI32 v, NxI32 w, NxI32 n, NxI32 *V)
+bool CTriangulator::_snip(PxI32 u, PxI32 v, PxI32 w, PxI32 n, PxI32 *V)
 {
-    NxI32 p;
+    PxI32 p;
 
     const TVec &A = mPoints[ V[u] ];
     const TVec &B = mPoints[ V[v] ];
@@ -5380,8 +5380,8 @@ bool CTriangulator::_snip(NxI32 u, NxI32 v, NxI32 w, NxI32 n, NxI32 *V)
 ///     Tests if a point is inside the given triangle
 bool CTriangulator::_insideTriangle(const TVec& A, const TVec& B, const TVec& C,const TVec& P)
 {
-    NxF64 ax, ay, bx, by, cx, cy, apx, apy, bpx, bpy, cpx, cpy;
-    NxF64 cCROSSap, bCROSScp, aCROSSbp;
+    PxF64 ax, ay, bx, by, cx, cy, apx, apy, bpx, bpy, cpx, cpy;
+    PxF64 cCROSSap, bCROSScp, aCROSSbp;
 
     ax = C.x - B.x;  ay = C.y - B.y;
     bx = A.x - C.x;  by = A.y - C.y;
@@ -5418,57 +5418,57 @@ public:
     mPointsDouble = 0;
   }
 
-  virtual const NxF64 *       triangulate3d(NxU32 pcount,
-                                             const NxF64 *_points,
-                                             NxU32 vstride,
-                                             NxU32 &tcount,
+  virtual const PxF64 *       triangulate3d(PxU32 pcount,
+                                             const PxF64 *_points,
+                                             PxU32 vstride,
+                                             PxU32 &tcount,
                                              bool consolidate,
-                                             NxF64 epsilon)
+                                             PxF64 epsilon)
   {
     reset();
 
-    NxF64 *points = (NxF64 *)MEMALLOC_MALLOC(sizeof(NxF64)*pcount*3);
+    PxF64 *points = (PxF64 *)MEMALLOC_MALLOC(sizeof(PxF64)*pcount*3);
     if ( consolidate )
     {
       pcount = fm_consolidatePolygon(pcount,_points,vstride,points,1-epsilon);
     }
     else
     {
-      NxF64 *dest = points;
-      for (NxU32 i=0; i<pcount; i++)
+      PxF64 *dest = points;
+      for (PxU32 i=0; i<pcount; i++)
       {
-        const NxF64 *src = fm_getPoint(_points,vstride,i);
+        const PxF64 *src = fm_getPoint(_points,vstride,i);
         dest[0] = src[0];
         dest[1] = src[1];
         dest[2] = src[2];
         dest+=3;
       }
-      vstride = sizeof(NxF64)*3;
+      vstride = sizeof(PxF64)*3;
     }
 
     if ( pcount >= 3 )
     {
       CTriangulator ct;
-      for (NxU32 i=0; i<pcount; i++)
+      for (PxU32 i=0; i<pcount; i++)
       {
-        const NxF64 *src = fm_getPoint(points,vstride,i);
+        const PxF64 *src = fm_getPoint(points,vstride,i);
         ct.addPoint( src[0], src[1], src[2] );
       }
-      NxU32 _tcount;
-      NxU32 *indices = ct.triangulate(_tcount,epsilon);
+      PxU32 _tcount;
+      PxU32 *indices = ct.triangulate(_tcount,epsilon);
       if ( indices )
       {
         tcount = _tcount;
-        mPointsDouble = (NxF64 *)MEMALLOC_MALLOC(sizeof(NxF64)*tcount*3*3);
-        NxF64 *dest = mPointsDouble;
-        for (NxU32 i=0; i<tcount; i++)
+        mPointsDouble = (PxF64 *)MEMALLOC_MALLOC(sizeof(PxF64)*tcount*3*3);
+        PxF64 *dest = mPointsDouble;
+        for (PxU32 i=0; i<tcount; i++)
         {
-          NxU32 i1 = indices[i*3+0];
-          NxU32 i2 = indices[i*3+1];
-          NxU32 i3 = indices[i*3+2];
-          const NxF64 *p1 = ct.getPoint(i1);
-          const NxF64 *p2 = ct.getPoint(i2);
-          const NxF64 *p3 = ct.getPoint(i3);
+          PxU32 i1 = indices[i*3+0];
+          PxU32 i2 = indices[i*3+1];
+          PxU32 i3 = indices[i*3+2];
+          const PxF64 *p1 = ct.getPoint(i1);
+          const PxF64 *p2 = ct.getPoint(i2);
+          const PxF64 *p3 = ct.getPoint(i3);
 
           dest[0] = p1[0];
           dest[1] = p1[1];
@@ -5490,34 +5490,34 @@ public:
     return mPointsDouble;
   }
 
-  virtual const NxF32  *       triangulate3d(NxU32 pcount,
-                                             const NxF32  *points,
-                                             NxU32 vstride,
-                                             NxU32 &tcount,
+  virtual const PxF32  *       triangulate3d(PxU32 pcount,
+                                             const PxF32  *points,
+                                             PxU32 vstride,
+                                             PxU32 &tcount,
                                              bool consolidate,
-                                             NxF32 epsilon)
+                                             PxF32 epsilon)
   {
     reset();
 
-    NxF64 *temp = (NxF64 *)MEMALLOC_MALLOC(sizeof(NxF64)*pcount*3);
-    NxF64 *dest = temp;
-    for (NxU32 i=0; i<pcount; i++)
+    PxF64 *temp = (PxF64 *)MEMALLOC_MALLOC(sizeof(PxF64)*pcount*3);
+    PxF64 *dest = temp;
+    for (PxU32 i=0; i<pcount; i++)
     {
-      const NxF32 *p = fm_getPoint(points,vstride,i);
+      const PxF32 *p = fm_getPoint(points,vstride,i);
       dest[0] = p[0];
       dest[1] = p[1];
       dest[2] = p[2];
       dest+=3;
     }
-    const NxF64 *results = triangulate3d(pcount,temp,sizeof(NxF64)*3,tcount,consolidate,epsilon);
+    const PxF64 *results = triangulate3d(pcount,temp,sizeof(PxF64)*3,tcount,consolidate,epsilon);
     if ( results )
     {
-      NxU32 fcount = tcount*3*3;
-      mPointsFloat = (NxF32 *)MEMALLOC_MALLOC(sizeof(NxF32)*tcount*3*3);
-      NxF32 *dest = mPointsFloat;
-      for (NxU32 i=0; i<fcount; i++)
+      PxU32 fcount = tcount*3*3;
+      mPointsFloat = (PxF32 *)MEMALLOC_MALLOC(sizeof(PxF32)*tcount*3*3);
+      PxF32 *dest = mPointsFloat;
+      for (PxU32 i=0; i<fcount; i++)
       {
-        dest[i] = (NxF32) results[i];
+        dest[i] = (PxF32) results[i];
       }
       MEMALLOC_FREE(mPointsDouble);
       mPointsDouble = 0;
@@ -5528,8 +5528,8 @@ public:
   }
 
 private:
-  NxF32 *mPointsFloat;
-  NxF64 *mPointsDouble;
+  PxF32 *mPointsFloat;
+  PxF64 *mPointsDouble;
 };
 
 fm_Triangulate * fm_createTriangulate(void)
@@ -5587,7 +5587,7 @@ bool fm_isValidTriangle(const REAL *p1,const REAL *p2,const REAL *p3,REAL epsilo
 		_vertices[7] = p3[1];
 		_vertices[8] = p3[2];
 
-		NxU32 pcount = fm_consolidatePolygon(3,_vertices,sizeof(REAL)*3,vertices,1-epsilon);
+		PxU32 pcount = fm_consolidatePolygon(3,_vertices,sizeof(REAL)*3,vertices,1-epsilon);
 		if ( pcount == 3 )
 		{
 		  ret = true;

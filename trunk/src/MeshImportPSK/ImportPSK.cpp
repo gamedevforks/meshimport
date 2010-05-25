@@ -33,86 +33,86 @@ struct AnimInfo : public Memalloc
 {
 	char	mName[64];
 	char	mGroup[64];    // Animation's group name
-	NxI32	mTotalBones;           // TotalBones * NumRawFrames is number of animation keys to digest.
-	NxI32	mRootInclude;          // 0 none 1 included 	(unused)
-	NxI32	mKeyCompressionStyle;  // Reserved: variants in tradeoffs for compression.
-	NxI32	mKeyQuotum;            // Max key quotum for compression
-	NxF32	mKeyReduction;       // desired
-	NxF32	mTrackTime;          // explicit - can be overridden by the animation rate
-	NxF32	mAnimRate;           // frames per second.
-	NxI32	mStartBone;            // - Reserved: for partial animations (unused)
-	NxI32	mFirstRawFrame;        //
-	NxI32	mNumRawFrames;         // NumRawFrames and AnimRate dictate tracktime...
+	PxI32	mTotalBones;           // TotalBones * NumRawFrames is number of animation keys to digest.
+	PxI32	mRootInclude;          // 0 none 1 included 	(unused)
+	PxI32	mKeyCompressionStyle;  // Reserved: variants in tradeoffs for compression.
+	PxI32	mKeyQuotum;            // Max key quotum for compression
+	PxF32	mKeyReduction;       // desired
+	PxF32	mTrackTime;          // explicit - can be overridden by the animation rate
+	PxF32	mAnimRate;           // frames per second.
+	PxI32	mStartBone;            // - Reserved: for partial animations (unused)
+	PxI32	mFirstRawFrame;        //
+	PxI32	mNumRawFrames;         // NumRawFrames and AnimRate dictate tracktime...
 };
 
 struct AnimKey : public Memalloc
 {
-	NxF32	mPosition[3];
-	NxF32	mOrientation[4];
-	NxF32	mTime;
+	PxF32	mPosition[3];
+	PxF32	mOrientation[4];
+	PxF32	mTime;
 };
 
 struct Header : public Memalloc
 {
     char  mChunkName[20];
-    NxI32 mType;
-    NxI32 mLen;
-    NxI32 mCount;
+    PxI32 mType;
+    PxI32 mLen;
+    PxI32 mCount;
 };
 
 struct Vector : public Memalloc
 {
-    NxF32 x;
-    NxF32 y;
-    NxF32 z;
+    PxF32 x;
+    PxF32 y;
+    PxF32 z;
 };
 
 struct Vertex : public Memalloc
 {
-    NxU16 mIndex;
-    NxF32 mTexel[2];
-    NxU8  mMaterialIndex;
-    NxU8  mUnused;
+    PxU16 mIndex;
+    PxF32 mTexel[2];
+    PxU8  mMaterialIndex;
+    PxU8  mUnused;
 };
 
 struct Triangle : public Memalloc
 {
-    NxU16 mWedgeIndex[3];
-    NxU8  mMaterialIndex;
-    NxU8  mAuxMaterialIndex;
-    NxU32 mSmoothingGroups;
+    PxU16 mWedgeIndex[3];
+    PxU8  mMaterialIndex;
+    PxU8  mAuxMaterialIndex;
+    PxU32 mSmoothingGroups;
 };
 
 struct Material : public Memalloc
 {
     char mMaterialName[64];
-    NxI32 mTextureIndex;
-    NxU32 mPolyFlags;
-    NxU32 mAuxMaterial;
-	NxU32 mAuxFlags;
-    NxI32 mLodBias;
-    NxI32 mLodStyle;
+    PxI32 mTextureIndex;
+    PxU32 mPolyFlags;
+    PxU32 mAuxMaterial;
+	PxU32 mAuxFlags;
+    PxI32 mLodBias;
+    PxI32 mLodStyle;
 };
 
 struct Bone : public Memalloc
 {
     char  mName[64];
-    NxU32 mFlags;
-    NxI32 mNumChildren;
-    NxI32 mParentIndex;
-    NxF32 mOrientation[4];
-    NxF32 mPosition[3];
-    NxF32 mLength;
-    NxF32 mXSize;
-    NxF32 mYSize;
-    NxF32 mZSize;
+    PxU32 mFlags;
+    PxI32 mNumChildren;
+    PxI32 mParentIndex;
+    PxF32 mOrientation[4];
+    PxF32 mPosition[3];
+    PxF32 mLength;
+    PxF32 mXSize;
+    PxF32 mYSize;
+    PxF32 mZSize;
 };
 
 struct BoneInfluence : public Memalloc
 {
-    NxF32 mWeight;
-    NxI32 mVertexIndex;
-    NxI32 mBoneIndex;
+    PxF32 mWeight;
+    PxI32 mVertexIndex;
+    PxI32 mBoneIndex;
 };
 
 class DeformVector : public Memalloc
@@ -125,9 +125,9 @@ public:
         mBone[0] = mBone[1] = mBone[2] = mBone[3] = 0;
     }
 
-    NxU32  mCount;
-    NxF32  mWeight[4];
-    NxU16  mBone[4];
+    PxU32  mCount;
+    PxF32  mWeight[4];
+    PxU16  mBone[4];
 
 };
 
@@ -149,9 +149,9 @@ public:
   {
   }
 
-  virtual NxI32              getExtensionCount(void) { return 1; }; // most importers support just one file name extension.
-  virtual const char *     getExtension(NxI32 index) { return ".psk"; }; // report the default file name extension for this mesh type.
-  virtual const char *     getDescription(NxI32 index)
+  virtual PxI32              getExtensionCount(void) { return 1; }; // most importers support just one file name extension.
+  virtual const char *     getExtension(PxI32 index) { return ".psk"; }; // report the default file name extension for this mesh type.
+  virtual const char *     getDescription(PxI32 index)
   {
 	  return "PSK Skeletal Meshes";
   }
@@ -212,7 +212,7 @@ public:
   }
 
   // warning, this code will not work on big endian processors.
-  virtual bool             importMesh(const char *_meshName,const void *_data,NxU32 dlen,MeshImportInterface *callback,const char *options,MeshImportApplicationResource *appResource)
+  virtual bool             importMesh(const char *_meshName,const void *_data,PxU32 dlen,MeshImportInterface *callback,const char *options,MeshImportApplicationResource *appResource)
   {
 	  bool ret = false;
 
@@ -243,7 +243,7 @@ public:
 
       if ( appResource )
       {
-        NxU32 len;
+        PxU32 len;
         void *mem = appResource->getApplicationResource(meshName,scratch,len);
         if ( mem )
         {
@@ -277,11 +277,11 @@ public:
            ma.mName = ainfo->mName;
            ma.mTrackCount = ainfo->mTotalBones;
            ma.mFrameCount = ainfo->mNumRawFrames;
-		   ma.mDtime = 1.0f / (NxF32)(ainfo->mAnimRate);
+		   ma.mDtime = 1.0f / (PxF32)(ainfo->mAnimRate);
            ma.mDuration = ma.mDtime*ainfo->mNumRawFrames;
            ma.mTracks = (MeshAnimTrack **)MEMALLOC_MALLOC(sizeof(MeshAnimTrack *)*ma.mTrackCount);
 
-           for (NxI32 i=0; i<ma.mTrackCount; i++)
+           for (PxI32 i=0; i<ma.mTrackCount; i++)
            {
              Bone &b = bones[i];
              fixName(b.mName);
@@ -293,10 +293,10 @@ public:
 			 track->mDtime      = ma.mDtime;
              track->mPose       = MEMALLOC_NEW(MeshAnimPose)[track->mFrameCount];
 
-             for (NxI32 j=0; j<ma.mFrameCount; j++)
+             for (PxI32 j=0; j<ma.mFrameCount; j++)
              {
 
-			   NxU32 index = (j*ma.mTrackCount)+i;
+			   PxU32 index = (j*ma.mTrackCount)+i;
 
                AnimKey &key = keys[index];
                MeshAnimPose &p = track->mPose[j];
@@ -330,7 +330,7 @@ public:
 
           callback->importAnimation(ma);
 
-          for (NxI32 i=0; i<ma.mTrackCount; i++)
+          for (PxI32 i=0; i<ma.mTrackCount; i++)
           {
             MeshAnimTrack *track = ma.mTracks[i];
             delete []track->mPose;
@@ -358,7 +358,7 @@ public:
        Vector *positions = ( Vector *)scan;
        scan+=h->mLen*h->mCount;
 #if HACK_MESH_POSITION
-	   for (NxI32 i=0; i<positionsHeader->mCount; i++)
+	   for (PxI32 i=0; i<positionsHeader->mCount; i++)
 	   {
 		   Vector &v = positions[i];
 		   v.y*=-1; // flip the Y-coordinate
@@ -400,7 +400,7 @@ public:
         ms->mName = meshName;
         ms->mBoneCount = bonesHeader->mCount;
         ms->mBones = MEMALLOC_NEW(MeshBone)[ms->mBoneCount];
-        for (NxI32 i=0; i<ms->mBoneCount; i++)
+        for (PxI32 i=0; i<ms->mBoneCount; i++)
         {
             MeshBone &dest = ms->mBones[i];
             Bone &src = bones[i];
@@ -445,21 +445,21 @@ public:
 
       DeformVector *dvertices = MEMALLOC_NEW(DeformVector)[positionsHeader->mCount];
 
-      for (NxI32 i=0; i<boneInfluencesHeader->mCount; i++)
+      for (PxI32 i=0; i<boneInfluencesHeader->mCount; i++)
       {
          BoneInfluence &b = boneInfluences[i];
         DeformVector &d = dvertices[b.mVertexIndex];
         if ( d.mCount < 4 )
         {
             d.mWeight[d.mCount] = b.mWeight;
-            d.mBone[d.mCount] = (NxU16)b.mBoneIndex;
+            d.mBone[d.mCount] = (PxU16)b.mBoneIndex;
             d.mCount++;
         }
       }
 
       Vector *normals = (Vector *)MEMALLOC_MALLOC( sizeof(Vector)*positionsHeader->mCount);
       memset(normals,0,sizeof(Vector)*positionsHeader->mCount);
-      for (NxI32 i=0; i<trianglesHeader->mCount; i++)
+      for (PxI32 i=0; i<trianglesHeader->mCount; i++)
       {
          Triangle &t = triangles[i];
         MeshVertex mv1,mv2,mv3;
@@ -492,7 +492,7 @@ public:
         n3.z+=normal.z;
       }
 
-      for (NxI32 i=0; i<positionsHeader->mCount; i++)
+      for (PxI32 i=0; i<positionsHeader->mCount; i++)
       {
         Vector &n = normals[i];
         fm_normalize(&n.x);
@@ -500,7 +500,7 @@ public:
 
 
 
-      for (NxI32 i=0; i<trianglesHeader->mCount; i++)
+      for (PxI32 i=0; i<trianglesHeader->mCount; i++)
       {
          Triangle &t = triangles[i];
         MeshVertex mv1,mv2,mv3;

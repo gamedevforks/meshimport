@@ -73,7 +73,7 @@ template <class Type> class VertexLess
 public:
 	typedef std::vector< Type > VertexVector;
 
-	bool operator()(NxI32 v1,NxI32 v2) const;
+	bool operator()(PxI32 v1,PxI32 v2) const;
 
 	static void SetSearch(const Type& match,VertexVector *list)
 	{
@@ -82,7 +82,7 @@ public:
 	};
 
 private:
-	const Type& Get(NxI32 index) const
+	const Type& Get(PxI32 index) const
 	{
 		if ( index == -1 ) return mFind;
 		VertexVector &vlist = *mList;
@@ -96,13 +96,13 @@ template <class Type> class VertexPool
 {
 public:
 #if HE_USE_MEMORY_TRACKING
-  typedef std::set<NxI32, std::GlobalMemoryPool, VertexLess<Type> > VertexSet;
+  typedef std::set<PxI32, std::GlobalMemoryPool, VertexLess<Type> > VertexSet;
 #else
-  typedef std::set<NxI32, VertexLess<Type> > VertexSet;
+  typedef std::set<PxI32, VertexLess<Type> > VertexSet;
 #endif
 	typedef std::vector< Type > VertexVector;
 
-	NxI32 GetVertex(const Type& vtx)
+	PxI32 GetVertex(const Type& vtx)
 	{
 		VertexLess<Type>::SetSearch(vtx,&mVtxs);
 		typename VertexSet::iterator found;
@@ -111,30 +111,30 @@ public:
 		{
 			return *found;
 		}
-		NxI32 idx = (NxI32)mVtxs.size();
+		PxI32 idx = (PxI32)mVtxs.size();
 		mVtxs.push_back( vtx );
 		mVertSet.insert( idx );
 		return idx;
 	};
 
-	void GetPos(NxI32 idx,NxF32 pos[3]) const
+	void GetPos(PxI32 idx,PxF32 pos[3]) const
 	{
 		pos[0] = mVtxs[idx].mPos[0];
     pos[1] = mVtxs[idx].mPos[1];
     pos[2] = mVtxs[idx].mPos[2];
 	}
 
-	const Type& Get(NxI32 idx) const
+	const Type& Get(PxI32 idx) const
 	{
 		return mVtxs[idx];
 	};
 
-	NxI32 GetSize(void) const
+	PxI32 GetSize(void) const
 	{
-		return (NxI32)mVtxs.size();
+		return (PxI32)mVtxs.size();
 	};
 
-	void Clear(NxI32 reservesize)  // clear the vertice pool.
+	void Clear(PxI32 reservesize)  // clear the vertice pool.
 	{
 		mVertSet.clear();
 		mVtxs.clear();
@@ -148,12 +148,12 @@ public:
 		mVtxs.push_back(vtx);
 	}
 
-	NxI32 GetVertexCount(void) const
+	PxI32 GetVertexCount(void) const
 	{
-		return (NxI32)mVtxs.size();
+		return (PxI32)mVtxs.size();
 	};
 
-	bool GetVertex(NxI32 i,NxF32 vect[3]) const
+	bool GetVertex(PxI32 i,PxF32 vect[3]) const
 	{
 		vect[0] = mVtxs[i].mPos[0];
     vect[1] = mVtxs[i].mPos[1];

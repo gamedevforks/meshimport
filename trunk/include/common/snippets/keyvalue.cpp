@@ -93,7 +93,7 @@ static bool endQuote(char c,char quote)
   return ret;
 }
 
-const char ** KeyValue::getKeyValues(const char *userProperties,NxU32 &count)
+const char ** KeyValue::getKeyValues(const char *userProperties,PxU32 &count)
 {
 	const char **ret = 0;
 	count = 0;
@@ -171,11 +171,11 @@ const char *  KeyValue::getKeyValue(const char *userProperties,const char *_key,
 {
   const char *ret = 0;
 
-  NxU32 count=0;
+  PxU32 count=0;
   const char **slist = getKeyValues(userProperties,count);
   if ( count )
   {
-    for (NxU32 i=0; i<count; i++)
+    for (PxU32 i=0; i<count; i++)
     {
       const char *key = slist[i*2];
       const char *value = slist[i*2+1];

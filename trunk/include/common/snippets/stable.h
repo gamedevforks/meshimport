@@ -25,11 +25,11 @@ class CRC32
 public:
   CRC32(void)
   {
-    const NxU32 QUOTIENT=0x04c11db7;
-    for (NxU32 i = 0; i < 256; i++)
+    const PxU32 QUOTIENT=0x04c11db7;
+    for (PxU32 i = 0; i < 256; i++)
     {
-      NxU32 crc = i << 24;
-      for (NxU32 j = 0; j < 8; j++)
+      PxU32 crc = i << 24;
+      for (PxU32 j = 0; j < 8; j++)
       {
         if (crc & 0x80000000)
           crc = (crc << 1) ^ QUOTIENT;
@@ -42,10 +42,10 @@ public:
   }
 
 
-  inline NxU32 myhtonl(NxU32 n_ecx)
+  inline PxU32 myhtonl(PxU32 n_ecx)
   {
-    NxU32 n_eax = n_ecx;           //mov         eax,ecx
-    NxU32 n_edx = n_ecx;           //mov         edx,ecx
+    PxU32 n_eax = n_ecx;           //mov         eax,ecx
+    PxU32 n_edx = n_ecx;           //mov         edx,ecx
     n_edx = n_edx << 16;           //shl         edx,10h
     n_eax = n_eax & 0x0FF00;       //and         eax,0FF00h
     n_eax = n_eax | n_edx;         //or          eax,edx
@@ -59,37 +59,37 @@ public:
     return n_eax;
   }
 
-  inline void getRand(NxU32 &current) const
+  inline void getRand(PxU32 &current) const
   {
     current = (current * 214013L + 2531011L) & 0x7fffffff;
   };
 
-  NxU32 crc32(const NxU8 *data, NxU32 len) const
+  PxU32 crc32(const PxU8 *data, PxU32 len) const
   {
-    NxU32 ret;
+    PxU32 ret;
 
     ret =  crc32Internal(data,len);
 
     return ret;
   }
 
-  NxU32 crc32(const char *data) const
+  PxU32 crc32(const char *data) const
   {
-    NxU32 len = (NxU32)strlen(data);
-    return crc32( (const NxU8 *)data,len);
+    PxU32 len = (PxU32)strlen(data);
+    return crc32( (const PxU8 *)data,len);
   }
 
 private:
 
   bool inline isBigEndian() { int i = 1; return *((char*)&i)==0; }
 
-  NxU32 crc32Internal(const NxU8 *data,NxU32 len) const
+  PxU32 crc32Internal(const PxU8 *data,PxU32 len) const
   {
-    NxU32        dlen = (len/4)*4;
-    NxU32        result=len;
-    NxU32        *p = (NxU32 *)data;
-    NxU32        *e = (NxU32 *)(data + dlen);
-    NxU32         current = len;
+    PxU32        dlen = (len/4)*4;
+    PxU32        result=len;
+    PxU32        *p = (PxU32 *)data;
+    PxU32        *e = (PxU32 *)(data + dlen);
+    PxU32         current = len;
 
 
 	if ( dlen >= 4 )
@@ -97,7 +97,7 @@ private:
 		result = ~*p++;
 		result = result ^ len;
 
-		const NxU32 *tmp = (const NxU32 *) data;
+		const PxU32 *tmp = (const PxU32 *) data;
 		current = *tmp & len;
 
 		if ( mIsLittleEndian )
@@ -131,13 +131,13 @@ private:
 
 
     }
-    NxU32 partial = len&3;
+    PxU32 partial = len&3;
     if ( partial )
     {
-      for (NxU32 i=0; i<partial; i++)
+      for (PxU32 i=0; i<partial; i++)
       {
           getRand(current);
-          NxU8 v = data[dlen+i];
+          PxU8 v = data[dlen+i];
           result = mCRCTable[v]^result;
           result^=current;
           current &= result;
@@ -147,7 +147,7 @@ private:
   }
 
   bool  mIsLittleEndian;
-  NxU32 mCRCTable[256];
+  PxU32 mCRCTable[256];
 };
 
 
@@ -158,7 +158,7 @@ public:
   StringHash(const char *str)
   {
     mNextHash = 0;
-    NxU32 len = (NxU32)strlen(str);
+    PxU32 len = (PxU32)strlen(str);
     mString = (char *)MEMALLOC_MALLOC(len+1);
     strcpy(mString,str);
   }
@@ -190,7 +190,7 @@ class StringTable : public Memalloc, public CRC32
 {
 public:
 
-    typedef HashMap< NxU32, StringHash *> StringHashMap;
+    typedef HashMap< PxU32, StringHash *> StringHashMap;
 
 	StringTable(void)
 	{
@@ -216,7 +216,7 @@ public:
 		first = false;
         const char *ret=0;
 
-        NxU32 hash;
+        PxU32 hash;
 
         if ( !mCaseSensitive )
         {
@@ -279,11 +279,11 @@ private:
 class StringIntHash : public Memalloc
 {
 public:
-  StringIntHash(const char *str,NxU32 id)
+  StringIntHash(const char *str,PxU32 id)
   {
     mNextHash = 0;
     mId       = id;
-    NxU32 len = (NxU32)strlen(str);
+    PxU32 len = (PxU32)strlen(str);
     mString = (char *)MEMALLOC_MALLOC(len+1);
     strcpy(mString,str);
   }
@@ -302,11 +302,11 @@ public:
 	  return caseSensitive ? (strcmp(mString,str) == 0) : (stricmp(mString,str) == 0);
   };
 
-  inline NxU32           getId(void) const { return mId; };
+  inline PxU32           getId(void) const { return mId; };
 
 private:
   StringIntHash *mNextHash;
-  NxU32          mId;
+  PxU32          mId;
   char          *mString;
 };
 
@@ -315,8 +315,8 @@ class StringTableInt : public Memalloc, public CRC32
 {
 public:
 
-    typedef HashMap< NxU32, StringIntHash *>  StringIntHashMap;
-    typedef HashMap< NxU32, StringIntHash * > IntCharHashMap;
+    typedef HashMap< PxU32, StringIntHash *>  StringIntHashMap;
+    typedef HashMap< PxU32, StringIntHash * > IntCharHashMap;
 
 	StringTableInt(void)
 	{
@@ -336,19 +336,19 @@ public:
         }
 	}
 
-	bool Get(const char *str,NxU32 &id) const
+	bool Get(const char *str,PxU32 &id) const
 	{
 		id = Get(str);
 		return id != 0;
 	}
 
-	NxU32 Get(const char *str) const
+	PxU32 Get(const char *str) const
 	{
-		NxU32 ret = 0;
+		PxU32 ret = 0;
 
         if ( str )
         {
-          NxU32 hash;
+          PxU32 hash;
 
           if ( !mCaseSensitive )
           {
@@ -381,12 +381,12 @@ public:
 		return ret;
 	};
 
-	void Add(const char *str,NxU32 id)
+	void Add(const char *str,PxU32 id)
 	{
         StringIntHash *sh;
         char temp_string[8192];
 
-        NxU32 hash;
+        PxU32 hash;
         if ( !mCaseSensitive )
         {
             strncpy(temp_string,str,8192);
@@ -428,7 +428,7 @@ public:
         mIds[id] = sh;
 	}
 
-	const char * Get(NxU32 id) const
+	const char * Get(PxU32 id) const
 	{
 		const char *ret = 0;
 

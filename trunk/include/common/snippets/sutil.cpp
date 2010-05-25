@@ -91,7 +91,7 @@ char *stristr(const char *str,const char *key)       // case insensitive str str
 	char *foo = strstr(istr,ikey);
 	if ( foo )
 	{
-		NxU32 loc = (NxU32)(foo - istr);
+		PxU32 loc = (PxU32)(foo - istr);
 		foo = (char *)str+loc;
 	}
 
@@ -106,9 +106,9 @@ bool        isstristr(const char *str,const char *key)     // bool true/false ba
 	return ret;
 }
 
-NxU32 GetHex(NxU8 c)
+PxU32 GetHex(PxU8 c)
 {
-	NxU32 v = 0;
+	PxU32 v = 0;
 	c = ToLower(c);
 	if ( c >= '0' && c <= '9' )
 		v = c-'0';
@@ -122,9 +122,9 @@ NxU32 GetHex(NxU8 c)
 	return v;
 }
 
-NxU8 GetHEX1(const char *foo,const char **endptr)
+PxU8 GetHEX1(const char *foo,const char **endptr)
 {
-	NxU32 ret = 0;
+	PxU32 ret = 0;
 
 	ret = (GetHex(foo[0])<<4) | GetHex(foo[1]);
 
@@ -133,13 +133,13 @@ NxU8 GetHEX1(const char *foo,const char **endptr)
 		*endptr = foo+2;
 	}
 
-	return (NxU8) ret;
+	return (PxU8) ret;
 }
 
 
-NxU16 GetHEX2(const char *foo,const char **endptr)
+PxU16 GetHEX2(const char *foo,const char **endptr)
 {
-	NxU32 ret = 0;
+	PxU32 ret = 0;
 
 	ret = (GetHex(foo[0])<<12) | (GetHex(foo[1])<<8) | (GetHex(foo[2])<<4) | GetHex(foo[3]);
 
@@ -148,14 +148,14 @@ NxU16 GetHEX2(const char *foo,const char **endptr)
 		*endptr = foo+4;
 	}
 
-	return (NxU16) ret;
+	return (PxU16) ret;
 }
 
-NxU32 GetHEX4(const char *foo,const char **endptr)
+PxU32 GetHEX4(const char *foo,const char **endptr)
 {
-	NxU32 ret = 0;
+	PxU32 ret = 0;
 
-	for (NxI32 i=0; i<8; i++)
+	for (PxI32 i=0; i<8; i++)
 	{
 		ret = (ret<<4) | GetHex(foo[i]);
 	}
@@ -168,14 +168,14 @@ NxU32 GetHEX4(const char *foo,const char **endptr)
 	return ret;
 }
 
-NxU32 GetHEX(const char *foo,const char **endptr)
+PxU32 GetHEX(const char *foo,const char **endptr)
 {
-	NxU32 ret = 0;
+	PxU32 ret = 0;
 
 	while ( *foo )
 	{
-		NxU8 c = ToLower( *foo );
-		NxU32 v = 0;
+		PxU8 c = ToLower( *foo );
+		PxU32 v = 0;
 		if ( c >= '0' && c <= '9' )
 			v = c-'0';
 		else
@@ -212,9 +212,9 @@ const char * SkipWhitespace(const char *str)
 
 #define MAXNUM 32
 
-NxF32        GetFloatValue(const char *str,const char **next)
+PxF32        GetFloatValue(const char *str,const char **next)
 {
-	NxF32 ret = 0;
+	PxF32 ret = 0;
 
 	if ( next ) *next = 0;
 
@@ -224,7 +224,7 @@ NxF32        GetFloatValue(const char *str,const char **next)
 	char *dst = dest;
 	const char *hex = 0;
 
-	for (NxI32 i=0; i<(MAXNUM-1); i++)
+	for (PxI32 i=0; i<(MAXNUM-1); i++)
 	{
 		char c = *str;
 		if ( c == 0 || IsWhitespace(c) )
@@ -244,8 +244,8 @@ NxF32        GetFloatValue(const char *str,const char **next)
 
 	if ( hex )
 	{
-		NxU32 iv = GetHEX(hex,0);
-		NxF32 *v = (NxF32 *)&iv;
+		PxU32 iv = GetHEX(hex,0);
+		PxF32 *v = (PxF32 *)&iv;
 		ret = *v;
 	}
 	else if ( dest[0] == 'f' )
@@ -265,14 +265,14 @@ NxF32        GetFloatValue(const char *str,const char **next)
 	}
 	else
 	{
-		ret = (NxF32)atof(dest);
+		ret = (PxF32)atof(dest);
 	}
 	return ret;
 }
 
-NxI32          GetIntValue(const char *str,const char **next)
+PxI32          GetIntValue(const char *str,const char **next)
 {
-	NxI32 ret = 0;
+	PxI32 ret = 0;
 
 	if ( next ) *next = 0;
 
@@ -281,7 +281,7 @@ NxI32          GetIntValue(const char *str,const char **next)
 	char dest[MAXNUM];
 	char *dst = dest;
 
-	for (NxI32 i=0; i<(MAXNUM-1); i++)
+	for (PxI32 i=0; i<(MAXNUM-1); i++)
 	{
 		char c = *str;
 		if ( c == 0 || IsWhitespace(c) )
@@ -301,7 +301,7 @@ NxI32          GetIntValue(const char *str,const char **next)
 }
 
 
-bool CharToWide(const char *source,wchar_t *dest,NxI32 maxlen)
+bool CharToWide(const char *source,wchar_t *dest,PxI32 maxlen)
 {
 	bool ret = false;
 
@@ -311,7 +311,7 @@ bool CharToWide(const char *source,wchar_t *dest,NxI32 maxlen)
 	return ret;
 }
 
-bool WideToChar(const wchar_t *source,char *dest,NxI32 maxlen)
+bool WideToChar(const wchar_t *source,char *dest,PxI32 maxlen)
 {
 	bool ret = false;
 
@@ -323,17 +323,17 @@ bool WideToChar(const wchar_t *source,char *dest,NxI32 maxlen)
 
 
 
-const char * GetTrueFalse(NxU32 state)
+const char * GetTrueFalse(PxU32 state)
 {
 	if ( state ) return "true";
 	return "false";
 };
 
 
-const char * FloatString(NxF32 v,bool binary)
+const char * FloatString(PxF32 v,bool binary)
 {
 	static char data[64*16];
-	static NxI32  index=0;
+	static PxI32  index=0;
 
 	char *ret = &data[index*64];
 	index++;
@@ -370,7 +370,7 @@ const char * FloatString(NxF32 v,bool binary)
 	{
 		if ( binary )
 		{
-			NxU32 *iv = (NxU32 *) &v;
+			PxU32 *iv = (PxU32 *) &v;
 			sprintf(ret,"%.4f$%x", v, *iv );
 		}
 		else
@@ -379,7 +379,7 @@ const char * FloatString(NxF32 v,bool binary)
 			const char *dot = strstr(ret,".");
 			if ( dot )
 			{
-				NxI32 len = (NxI32)strlen(ret);
+				PxI32 len = (PxI32)strlen(ret);
 				char *foo = &ret[len-1];
 				while ( *foo == '0' ) foo--;
 				if ( *foo == '.' )
@@ -404,9 +404,9 @@ char * NextSep(char *str,char &c)
 	return str;
 }
 
-NxI32 GetUserArgs(const char *us,const char *key,const char **args)
+PxI32 GetUserArgs(const char *us,const char *key,const char **args)
 {
-	NxI32 ret = 0;
+	PxI32 ret = 0;
 	static char arglist[2048];
 	strcpy(arglist,us);
 
@@ -443,13 +443,13 @@ NxI32 GetUserArgs(const char *us,const char *key,const char **args)
 	return ret;
 }
 
-bool GetUserSetting(const char *us,const char *key,NxI32 &v)
+bool GetUserSetting(const char *us,const char *key,PxI32 &v)
 {
 	bool ret = false;
 
 	const char *argv[256];
 
-	NxI32 argc = GetUserArgs(us,key,argv);
+	PxI32 argc = GetUserArgs(us,key,argv);
 	if ( argc )
 	{
 		v = atoi( argv[0] );
@@ -463,7 +463,7 @@ bool GetUserSetting(const char *us,const char *key,const char * &v)
 	bool ret = false;
 
 	const char *argv[256];
-	NxI32 argc = GetUserArgs(us,key,argv);
+	PxI32 argc = GetUserArgs(us,key,argv);
 	if ( argc )
 	{
 		v = argv[0];
@@ -472,7 +472,7 @@ bool GetUserSetting(const char *us,const char *key,const char * &v)
 	return ret;
 }
 
-const char **  GetArgs(char *str,NxI32 &count) // destructable parser, stomps EOS markers on the input string!
+const char **  GetArgs(char *str,PxI32 &count) // destructable parser, stomps EOS markers on the input string!
 {
 	InPlaceParser ipp;
 
@@ -621,10 +621,10 @@ const char *         lastSlash(const char *src) // last forward or backward slas
 }
 
 
-const char	*fstring(NxF32 v)
+const char	*fstring(PxF32 v)
 {
 	static char	data[64	*16];
-	static NxI32 index = 0;
+	static PxI32 index = 0;
 
 	char *ret	=	&data[index	*64];
 	index++;
@@ -661,7 +661,7 @@ const char	*fstring(NxF32 v)
 		const	char *dot	=	strstr(ret,	".");
 		if (dot)
 		{
-			NxI32	len	=	(NxI32)strlen(ret);
+			PxI32	len	=	(PxI32)strlen(ret);
 			char *foo	=	&ret[len - 1];
 			while	(*foo	== '0')
 			{
@@ -686,9 +686,9 @@ const char	*fstring(NxF32 v)
 #define MAXFNUM    16
 
 static	char  gFormat[MAXNUMERIC*MAXFNUM];
-static NxI32    gIndex=0;
+static PxI32    gIndex=0;
 
-const char * formatNumber(NxI32 number) // JWR  format this integer into a fancy comma delimited string
+const char * formatNumber(PxI32 number) // JWR  format this integer into a fancy comma delimited string
 {
 	char * dest = &gFormat[gIndex*MAXNUMERIC];
 	gIndex++;
@@ -703,10 +703,10 @@ const char * formatNumber(NxI32 number) // JWR  format this integer into a fancy
 #endif
 
 	char *str = dest;
-	NxU32 len = (NxU32)strlen(scratch);
-	for (NxU32 i=0; i<len; i++)
+	PxU32 len = (PxU32)strlen(scratch);
+	for (PxU32 i=0; i<len; i++)
 	{
-		NxI32 place = (len-1)-i;
+		PxI32 place = (len-1)-i;
 		*str++ = scratch[i];
 		if ( place && (place%3) == 0 ) *str++ = ',';
 	}
@@ -807,11 +807,11 @@ bool           endsWith(const char *str,const char *ends,bool caseSensitive)
 {
   bool ret = false;
 
-  NxI32 l1 = strlen(str);
-  NxI32 l2 = strlen(ends);
+  PxI32 l1 = strlen(str);
+  PxI32 l2 = strlen(ends);
   if ( l1 >= l2 )
   {
-    NxI32 diff = l1-l2;
+    PxI32 diff = l1-l2;
     const char *echeck = &str[diff];
     if ( caseSensitive )
     {

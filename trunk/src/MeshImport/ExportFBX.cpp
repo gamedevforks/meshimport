@@ -13,9 +13,9 @@ void writeVertices(FILE_INTERFACE *fph,Mesh *mesh)
 	if ( mesh->mVertexCount )
 	{
 		fi_fprintf(fph,"        Vertices: ");
-		NxU32 col = 0;
+		PxU32 col = 0;
 
-		for (NxU32 i=0; i<mesh->mVertexCount; i++)
+		for (PxU32 i=0; i<mesh->mVertexCount; i++)
 		{
 			if (col == 0 && i > 0 )
 			{
@@ -45,20 +45,20 @@ void writePolygonVertexIndex(FILE_INTERFACE *fph,Mesh *mesh)
 	{
 
 		fi_fprintf(fph,"        PolygonVertexIndex: ");
-		NxU32 col = 0;
-		NxU32 index = 0;
+		PxU32 col = 0;
+		PxU32 index = 0;
 		while ( index < mesh->mSubMeshCount )
 		{
 			SubMesh *sm = mesh->mSubMeshes[index];
-			for (NxU32 i=0; i<sm->mTriCount; i++)
+			for (PxU32 i=0; i<sm->mTriCount; i++)
 			{
 				if (col == 0 && (i > 0 || index > 0 ))
 				{
 					fi_fprintf(fph,"        ,");
 				}
-				NxI32 i1 = (NxI32)sm->mIndices[i*3+0];
-				NxI32 i2 = (NxI32)sm->mIndices[i*3+1];
-				NxI32 i3 = (NxI32)sm->mIndices[i*3+2];
+				PxI32 i1 = (PxI32)sm->mIndices[i*3+0];
+				PxI32 i2 = (PxI32)sm->mIndices[i*3+1];
+				PxI32 i3 = (PxI32)sm->mIndices[i*3+2];
 				i3 = (i3+1)*-1;
 				fi_fprintf(fph,"%d,%d,%d", i1, i2, i3 );
 				col++;
@@ -101,10 +101,10 @@ void writeUV(FILE_INTERFACE *fph,Mesh *mesh)
 	fi_fprintf(fph,"            ReferenceInformationType: \"IndexToDirect\"\r\n");
 	fi_fprintf(fph,"            UV: ");
 
-	NxU32 vcount = mesh->mVertexCount;
+	PxU32 vcount = mesh->mVertexCount;
 
-	NxU32 col = 0;
-	for (NxU32 i=0; i<vcount; i++)
+	PxU32 col = 0;
+	for (PxU32 i=0; i<vcount; i++)
 	{
 		if ( col == 0 && i > 0 )
 		{
@@ -127,7 +127,7 @@ void writeUV(FILE_INTERFACE *fph,Mesh *mesh)
 
 	fi_fprintf(fph,"            UVIndex: ");
 	col = 0;
-	for (NxU32 i=0; i<vcount; i++)
+	for (PxU32 i=0; i<vcount; i++)
 	{
 		if ( col == 0 && i > 0 )
 			fi_fprintf(fph,"            ,");

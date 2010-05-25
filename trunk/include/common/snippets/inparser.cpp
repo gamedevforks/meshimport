@@ -132,7 +132,7 @@ namespace NVSHARE
 		if ( mLen )
 		{
 			mData = (char *) MEMALLOC_MALLOC(sizeof(char)*(mLen+1));
-			NxI32 read = (NxI32)fread(mData,mLen,1,fph);
+			PxI32 read = (PxI32)fread(mData,mLen,1,fph);
 			if ( !read )
 			{
 				MEMALLOC_FREE(mData);
@@ -164,7 +164,7 @@ bool InPlaceParser::IsHard(char c)
 }
 
 //==================================================================================
-char * InPlaceParser::AddHard(NxI32 &argc,const char **argv,char *foo)
+char * InPlaceParser::AddHard(PxI32 &argc,const char **argv,char *foo)
 {
 	while ( IsHard(*foo) )
 	{
@@ -199,12 +199,12 @@ bool InPlaceParser::IsNonSeparator(char c)
 }
 
 //==================================================================================
-NxI32 InPlaceParser::ProcessLine(NxI32 lineno,char *line,InPlaceParserInterface *callback)
+PxI32 InPlaceParser::ProcessLine(PxI32 lineno,char *line,InPlaceParserInterface *callback)
 {
-	NxI32 ret = 0;
+	PxI32 ret = 0;
 
 	const char *argv[MAXARGS];
-	NxI32 argc = 0;
+	PxI32 argc = 0;
 
 	char *foo = line;
 
@@ -291,11 +291,11 @@ NxI32 InPlaceParser::ProcessLine(NxI32 lineno,char *line,InPlaceParserInterface 
 }
 
 
-NxI32  InPlaceParser::Parse(const char *str,InPlaceParserInterface *callback) // returns true if entire file was parsed, false if it aborted for some reason
+PxI32  InPlaceParser::Parse(const char *str,InPlaceParserInterface *callback) // returns true if entire file was parsed, false if it aborted for some reason
 {
-  NxI32 ret = 0;
+  PxI32 ret = 0;
 
-  mLen = (NxI32)strlen(str);
+  mLen = (PxI32)strlen(str);
   if ( mLen )
   {
     mData = (char *)MEMALLOC_MALLOC(mLen+1);
@@ -309,13 +309,13 @@ NxI32  InPlaceParser::Parse(const char *str,InPlaceParserInterface *callback) //
 //==================================================================================
 // returns true if entire file was parsed, false if it aborted for some reason
 //==================================================================================
-NxI32  InPlaceParser::Parse(InPlaceParserInterface *callback)
+PxI32  InPlaceParser::Parse(InPlaceParserInterface *callback)
 {
-	NxI32 ret = 0;
+	PxI32 ret = 0;
 	assert( callback );
 	if ( mData )
 	{
-		NxI32 lineno = 0;
+		PxI32 lineno = 0;
 
 		char *foo   = mData;
 		char *begin = foo;
@@ -331,7 +331,7 @@ NxI32  InPlaceParser::Parse(InPlaceParserInterface *callback)
           bool snarfed = callback->preParseLine(lineno,begin);
           if ( !snarfed )
           {
-  					NxI32 v = ProcessLine(lineno,begin,callback);
+  					PxI32 v = ProcessLine(lineno,begin,callback);
   					if ( v )
   						ret = v;
           }
@@ -350,7 +350,7 @@ NxI32  InPlaceParser::Parse(InPlaceParserInterface *callback)
 
 		lineno++; // lasst line.
 
-		NxI32 v = ProcessLine(lineno,begin,callback);
+		PxI32 v = ProcessLine(lineno,begin,callback);
 		if ( v )
 			ret = v;
 	}
@@ -374,11 +374,11 @@ void InPlaceParser::DefaultSymbols(void)
 //==================================================================================
 // convert source string into an arg list, this is a destructive parse.
 //==================================================================================
-const char ** InPlaceParser::GetArglist(char *line,NxI32 &count)
+const char ** InPlaceParser::GetArglist(char *line,PxI32 &count)
 {
 	const char **ret = 0;
 
-	NxI32 argc = 0;
+	PxI32 argc = 0;
 
 	char *foo = line;
 

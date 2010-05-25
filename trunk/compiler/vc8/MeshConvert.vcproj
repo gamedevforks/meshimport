@@ -4,7 +4,9 @@
 	Version="8.00"
 	Name="MeshConvert"
 	ProjectGUID="{6E37CFC1-CCA2-832E-A166-9103C14A8FFA}"
-	RootNamespace="MeshConvert"
+	SccProjectName="Perforce Project"
+	SccLocalPath="."
+	SccProvider="MSCCI:Perforce SCM"
 	>
 	<Platforms>
 		<Platform
@@ -70,7 +72,7 @@
 			/>
 			<Tool
 				Name="VCManifestTool"
-				EmbedManifest="true"
+				EmbedManifest="false"
 			/>
 			<Tool
 				Name="VCXDCMakeTool"
@@ -147,7 +149,7 @@
 			/>
 			<Tool
 				Name="VCManifestTool"
-				EmbedManifest="true"
+				EmbedManifest="false"
 			/>
 			<Tool
 				Name="VCXDCMakeTool"
@@ -176,11 +178,11 @@
 			Name="MeshImport Files"
 			>
 			<File
-				RelativePath="..\..\include\MeshImport\MeshImport.h"
+				RelativePath="..\..\include\MeshImport\MeshImport.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\include\common\snippets\MeshImportLoader.cpp"
+				RelativePath="..\..\include\MeshImport\MeshImport.h"
 				>
 			</File>
 		</Filter>

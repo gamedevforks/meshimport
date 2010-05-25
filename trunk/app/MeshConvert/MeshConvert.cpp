@@ -54,7 +54,7 @@ static char *stristr(const char *str,const char *key)       // case insensitive 
 	char *foo = strstr(istr,ikey);
 	if ( foo )
 	{
-		NxU32 loc = (NxU32)(foo - istr);
+		PxU32 loc = (PxU32)(foo - istr);
 		foo = (char *)str+loc;
 	}
 
@@ -64,7 +64,7 @@ static char *stristr(const char *str,const char *key)       // case insensitive 
 class MyMeshImportApplicationResource : public NVSHARE::MeshImportApplicationResource
 {
 public:
-	virtual void * getApplicationResource(const char *base_name,const char *resource_name,NxU32 &len) 
+	virtual void * getApplicationResource(const char *base_name,const char *resource_name,PxU32 &len) 
 	{
 		void *ret = 0;
 		len = 0;
@@ -92,7 +92,7 @@ public:
 };
 
 
-void main(NxI32 argc,const char **argv)
+void main(PxI32 argc,const char **argv)
 {
 
 
@@ -110,13 +110,13 @@ void main(NxI32 argc,const char **argv)
     {
         bool rotate = false;
         bool scale  = false;
-        NxF32 meshScale = 1;
-        NxF32 rot[3];
+        PxF32 meshScale = 1;
+        PxF32 rot[3];
 
         NVSHARE::MeshSerializeFormat inputFormat = NVSHARE::MSF_EZMESH;
         NVSHARE::MeshSerializeFormat outputFormat = NVSHARE::MSF_EZMESH;
 
-        for (NxI32 i=2; i<argc; i++)
+        for (PxI32 i=2; i<argc; i++)
         {
             const char *key = argv[i];
             if ( strcmp(key,"-r") == 0 )
@@ -126,9 +126,9 @@ void main(NxI32 argc,const char **argv)
                     const char *x = argv[i+1];
                     const char *y = argv[i+2];
                     const char *z = argv[i+3];
-                    rot[0] = (NxF32) atof( x );
-                    rot[1] = (NxF32) atof( y );
-                    rot[2] = (NxF32) atof( z );
+                    rot[0] = (PxF32) atof( x );
+                    rot[1] = (PxF32) atof( y );
+                    rot[2] = (PxF32) atof( z );
                     printf("Rotating input mesh by euler(%0.2f,%0.2f,%0.2f)\r\n", rot[0], rot[1], rot[2] );
                     rotate = true;
                     i+=3;
@@ -144,7 +144,7 @@ void main(NxI32 argc,const char **argv)
                 {
                     i++;
                     const char *value = argv[i];
-                    meshScale = (NxF32)atof(value);
+                    meshScale = (PxF32)atof(value);
                     if ( meshScale > 0.0001f )
                     {
                         printf("Mesh scale set to %0.4f\r\n", meshScale );
@@ -218,7 +218,7 @@ void main(NxI32 argc,const char **argv)
 		}
 		printf("dirname=%s\r\n", dirname );
 
-		NVSHARE::MeshImport *meshImport = loadMeshImporters(dirname,0); // loads the mesh import library (dll) and all available importers from the same directory.
+		NVSHARE::MeshImport *meshImport = loadMeshImporters(dirname); // loads the mesh import library (dll) and all available importers from the same directory.
 		if ( meshImport )
 		{
 			printf("Succesfully loaded the MeshImport DLL from directory: %s\r\n", dirname );
@@ -255,7 +255,7 @@ void main(NxI32 argc,const char **argv)
 			if ( fph )
 			{
 				fseek(fph,0L,SEEK_END);
-				NxU32 len = ftell(fph);
+				PxU32 len = ftell(fph);
 				fseek(fph,0L,SEEK_SET);
 				if ( len )
 				{
