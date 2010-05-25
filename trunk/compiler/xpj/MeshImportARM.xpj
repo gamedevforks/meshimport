@@ -22,6 +22,63 @@
 					*.cpp
 					*.c
 				</Files>
+
+				<Files name="foundation" root="../../src/MeshImportARM/foundation" type="source">
+					*.h
+					windows/*.h
+				</Files>
+
+				<Files name="reviewed" root="../../src/MeshImportARM/reviewed" type="source">
+					include/ *.h
+					include/windows/*.h
+					src/*.cpp
+					src/*.h
+					src/windows/*.h
+					src/windows/*.cpp
+				</Files>
+
+				<Files name="general" root="../../src/MeshImportARM/general" type="source">
+					PxIOStream/include/*.h
+					PxIOStream/include/*.inl
+					PxIOStream/public/*.h
+					shared/include/*.h
+				</Files>
+
+				<Files name="NxParameterized" root="../../src/MeshImportARM/NxParameterized" type="source">
+					include/*.inl
+					include/*.h
+					public/*.inl
+					public/*.h
+					src/*.cpp
+					src/*.h
+				</Files>
+
+				<Files name="params" root="../../src/MeshImportARM/params" type="source">
+					basicios/*.h
+					basicios/*.cpp
+					clothing/*.h
+					clothing/*.cpp
+					common/*.cpp
+					common/*.h
+					destructible/*.cpp
+					destructible/*.h
+					emitter/*.cpp
+					emitter/*.h
+					explosion/*.cpp
+					explosion/*.h
+					forcefield/*.cpp
+					forcefield/*.h
+					framework/*.cpp
+					framework/*.h
+					iofx/*.cpp
+					iofx/*.h
+					particles/*.cpp
+					particles/*.h
+					wind/*.cpp
+					wind/*.h
+				</Files>
+
+
 				<Files name="Header Files" root="../../src/MeshImportARM" type="header">
 					*.h
 				</Files>
@@ -49,6 +106,26 @@
                  ../../include/common/snippets
                  ../../include/MeshImport
                  ../../include
+                 ../../src/MeshImportARM/foundation
+                 ../../src/MeshImportARM/foundation/windows
+                 ../../src/MeshImportARM/reviewed/include
+                 ../../src/MeshImportARM/reviewed/include/windows
+                 ../../src/MeshImportARM/general/PxIOStream/include
+                 ../../src/MeshImportARM/general/PxIOStream/public
+                 ../../src/MeshImportARM/general/shared/include
+                 ../../src/MeshImportARM/NxParameterized/include
+                 ../../src/MeshImportARM/NxParameterized/public
+                 ../../src/MeshImportARM/params/basicios
+                 ../../src/MeshImportARM/params/clothing
+                 ../../src/MeshImportARM/params/common
+                 ../../src/MeshImportARM/params/destructible
+                 ../../src/MeshImportARM/params/emitter
+                 ../../src/MeshImportARM/params/explosion
+                 ../../src/MeshImportARM/params/forcefield
+                 ../../src/MeshImportARM/params/framework
+                 ../../src/MeshImportARM/params/iofx
+                 ../../src/MeshImportARM/params/particles
+                 ../../src/MeshImportARM/params/wind
 				</SearchPaths>
 				<SearchPaths type="library">
          ../../lib/win32
