@@ -186,7 +186,7 @@ char * skipDir(char *start)
 
 bool OBJ::importMesh(const char *fname,const void *_data,NxU32 len,MeshImportInterface *callback,const char *options,MeshImportApplicationResource *appResource)
 {
-  bool ret = false;
+  bool ret = true;
 
   release();
 

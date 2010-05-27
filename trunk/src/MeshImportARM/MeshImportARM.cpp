@@ -44,7 +44,7 @@ public:
 
   virtual const char * getExtension(NxI32 index)  // report the default file name extension for this mesh type.
   {
-    return ".xml";
+    return ".apx";
   }
 
   virtual const char * getDescription(NxI32 index)  // report the default file name extension for this mesh type.
