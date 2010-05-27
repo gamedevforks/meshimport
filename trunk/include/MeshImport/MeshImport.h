@@ -1466,7 +1466,7 @@ protected:
 };
 
 
-#define MESHIMPORT_VERSION 10  // version 0.01  increase this version number whenever an interface change occurs.
+#define MESHIMPORT_VERSION 11  // version 0.01  increase this version number whenever an interface change occurs.
 
 
 extern MeshImport *gMeshImport; // This is an optional global variable that can be used by the application.  If the application uses it, it should define it somewhere in its codespace.
