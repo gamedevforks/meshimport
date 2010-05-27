@@ -268,7 +268,7 @@ public:
   	virtual NxI32              getExtensionCount(void) { return 1; }; // most importers support just one file name extension.
   	virtual const char *     getExtension(NxI32 index)  // report the default file name extension for this mesh type.
   	{
-  		return ".xml";
+  		return ".apx";
 	}
 
   	virtual const char *     getDescription(NxI32 index) // report the ascii description of the import type.

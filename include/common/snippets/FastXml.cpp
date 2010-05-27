@@ -246,7 +246,8 @@ public:
       while ( *scan )
       {
         scan = skipNextData(scan);
-        if ( *scan == 0 ) return ret;
+        if ( *scan == 0 ) 
+			return ret;
         if ( *scan == '<' )
         {
           scan++;
@@ -273,11 +274,13 @@ public:
             *scan = 0;
             scan++;
             scan = processClose(c,element,scan,argc,argv,iface);
-            if ( !scan ) return false;
+            if ( !scan ) 
+				return false;
           }
           else
           {
-            if ( *scan == 0 ) return ret;
+            if ( *scan == 0 ) 
+				return ret;
             *scan = 0; // place a zero byte to indicate the end of the element name...
             scan++;
 
@@ -289,7 +292,8 @@ public:
               {
                 char c = *scan++;
                 scan = processClose(c,element,scan,argc,argv,iface);
-                if ( !scan ) return false;
+                if ( !scan ) 
+					return false;
                 break;
               }
               else
