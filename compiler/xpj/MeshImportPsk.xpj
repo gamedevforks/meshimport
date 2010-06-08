@@ -1,11 +1,13 @@
 <XPJ version="4">
 
 	<Project name="MeshImportPSK" version="1">
+		<Export platform="win32" tool="vc9">../vc9</Export>
 		<Export platform="win32" tool="vc8">../vc8</Export>
 		<Export platform="win32" tool="vc7">../vc7</Export>
 
 
 		<Target name="MeshImportPSK">
+			<Export platform="win32" tool="vc9">../vc9</Export>
 			<Export platform="win32" tool="vc8">../vc8</Export>
 			<Export platform="win32" tool="vc7">../vc7</Export>
 

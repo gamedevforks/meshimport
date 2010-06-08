@@ -8,19 +8,33 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MeshConvert", "MeshConvert.
 		{95616A0F-1651-8B98-68B7-3678C9EA5ACB} = {95616A0F-1651-8B98-68B7-3678C9EA5ACB}
 	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MeshImport", "MeshImport.vcproj", "{082FBBBD-9532-5712-DF18-A054AE91C0F0}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MeshImport", ".\/../vc8/MeshImport.vcproj", "{082FBBBD-9532-5712-DF18-A054AE91C0F0}"
+	ProjectSection(ProjectDependencies) = postProject
+	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MeshImportPSK", "MeshImportPSK.vcproj", "{F65A6A6D-8257-C5DA-9620-9730FA78E23E}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MeshImportPSK", ".\/../vc8/MeshImportPSK.vcproj", "{F65A6A6D-8257-C5DA-9620-9730FA78E23E}"
+	ProjectSection(ProjectDependencies) = postProject
+	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MeshImportEzm", "MeshImportEzm.vcproj", "{3454184B-5C28-0EE8-A994-F7B09BF0879C}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MeshImportEzm", ".\/../vc8/MeshImportEzm.vcproj", "{3454184B-5C28-0EE8-A994-F7B09BF0879C}"
+	ProjectSection(ProjectDependencies) = postProject
+	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MeshImportObj", "MeshImportObj.vcproj", "{23550C12-8028-7C24-92CC-C9BAD660CFD0}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MeshImportObj", ".\/../vc8/MeshImportObj.vcproj", "{23550C12-8028-7C24-92CC-C9BAD660CFD0}"
+	ProjectSection(ProjectDependencies) = postProject
+	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MeshImportOgre", "MeshImportOgre.vcproj", "{95616A0F-1651-8B98-68B7-3678C9EA5ACB}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MeshImportARM", ".\/../vc8/MeshImportARM.vcproj", "{E85D2B0E-76C2-504F-66B0-102E6DDB0798}"
+	ProjectSection(ProjectDependencies) = postProject
+	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MeshImportFbx", "MeshImportFbx.vcproj", "{4781D7B8-BA07-413F-9C60-BC7A437171EF}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MeshImportFbx", ".\/../vc8/MeshImportFbx.vcproj", "{285507B1-ED5C-5646-8C30-665A8583D9F8}"
+	ProjectSection(ProjectDependencies) = postProject
+	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MeshImportARM", "MeshImportARM.vcproj", "{E85D2B0E-76C2-504F-66B0-102E6DDB0798}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MeshImportOgre", ".\/../vc8/MeshImportOgre.vcproj", "{95616A0F-1651-8B98-68B7-3678C9EA5ACB}"
+	ProjectSection(ProjectDependencies) = postProject
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -48,20 +62,21 @@ Global
 		{23550C12-8028-7C24-92CC-C9BAD660CFD0}.debug|Win32.Build.0 = debug|Win32
 		{23550C12-8028-7C24-92CC-C9BAD660CFD0}.release|Win32.ActiveCfg = release|Win32
 		{23550C12-8028-7C24-92CC-C9BAD660CFD0}.release|Win32.Build.0 = release|Win32
-		{95616A0F-1651-8B98-68B7-3678C9EA5ACB}.debug|Win32.ActiveCfg = debug|Win32
-		{95616A0F-1651-8B98-68B7-3678C9EA5ACB}.debug|Win32.Build.0 = debug|Win32
-		{95616A0F-1651-8B98-68B7-3678C9EA5ACB}.release|Win32.ActiveCfg = release|Win32
-		{95616A0F-1651-8B98-68B7-3678C9EA5ACB}.release|Win32.Build.0 = release|Win32
-		{4781D7B8-BA07-413F-9C60-BC7A437171EF}.debug|Win32.ActiveCfg = debug|Win32
-		{4781D7B8-BA07-413F-9C60-BC7A437171EF}.debug|Win32.Build.0 = debug|Win32
-		{4781D7B8-BA07-413F-9C60-BC7A437171EF}.release|Win32.ActiveCfg = release|Win32
-		{4781D7B8-BA07-413F-9C60-BC7A437171EF}.release|Win32.Build.0 = release|Win32
 		{E85D2B0E-76C2-504F-66B0-102E6DDB0798}.debug|Win32.ActiveCfg = debug|Win32
 		{E85D2B0E-76C2-504F-66B0-102E6DDB0798}.debug|Win32.Build.0 = debug|Win32
 		{E85D2B0E-76C2-504F-66B0-102E6DDB0798}.release|Win32.ActiveCfg = release|Win32
 		{E85D2B0E-76C2-504F-66B0-102E6DDB0798}.release|Win32.Build.0 = release|Win32
+		{285507B1-ED5C-5646-8C30-665A8583D9F8}.debug|Win32.ActiveCfg = debug|Win32
+		{285507B1-ED5C-5646-8C30-665A8583D9F8}.debug|Win32.Build.0 = debug|Win32
+		{285507B1-ED5C-5646-8C30-665A8583D9F8}.release|Win32.ActiveCfg = release|Win32
+		{285507B1-ED5C-5646-8C30-665A8583D9F8}.release|Win32.Build.0 = release|Win32
+		{95616A0F-1651-8B98-68B7-3678C9EA5ACB}.debug|Win32.ActiveCfg = debug|Win32
+		{95616A0F-1651-8B98-68B7-3678C9EA5ACB}.debug|Win32.Build.0 = debug|Win32
+		{95616A0F-1651-8B98-68B7-3678C9EA5ACB}.release|Win32.ActiveCfg = release|Win32
+		{95616A0F-1651-8B98-68B7-3678C9EA5ACB}.release|Win32.Build.0 = release|Win32
 	EndGlobalSection
-	GlobalSection(SolutionProperties) = preSolution
-		HideSolutionNode = FALSE
+	GlobalSection(ExtensibilityGlobals) = postSolution
+	EndGlobalSection
+	GlobalSection(ExtensibilityAddins) = postSolution
 	EndGlobalSection
 EndGlobal

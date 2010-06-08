@@ -1,14 +1,20 @@
 <XPJ version="4">
 	<Project name="MeshConvert" version="1">
+
+		<Export platform="win32" tool="vc9">../vc9</Export>
 		<Export platform="win32" tool="vc8">../vc8</Export>
 		<Export platform="win32" tool="vc7">../vc7</Export>
+
 		<Import root=".\" file="MeshImport.xpj"/>
 		<Import root=".\" file="MeshImportPSK.xpj"/>
 		<Import root=".\" file="MeshImportEzm.xpj"/>
 		<Import root=".\" file="MeshImportObj.xpj"/>
+		<Import root=".\" file="MeshImportARM.xpj"/>
+		<Import root=".\" file="MeshImportFBX.xpj"/>
 		<Import root=".\" file="MeshImportOgre.xpj"/>
 
 		<Target name="MeshConvert">
+			<Export platform="win32" tool="vc9">../vc9</Export>
 			<Export platform="win32" tool="vc8">../vc8</Export>
 			<Export platform="win32" tool="vc7">../vc7</Export>
 

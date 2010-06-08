@@ -69,6 +69,7 @@
 #pragma warning(disable:4996)
 
 using namespace physx;
+using namespace NxParameterized;
 
 namespace NVSHARE
 {
@@ -103,24 +104,24 @@ public:
 
 struct ParamFactory : public UserAllocated
 {
-	ParamFactory(const char *name,NxParamFactory *f)
+	ParamFactory(const char *name,NxParameterized::Factory *f)
 	{
 		mName = name;
 		mFactory = f;
 	}
 	const char *mName;
-	NxParamFactory *mFactory;
+	NxParameterized::Factory *mFactory;
 };
 
 typedef Array< ParamFactory >  ParamFactoryVector;
 
-class AppTraits : public NxParamTraits
+class AppTraits : public NxParameterized::Traits
 {
 public:
 
-	virtual void registerFactory( const char * name, NxParamFactory *ptr )
+	virtual void registerFactory(NxParameterized::Factory &ptr)
 	{
-		ParamFactory p(name,ptr);
+		ParamFactory p(ptr.getClassName(),&ptr);
 		mFactories.pushBack(p);
 	}
 
@@ -129,11 +130,11 @@ public:
 		PX_ALWAYS_ASSERT(); // not expected/implemented
 	}
 
-	virtual NxParamInterface * createNxParameterized( const char * name )
+	virtual NxParameterized::Interface * createNxParameterized( const char * name )
 	{
-		NxParamInterface *ret = NULL;
+		NxParameterized::Interface *ret = NULL;
 
-		NxParamFactory *f = getFactory(name);
+		NxParameterized::Factory *f = getFactory(name);
 		PX_ASSERT(f);
 		if ( f )
 		{
@@ -143,11 +144,17 @@ public:
 		return ret;
 	}
 
-	virtual NxParamInterface * finishNxParameterized( const char * name, void *ptr, void *memoryStart, physx::PxI32 *pRefCount )
+	virtual NxParameterized::Interface * createNxParameterized( const char * name, physx::PxU32 ver ) 
 	{
-		NxParamInterface *ret = NULL;
+		PX_ALWAYS_ASSERT();
+		return NULL;
+	}
 
-		NxParamFactory *f = getFactory(name);
+	virtual NxParameterized::Interface * finishNxParameterized( const char * name, void *ptr, void *memoryStart, physx::PxI32 *pRefCount )
+	{
+		NxParameterized::Interface *ret = NULL;
+
+		NxParameterized::Factory *f = getFactory(name);
 		PX_ASSERT(f);
 		if ( f )
 		{
@@ -158,9 +165,21 @@ public:
 		return ret;
 	}
 
-	NxParamFactory * getFactory(const char *name)
+	virtual NxParameterized::Interface * finishNxParameterized( const char * name, physx::PxU32 ver, void *obj, void *buf, physx::PxI32 *refCount ) 
 	{
-		NxParamFactory *ret = NULL;
+		PX_ALWAYS_ASSERT();
+		return NULL;
+	}
+
+	virtual physx::PxU32 getCurrentVersion(const char *className) const 
+	{
+		PX_ALWAYS_ASSERT();
+		return 1;
+	}
+
+	NxParameterized::Factory * getFactory(const char *name)
+	{
+		NxParameterized::Factory *ret = NULL;
 		for (ParamFactoryVector::Iterator i=mFactories.begin(); i!=mFactories.end(); ++i)
 		{
 			ParamFactory &p = (*i);
@@ -173,7 +192,7 @@ public:
 		return ret;
 	}
 
-	virtual bool getNxParameterizedNames( const char ** names, physx::PxU32 &outCount, physx::PxU32 inCount)
+	virtual bool getNxParameterizedNames( const char ** names, physx::PxU32 &outCount, physx::PxU32 inCount) const
 	{
 		bool ret = false;
 		return ret;
@@ -205,7 +224,7 @@ public:
 
 };
 
-typedef Array< NxParamInterface * > NxParamInterfaceVector;
+typedef Array< NxParameterized::Interface * > InterfaceVector;
 
 
 class MeshImporterARM : public MeshImporter, public Memalloc, public AppTraits
@@ -213,78 +232,80 @@ class MeshImporterARM : public MeshImporter, public Memalloc, public AppTraits
 public:
 	MeshImporterARM(void)
 	{
-		registerFactory("NxApexBasicIOSAssetParam",&mNxApexBasicIOSAssetParamFactory);
-		registerFactory("NxApexClothingActorParam",&mNxApexClothingActorParamFactory);
-		registerFactory("ClothingAssetParameters",&mClothingAssetParametersFactory);
-		registerFactory("ClothingGraphicalLodParameters",&mClothingGraphicalLodParametersFactory);
-		registerFactory("ClothingMaterialLibraryParameters",&mClothingMaterialLibraryParametersFactory);
-		registerFactory("ClothingPhysicalMeshParameters",&mClothingPhysicalMeshParametersFactory);
-		registerFactory("ConvexHullParameters",&mConvexHullParametersFactory);
-		registerFactory("NxApexDestructibleActorParam",&mNxApexDestructibleActorParamFactory);
-		registerFactory("DestructibleAssetParameters",&mDestructibleAssetParametersFactory);
-		registerFactory("SurfaceTraceParameters",&mSurfaceTraceParametersFactory);
-		registerFactory("SurfaceTraceSetParameters",&mSurfaceTraceSetParametersFactory);
-		registerFactory("ApexEmitterActorParameters",&mApexEmitterActorParametersFactory);
-		registerFactory("ApexEmitterAssetParameters",&mApexEmitterAssetParametersFactory);
-		registerFactory("EmitterGeomBoxParams",&mEmitterGeomBoxParamsFactory);
-		registerFactory("EmitterGeomExplicitParams",&mEmitterGeomExplicitParamsFactory);
-		registerFactory("EmitterGeomSphereParams",&mEmitterGeomSphereParamsFactory);
-		registerFactory("EmitterGeomSphereShellParams",&mEmitterGeomSphereShellParamsFactory);
-		registerFactory("GroundEmitterActorParameters",&mGroundEmitterActorParametersFactory);
-		registerFactory("GroundEmitterAssetParameters",&mGroundEmitterAssetParametersFactory);
-		registerFactory("ImpactEmitterActorParameters",&mImpactEmitterActorParametersFactory);
-		registerFactory("ImpactEmitterAssetParameters",&mImpactEmitterAssetParametersFactory);
-		registerFactory("NxApexExplosionAssetParam",&mNxApexExplosionAssetParamFactory);
-		registerFactory("ExplosionActorParameters",&mExplosionActorParametersFactory);
-		registerFactory("ExplosionEnvParameters",&mExplosionEnvParametersFactory);
-		registerFactory("FieldBoundaryActorParameters",&mFieldBoundaryActorParametersFactory);
-		registerFactory("FieldBoundaryAssetParameters",&mFieldBoundaryAssetParametersFactory);
-		registerFactory("ShapeBoxParams",&mShapeBoxParamsFactory);
-		registerFactory("ShapeCapsuleParams",&mShapeCapsuleParamsFactory);
-		registerFactory("ShapeConvexParams",&mShapeConvexParamsFactory);
-		registerFactory("ShapeSphereParams",&mShapeSphereParamsFactory);
-		registerFactory("RenderMeshAssetParameters",&mRenderMeshAssetParametersFactory);
-		registerFactory("SubmeshParameters",&mSubmeshParametersFactory);
-		registerFactory("VertexBufferParameters",&mVertexBufferParametersFactory);
-		registerFactory("ColorVsDensityModifierParams",&mColorVsDensityModifierParamsFactory);
-		registerFactory("ColorVsLifeModifierParams",&mColorVsLifeModifierParamsFactory);
-		registerFactory("IofxAssetParameters",&mIofxAssetParametersFactory);
-		registerFactory("OrientAlongVelocityModifierParams",&mOrientAlongVelocityModifierParamsFactory);
-		registerFactory("RandomRotationModifierParams",&mRandomRotationModifierParamsFactory);
-		registerFactory("RandomScaleModifierParams",&mRandomScaleModifierParamsFactory);
-		registerFactory("RandomSubtextureModifierParams",&mRandomSubtextureModifierParamsFactory);
-		registerFactory("RotationModifierParams",&mRotationModifierParamsFactory);
-		registerFactory("ScaleAlongVelocityModifierParams",&mScaleAlongVelocityModifierParamsFactory);
-		registerFactory("ScaleVsCameraDistanceModifierParams",&mScaleVsCameraDistanceModifierParamsFactory);
-		registerFactory("ScaleVsDensityModifierParams",&mScaleVsDensityModifierParamsFactory);
-		registerFactory("ScaleVsLifeModifierParams",&mScaleVsLifeModifierParamsFactory);
-		registerFactory("SimpleScaleModifierParams",&mSimpleScaleModifierParamsFactory);
-		registerFactory("SubtextureVsLifeModifierParams",&mSubtextureVsLifeModifierParamsFactory);
-		registerFactory("ViewDirectionSortingModifierParams",&mViewDirectionSortingModifierParamsFactory);
-		registerFactory("NxFluidIosParameters",&mNxFluidIosParametersFactory);
-		registerFactory("NxApexWindAssetParam",&mNxApexWindAssetParamFactory);
-		registerFactory("WindActorParameters",&mWindActorParametersFactory);
+		registerFactory(mNxApexBasicIOSAssetParamFactory);
+		registerFactory(mNxApexClothingActorParamFactory);
+		registerFactory(mClothingAssetParametersFactory);
+		registerFactory(mClothingGraphicalLodParametersFactory);
+		registerFactory(mClothingMaterialLibraryParametersFactory);
+		registerFactory(mClothingPhysicalMeshParametersFactory);
+		registerFactory(mConvexHullParametersFactory);
+		registerFactory(mNxApexDestructibleActorParamFactory);
+		registerFactory(mDestructibleAssetParametersFactory);
+		registerFactory(mSurfaceTraceParametersFactory);
+		registerFactory(mSurfaceTraceSetParametersFactory);
+		registerFactory(mApexEmitterActorParametersFactory);
+		registerFactory(mApexEmitterAssetParametersFactory);
+		registerFactory(mEmitterGeomBoxParamsFactory);
+		registerFactory(mEmitterGeomExplicitParamsFactory);
+		registerFactory(mEmitterGeomSphereParamsFactory);
+		registerFactory(mEmitterGeomSphereShellParamsFactory);
+		registerFactory(mGroundEmitterActorParametersFactory);
+		registerFactory(mGroundEmitterAssetParametersFactory);
+		registerFactory(mImpactEmitterActorParametersFactory);
+		registerFactory(mImpactEmitterAssetParametersFactory);
+		registerFactory(mNxApexExplosionAssetParamFactory);
+		registerFactory(mExplosionActorParametersFactory);
+		registerFactory(mExplosionEnvParametersFactory);
+		registerFactory(mFieldBoundaryActorParametersFactory);
+		registerFactory(mFieldBoundaryAssetParametersFactory);
+		registerFactory(mShapeBoxParamsFactory);
+		registerFactory(mShapeCapsuleParamsFactory);
+		registerFactory(mShapeConvexParamsFactory);
+		registerFactory(mShapeSphereParamsFactory);
+		registerFactory(mRenderMeshAssetParametersFactory);
+		registerFactory(mSubmeshParametersFactory);
+		registerFactory(mVertexBufferParametersFactory);
+		registerFactory(mColorVsDensityModifierParamsFactory);
+		registerFactory(mColorVsLifeModifierParamsFactory);
+		registerFactory(mIofxAssetParametersFactory);
+		registerFactory(mOrientAlongVelocityModifierParamsFactory);
+		registerFactory(mRandomRotationModifierParamsFactory);
+		registerFactory(mRandomScaleModifierParamsFactory);
+		registerFactory(mRandomSubtextureModifierParamsFactory);
+		registerFactory(mRotationModifierParamsFactory);
+		registerFactory(mScaleAlongVelocityModifierParamsFactory);
+		registerFactory(mScaleVsCameraDistanceModifierParamsFactory);
+		registerFactory(mScaleVsDensityModifierParamsFactory);
+		registerFactory(mScaleVsLifeModifierParamsFactory);
+		registerFactory(mSimpleScaleModifierParamsFactory);
+		registerFactory(mSubtextureVsLifeModifierParamsFactory);
+		registerFactory(mViewDirectionSortingModifierParamsFactory);
+		registerFactory(mNxFluidIosParametersFactory);
+		registerFactory(mNxApexWindAssetParamFactory);
+		registerFactory(mWindActorParametersFactory);
 	}
-  	virtual NxI32              getExtensionCount(void) { return 1; }; // most importers support just one file name extension.
+  	virtual NxI32              getExtensionCount(void) { return 2; }; // most importers support just one file name extension.
+
   	virtual const char *     getExtension(NxI32 index)  // report the default file name extension for this mesh type.
   	{
-  		return ".apx";
+  		return index == 0 ? ".apx" : ".apb";
 	}
 
   	virtual const char *     getDescription(NxI32 index) // report the ascii description of the import type.
   	{
-  		return "APEX Render Mesh";
+  		return index == 0 ? "APEX Render Mesh XML" : "APEX Render Mesh Binary";
 	}
 
   	virtual bool             importMesh(const char *meshName,const void *data,NxU32 dlen,MeshImportInterface *callback,const char *options,MeshImportApplicationResource *appResource)
   	{
   		bool ret = false;
+
   		return ret;
 	}
 
 private:
 
-	NxParamInterfaceVector				mObjects;
+	InterfaceVector				mObjects;
 	NxApexBasicIOSAssetParamFactory mNxApexBasicIOSAssetParamFactory;
 	NxApexClothingActorParamFactory mNxApexClothingActorParamFactory;
 	ClothingAssetParametersFactory mClothingAssetParametersFactory;

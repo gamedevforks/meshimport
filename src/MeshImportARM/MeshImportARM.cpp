@@ -40,16 +40,16 @@ public:
     return doShutdown();
   }
 
-  virtual NxI32              getExtensionCount(void) { return 1; }; // most importers support just one file name extension.
+  virtual NxI32              getExtensionCount(void) { return 2; }; // most importers support just one file name extension.
 
   virtual const char * getExtension(NxI32 index)  // report the default file name extension for this mesh type.
   {
-    return ".apx";
+  	return index == 0 ? ".apx" : ".apb";
   }
 
   virtual const char * getDescription(NxI32 index)  // report the default file name extension for this mesh type.
   {
-    return "APEX Render Mesh";
+    return index == 0 ?  "APEX Render Mesh XML" : "APEX Render Mesh Binary";
   }
 
   virtual bool importMesh(const char *meshName,const void *data,NxU32 dlen,NVSHARE::MeshImportInterface *callback,const char *options,MeshImportApplicationResource *appResource)
