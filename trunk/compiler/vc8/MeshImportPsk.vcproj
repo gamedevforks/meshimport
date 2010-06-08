@@ -1,276 +1,178 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
-	ProjectType="Visual C++"
-	Version="8.00"
-	Name="MeshImportPSK"
-	ProjectGUID="{F65A6A6D-8257-C5DA-9620-9730FA78E23E}"
-	SccProjectName="Perforce Project"
-	SccLocalPath="."
-	SccProvider="MSCCI:Perforce SCM"
-	>
-	<Platforms>
-		<Platform
-			Name="Win32"
-		/>
-	</Platforms>
-	<ToolFiles>
-	</ToolFiles>
-	<Configurations>
-		<Configuration
-			Name="debug|Win32"
-			OutputDirectory="../../bin/win32"
-			IntermediateDirectory="build/Win32/$(SolutionName)/$(ProjectName)/debug"
-			ConfigurationType="2"
-			CharacterSet="2"
-			>
-			<Tool
-				Name="VCPreBuildEventTool"
-			/>
-			<Tool
-				Name="VCCustomBuildTool"
-			/>
-			<Tool
-				Name="VCXMLDataGeneratorTool"
-			/>
-			<Tool
-				Name="VCWebServiceProxyGeneratorTool"
-			/>
-			<Tool
-				Name="VCMIDLTool"
-			/>
-			<Tool
-				Name="VCCLCompilerTool"
-				AdditionalOptions="/WX /W4 /fp:fast /MDd /Zi "
-				Optimization="4"
-				AdditionalIncludeDirectories="&quot;../../include/common/snippets&quot;;&quot;../../include/MeshImport&quot;;&quot;../../include&quot;;"
-				PreprocessorDefinitions="WIN32;_WINDOWS;UNICODE=1;_UNICODE=1;MESHIMPORTOGRE_EXPORTS;_DEBUG;"
-				ExceptionHandling="1"
-				WarningLevel="3"
-			/>
-			<Tool
-				Name="VCManagedResourceCompilerTool"
-			/>
-			<Tool
-				Name="VCResourceCompilerTool"
-			/>
-			<Tool
-				Name="VCPreLinkEventTool"
-			/>
-			<Tool
-				Name="VCLinkerTool"
-				AdditionalOptions="/NODEFAULTLIB:libcp.lib /DEBUG "
-				AdditionalDependencies=""
-				OutputFile="$(OutDir)/MeshImportPSK.dll"
-				AdditionalLibraryDirectories="&quot;../../lib/win32&quot;;"
-				ProgramDatabaseFile="$(OutDir)/MeshImportPSK.dll.pdb"
-				GenerateMapFile="true"
-				MapFileName="$(OutDir)/MeshImportPSK.dll.map"
-				SubSystem="1"
-				ImportLibrary="../../lib/win32/$(TargetName).lib"
-			/>
-			<Tool
-				Name="VCALinkTool"
-			/>
-			<Tool
-				Name="VCManifestTool"
-			/>
-			<Tool
-				Name="VCXDCMakeTool"
-			/>
-			<Tool
-				Name="VCBscMakeTool"
-			/>
-			<Tool
-				Name="VCFxCopTool"
-			/>
-			<Tool
-				Name="VCAppVerifierTool"
-			/>
-			<Tool
-				Name="VCWebDeploymentTool"
-			/>
-			<Tool
-				Name="VCPostBuildEventTool"
-			/>
-		</Configuration>
-		<Configuration
-			Name="release|Win32"
-			OutputDirectory="../../bin/win32"
-			IntermediateDirectory="build/Win32/$(SolutionName)/$(ProjectName)/release"
-			ConfigurationType="2"
-			CharacterSet="2"
-			>
-			<Tool
-				Name="VCPreBuildEventTool"
-			/>
-			<Tool
-				Name="VCCustomBuildTool"
-			/>
-			<Tool
-				Name="VCXMLDataGeneratorTool"
-			/>
-			<Tool
-				Name="VCWebServiceProxyGeneratorTool"
-			/>
-			<Tool
-				Name="VCMIDLTool"
-			/>
-			<Tool
-				Name="VCCLCompilerTool"
-				AdditionalOptions="/Zi /WX /W4 /fp:fast /WX /MD /O2 "
-				Optimization="4"
-				AdditionalIncludeDirectories="&quot;../../include/common/snippets&quot;;&quot;../../include/MeshImport&quot;;&quot;../../include&quot;;"
-				PreprocessorDefinitions="WIN32;_WINDOWS;UNICODE=1;_UNICODE=1;MESHIMPORTOGRE_EXPORTS;NDEBUG;"
-				ExceptionHandling="1"
-				WarningLevel="3"
-			/>
-			<Tool
-				Name="VCManagedResourceCompilerTool"
-			/>
-			<Tool
-				Name="VCResourceCompilerTool"
-			/>
-			<Tool
-				Name="VCPreLinkEventTool"
-			/>
-			<Tool
-				Name="VCLinkerTool"
-				AdditionalOptions="/NODEFAULTLIB:libcp.lib /DEBUG "
-				AdditionalDependencies=""
-				OutputFile="$(OutDir)/MeshImportPSK.dll"
-				AdditionalLibraryDirectories="&quot;../../lib/win32&quot;;"
-				ProgramDatabaseFile="$(OutDir)/MeshImportPSK.dll.pdb"
-				GenerateMapFile="true"
-				MapFileName="$(OutDir)/MeshImportPSK.dll.map"
-				SubSystem="1"
-				ImportLibrary="../../lib/win32/$(TargetName).lib"
-			/>
-			<Tool
-				Name="VCALinkTool"
-			/>
-			<Tool
-				Name="VCManifestTool"
-			/>
-			<Tool
-				Name="VCXDCMakeTool"
-			/>
-			<Tool
-				Name="VCBscMakeTool"
-			/>
-			<Tool
-				Name="VCFxCopTool"
-			/>
-			<Tool
-				Name="VCAppVerifierTool"
-			/>
-			<Tool
-				Name="VCWebDeploymentTool"
-			/>
-			<Tool
-				Name="VCPostBuildEventTool"
-			/>
-		</Configuration>
-	</Configurations>
-	<References>
-	</References>
-	<Files>
-		<Filter
-			Name="Source Files"
-			>
-			<File
-				RelativePath="..\..\src\MeshImportPSK\ImportPSK.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\src\MeshImportPSK\MeshImportPSK.cpp"
-				>
-			</File>
-		</Filter>
-		<Filter
-			Name="Header Files"
-			>
-			<File
-				RelativePath="..\..\src\MeshImportPSK\ImportPSK.h"
-				>
-			</File>
-		</Filter>
-		<Filter
-			Name="Plugin Header Files"
-			>
-			<Filter
-				Name="MeshImport"
-				>
-				<File
-					RelativePath="..\..\include\MeshImport\MeshImport.h"
-					>
-				</File>
-			</Filter>
-		</Filter>
-		<Filter
-			Name="Common Include-Binding Files"
-			>
-			<Filter
-				Name="snippets"
-				>
-				<File
-					RelativePath="..\..\include\common\snippets\FloatMath.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\include\common\snippets\FloatMath.h"
-					>
-				</File>
-				<File
-					RelativePath="..\..\include\common\snippets\FloatMath.inl"
-					>
-				</File>
-				<File
-					RelativePath="..\..\include\common\snippets\inparser.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\include\common\snippets\inparser.h"
-					>
-				</File>
-				<File
-					RelativePath="..\..\include\common\snippets\nvstl.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\include\common\snippets\Nx.h"
-					>
-				</File>
-				<File
-					RelativePath="..\..\include\common\snippets\NxAssert.h"
-					>
-				</File>
-				<File
-					RelativePath="..\..\include\common\snippets\NxMath.h"
-					>
-				</File>
-				<File
-					RelativePath="..\..\include\common\snippets\NxSimpleTypes.h"
-					>
-				</File>
-				<File
-					RelativePath="..\..\include\common\snippets\NxUserAllocator.h"
-					>
-				</File>
-				<File
-					RelativePath="..\..\include\common\snippets\sutil.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\include\common\snippets\sutil.h"
-					>
-				</File>
-				<File
-					RelativePath="..\..\include\common\snippets\UserMemAlloc.h"
-					>
-				</File>
-			</Filter>
-		</Filter>
-	</Files>
-	<Globals>
-	</Globals>
+ProjectType="Visual C++"
+Version="8.00"
+Name="MeshImportPSK"
+>
+<Platforms>
+<Platform Name="Win32"/>
+</Platforms>
+<Configurations>
+  <Configuration
+    Name="default|Win32"
+    OutputDirectory="../../bin/win32"
+    IntermediateDirectory="Win32/MeshImportPSK/default"
+    ConfigurationType="2"
+    InheritedPropertySheets=""
+    CharacterSet="2"
+    >
+    <Tool
+      Name="VCCLCompilerTool"
+      AdditionalIncludeDirectories="&quot;../../include/common/snippets&quot;;&quot;../../include/MeshImport&quot;;&quot;../../include&quot;;&quot;../../include/common/snippets&quot;;&quot;../../include/MeshImport&quot;;&quot;../../include&quot;;"
+      PreprocessorDefinitions="WIN32;_WINDOWS;UNICODE=1;_UNICODE=1;MESHIMPORTOGRE_EXPORTS;WIN32;_WINDOWS;UNICODE=1;_UNICODE=1;MESHIMPORTOGRE_EXPORTS;"
+      WarningLevel="3"
+      Optimization="4"
+      AdditionalOptions=""
+      ExceptionHandling="1"
+      DebugInformationFormat=""
+      RuntimeLibrary=""
+      />
+    <Tool Name="VCCustomBuildTool"/>
+    <Tool 
+      Name="VCLinkerTool" 
+      OutputFile="$(OutDir)/MeshImportPSK.dll" 
+      ProgramDatabaseFile="$(OutDir)/MeshImportPSK.dll.pdb" 
+      AdditionalOptions="/NODEFAULTLIB:libcp.lib /NODEFAULTLIB:libcp.lib "
+      AdditionalDependencies=""
+      AdditionalLibraryDirectories="&quot;../../lib/win32&quot;;&quot;../../lib/win32&quot;;"
+      ImportLibrary="../../lib/win32/$(TargetName).lib"
+      GenerateMapFile="TRUE"
+      MapFileName="$(OutDir)/MeshImportPSK.dll.map"
+      SubSystem="1"
+      GenerateDebugInformation=""
+      />
+    <Tool Name="VCMIDLTool"/>
+    <Tool Name="VCPreBuildEventTool"/>
+    <Tool Name="VCPostBuildEventTool"/>
+    <Tool Name="VCPreLinkEventTool"/>
+    <Tool Name="VCResourceCompilerTool"/>
+    <Tool Name="VCWebServiceProxyGeneratorTool"/>
+    <Tool Name="VCXMLDataGeneratorTool"/>
+    <Tool Name="VCWebDeploymentTool"/>
+    <Tool Name="VCManagedWrapperGeneratorTool"/>
+    <Tool Name="VCAuxiliaryManagedWrapperGeneratorTool"/>
+  </Configuration>
+  <Configuration
+    Name="debug|Win32"
+    OutputDirectory="../../bin/win32"
+    IntermediateDirectory="Win32/MeshImportPSK/debug"
+    ConfigurationType="2"
+    InheritedPropertySheets=""
+    CharacterSet="2"
+    >
+    <Tool
+      Name="VCCLCompilerTool"
+      AdditionalIncludeDirectories="&quot;../../include/common/snippets&quot;;&quot;../../include/MeshImport&quot;;&quot;../../include&quot;;"
+      PreprocessorDefinitions="WIN32;_WINDOWS;UNICODE=1;_UNICODE=1;MESHIMPORTOGRE_EXPORTS;_DEBUG;"
+      WarningLevel="3"
+      Optimization="4"
+      AdditionalOptions="/WX /W4 /fp:fast /MDd /Zi "
+      ExceptionHandling="1"
+      DebugInformationFormat=""
+      RuntimeLibrary=""
+      />
+    <Tool Name="VCCustomBuildTool"/>
+    <Tool 
+      Name="VCLinkerTool" 
+      OutputFile="$(OutDir)/MeshImportPSK.dll" 
+      ProgramDatabaseFile="$(OutDir)/MeshImportPSK.dll.pdb" 
+      AdditionalOptions="/NODEFAULTLIB:libcp.lib /DEBUG "
+      AdditionalDependencies=""
+      AdditionalLibraryDirectories="&quot;../../lib/win32&quot;;"
+      ImportLibrary="../../lib/win32/$(TargetName).lib"
+      GenerateMapFile="TRUE"
+      MapFileName="$(OutDir)/MeshImportPSK.dll.map"
+      SubSystem="1"
+      GenerateDebugInformation=""
+      />
+    <Tool Name="VCMIDLTool"/>
+    <Tool Name="VCPreBuildEventTool"/>
+    <Tool Name="VCPostBuildEventTool"/>
+    <Tool Name="VCPreLinkEventTool"/>
+    <Tool Name="VCResourceCompilerTool"/>
+    <Tool Name="VCWebServiceProxyGeneratorTool"/>
+    <Tool Name="VCXMLDataGeneratorTool"/>
+    <Tool Name="VCWebDeploymentTool"/>
+    <Tool Name="VCManagedWrapperGeneratorTool"/>
+    <Tool Name="VCAuxiliaryManagedWrapperGeneratorTool"/>
+  </Configuration>
+  <Configuration
+    Name="release|Win32"
+    OutputDirectory="../../bin/win32"
+    IntermediateDirectory="Win32/MeshImportPSK/release"
+    ConfigurationType="2"
+    InheritedPropertySheets=""
+    CharacterSet="2"
+    >
+    <Tool
+      Name="VCCLCompilerTool"
+      AdditionalIncludeDirectories="&quot;../../include/common/snippets&quot;;&quot;../../include/MeshImport&quot;;&quot;../../include&quot;;"
+      PreprocessorDefinitions="WIN32;_WINDOWS;UNICODE=1;_UNICODE=1;MESHIMPORTOGRE_EXPORTS;NDEBUG;"
+      WarningLevel="3"
+      Optimization="4"
+      AdditionalOptions="/Zi /WX /W4 /fp:fast /WX /MD /O2 "
+      ExceptionHandling="1"
+      DebugInformationFormat=""
+      RuntimeLibrary=""
+      />
+    <Tool Name="VCCustomBuildTool"/>
+    <Tool 
+      Name="VCLinkerTool" 
+      OutputFile="$(OutDir)/MeshImportPSK.dll" 
+      ProgramDatabaseFile="$(OutDir)/MeshImportPSK.dll.pdb" 
+      AdditionalOptions="/NODEFAULTLIB:libcp.lib /DEBUG "
+      AdditionalDependencies=""
+      AdditionalLibraryDirectories="&quot;../../lib/win32&quot;;"
+      ImportLibrary="../../lib/win32/$(TargetName).lib"
+      GenerateMapFile="TRUE"
+      MapFileName="$(OutDir)/MeshImportPSK.dll.map"
+      SubSystem="1"
+      GenerateDebugInformation=""
+      />
+    <Tool Name="VCMIDLTool"/>
+    <Tool Name="VCPreBuildEventTool"/>
+    <Tool Name="VCPostBuildEventTool"/>
+    <Tool Name="VCPreLinkEventTool"/>
+    <Tool Name="VCResourceCompilerTool"/>
+    <Tool Name="VCWebServiceProxyGeneratorTool"/>
+    <Tool Name="VCXMLDataGeneratorTool"/>
+    <Tool Name="VCWebDeploymentTool"/>
+    <Tool Name="VCManagedWrapperGeneratorTool"/>
+    <Tool Name="VCAuxiliaryManagedWrapperGeneratorTool"/>
+  </Configuration>
+</Configurations>
+<References></References>
+<Files>
+  <Filter Name="Source Files" Filter=""> <!--  -->
+    <File RelativePath="..\..\src\MeshImportPSK\ImportPSK.cpp"/>
+    <File RelativePath="..\..\src\MeshImportPSK\MeshImportPSK.cpp"/>
+  </Filter>
+  <Filter Name="Header Files" Filter=""> <!--  -->
+    <File RelativePath="..\..\src\MeshImportPSK\ImportPSK.h"/>
+  </Filter>
+  <Filter Name="Plugin Header Files" Filter=""> <!--  -->
+    <Filter Name="MeshImport" Filter=""> <!--  -->
+      <File RelativePath="..\..\include\MeshImport\MeshImport.h"/>
+    </Filter>
+  </Filter>
+  <Filter Name="Common Include-Binding Files" Filter=""> <!--  -->
+    <Filter Name="snippets" Filter=""> <!--  -->
+      <File RelativePath="..\..\include\common\snippets\nvstl.cpp"/>
+      <File RelativePath="..\..\include\common\snippets\UserMemAlloc.h"/>
+      <File RelativePath="..\..\include\common\snippets\Nx.h"/>
+      <File RelativePath="..\..\include\common\snippets\NxAssert.h"/>
+      <File RelativePath="..\..\include\common\snippets\NxMath.h"/>
+      <File RelativePath="..\..\include\common\snippets\NxSimpleTypes.h"/>
+      <File RelativePath="..\..\include\common\snippets\NxUserAllocator.h"/>
+      <File RelativePath="..\..\include\common\snippets\sutil.h"/>
+      <File RelativePath="..\..\include\common\snippets\sutil.cpp"/>
+      <File RelativePath="..\..\include\common\snippets\FloatMath.h"/>
+      <File RelativePath="..\..\include\common\snippets\FloatMath.inl"/>
+      <File RelativePath="..\..\include\common\snippets\FloatMath.cpp"/>
+      <File RelativePath="..\..\include\common\snippets\inparser.h"/>
+      <File RelativePath="..\..\include\common\snippets\inparser.cpp"/>
+    </Filter>
+  </Filter>
+</Files>
+<Globals></Globals>
 </VisualStudioProject>

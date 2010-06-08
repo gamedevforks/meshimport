@@ -5,14 +5,6 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MeshImport", "MeshImport.vc
 	EndProjectSection
 EndProject
 Global
-GlobalSection(SourceCodeControl) = preSolution
-  SccNumberOfProjects = 2
-  SccLocalPath0 = .
-  SccProjectUniqueName0 = debug.vcproj
-  SccLocalPath1 = .
-  SccProjectUniqueName1 = release.vcproj
-  SccLocalPath2 = .
-  EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		debug|Win32 = debug|Win32
 		release|Win32 = release|Win32
@@ -27,7 +19,4 @@ GlobalSection(SourceCodeControl) = preSolution
 	EndGlobalSection
 	GlobalSection(ExtensibilityAddins) = postSolution
 	EndGlobalSection
-GlobalSection(SolutionProperties) = preSolution
-  HideSolutionNode = FALSE
-  EndGlobalSection
 EndGlobal
