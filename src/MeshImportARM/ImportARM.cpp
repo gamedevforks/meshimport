@@ -10,6 +10,7 @@
 #include "UserMemAlloc.h"
 #include "sutil.h"
 #include "ImportARM.h"
+#include "NxParamUtils.h"
 
 #include "ConvexHullParams.h"
 #include "RenderMeshAssetParameters.h"
@@ -65,6 +66,8 @@
 #include "NxSerializer.h"
 #include "PsUserAllocated.h"
 #include "PxUserOutputStream.h"
+#include "PxMemoryBuffer.h"
+#include "VertexFormatParameters.h"
 
 #pragma warning(disable:4996)
 
@@ -283,6 +286,7 @@ public:
 		registerFactory(mNxFluidIosParametersFactory);
 		registerFactory(mNxApexWindAssetParamFactory);
 		registerFactory(mWindActorParametersFactory);
+		registerFactory(mVertexFormatParametersFactory);
 	}
   	virtual NxI32              getExtensionCount(void) { return 2; }; // most importers support just one file name extension.
 
@@ -299,6 +303,29 @@ public:
   	virtual bool             importMesh(const char *meshName,const void *data,NxU32 dlen,MeshImportInterface *callback,const char *options,MeshImportApplicationResource *appResource)
   	{
   		bool ret = false;
+
+		PxMemoryBuffer mb(data,dlen);
+		NxParameterized::NxSerializer *s = internalCreateNxSerializer(NxSerializer::NST_XML,this);
+		NxSerializer::DeserializedData desdata;
+		NxSerializer::ErrorType err = s->deserialize(mb,desdata);
+		if ( err == NxSerializer::ERROR_NONE )
+		{
+			for (PxU32 i=0; i<desdata.size(); i++)
+			{
+				NxParameterized::Interface *iface = desdata.getObject(i);
+
+				PxU32 count;
+				const NxParameterized::ParamResult *result = getParamList(*iface,NULL,count,true);
+				if ( result )
+				{
+					printf("Debug me");
+				}
+
+			}
+		}
+		s->release();
+
+
 
   		return ret;
 	}
@@ -357,6 +384,7 @@ private:
 	NxFluidIosParametersFactory mNxFluidIosParametersFactory;
 	NxApexWindAssetParamFactory mNxApexWindAssetParamFactory;
 	WindActorParametersFactory mWindActorParametersFactory;
+	VertexFormatParametersFactory mVertexFormatParametersFactory;
 };
 
 

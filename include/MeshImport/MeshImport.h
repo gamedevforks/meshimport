@@ -1334,6 +1334,7 @@ enum MeshSerializeFormat
   MSF_WAVEFRONT, // save as wavefront OBJ
   MSF_PSK, // save it back out as a PSK format file.
   MSF_FBX,  // FBX import is supported by FBX output is not yet.
+  MSF_ARM,   // APEX render mesh
   MSF_LAST
 };
 

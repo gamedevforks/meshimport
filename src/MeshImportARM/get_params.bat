@@ -13,9 +13,13 @@ cd framework
 copy \p4\sw\physx\APEXSDK\1.0\trunk\framework\src\RenderMeshAssetParameters.cpp
 copy \p4\sw\physx\APEXSDK\1.0\trunk\framework\src\SubmeshParameters.cpp
 copy \p4\sw\physx\APEXSDK\1.0\trunk\framework\src\VertexBufferParameters.cpp
+copy \p4\sw\physx\APEXSDK\1.0\trunk\framework\src\VertexFormatParameters.cpp
+
 copy \p4\sw\physx\APEXSDK\1.0\trunk\framework\include\RenderMeshAssetParameters.h
 copy \p4\sw\physx\APEXSDK\1.0\trunk\framework\include\SubmeshParameters.h
 copy \p4\sw\physx\APEXSDK\1.0\trunk\framework\include\VertexBufferParameters.h
+copy \p4\sw\physx\APEXSDK\1.0\trunk\framework\include\VertexFormatParameters.h
+
 cd ..
 
 md basicios

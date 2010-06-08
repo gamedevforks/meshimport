@@ -191,6 +191,11 @@ void main(NxI32 argc,const char **argv)
 						outputFormat = NVSHARE::MSF_FBX;
 						printf("Setting output format to AutoDesk FBX ASCII\r\n");
 					}
+					else if ( stricmp(value,"apx") == 0 )
+					{
+						outputFormat = NVSHARE::MSF_ARM;
+						printf("Setting output format to APEX Render Mesh\r\n");
+					}
                     else
                     {
                         printf("Unknown output format %s, defaulting to EZM\r\n", value );
@@ -250,6 +255,11 @@ void main(NxI32 argc,const char **argv)
             {
 				inputFormat = NVSHARE::MSF_FBX;
             }
+			else if ( strstr(fname,".apx") )
+			{
+				inputFormat = NVSHARE::MSF_ARM;
+			}
+
 			strncpy(fname,argv[1],512);
 			FILE *fph = fopen(fname,"rb");
 			if ( fph )
@@ -302,6 +312,9 @@ void main(NxI32 argc,const char **argv)
                                 break;
 							  case NVSHARE::MSF_FBX:
 								  strcat(fname,".fbx");
+								  break;
+							  case NVSHARE::MSF_ARM:
+								  strcat(fname,".apx");
 								  break;
                             }
 
