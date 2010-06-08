@@ -607,6 +607,14 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\src\MeshImportARM\NxParameterized\public\NxParamUtils.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\src\MeshImportARM\NxParameterized\public\NxParamUtils.h"
+					>
+				</File>
+				<File
 					RelativePath="..\..\src\MeshImportARM\NxParameterized\src\NxSerializeBinaryHelper.h"
 					>
 				</File>
@@ -916,6 +924,14 @@
 				</File>
 				<File
 					RelativePath="..\..\src\MeshImportARM\params\framework\VertexBufferParameters.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\src\MeshImportARM\params\framework\VertexFormatParameters.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\src\MeshImportARM\params\framework\VertexFormatParameters.h"
 					>
 				</File>
 			</Filter>

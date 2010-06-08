@@ -228,7 +228,7 @@ NVSHARE::MeshImport * loadMeshImporters(const char * directory) // loads the mes
 
 		  if ( directory && strlen(directory) )
 		  {
-			  sprintf(scratch,"%s%s", directory, scan);
+			  sprintf(scratch,"%s\\%s", directory, scan);
 			  fname = scratch;
 		  }
 		  else
