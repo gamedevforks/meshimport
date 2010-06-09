@@ -313,14 +313,45 @@ public:
 			for (PxU32 i=0; i<desdata.size(); i++)
 			{
 				NxParameterized::Interface *iface = desdata.getObject(i);
+#if 1
+				{
+					PxU32 count;
+					const NxParameterized::ParamResult *result = getParamList(*iface,NULL,count,true,false,this);
+					if ( result )
+					{
+						FILE *fph = fopen("param.txt", "wb");
+						for (PxU32 i=0; i<count; i++)
+						{
+							const NxParameterized::ParamResult &r = result[i];
+							if ( r.mArraySize > 0 )
+							{
+								fprintf(fph,"%s[%d] : %s\r\n",r.mLongName ? r.mLongName : r.mName, r.mArraySize, iface->typeToStr(r.mDataType) );
+							}
+							else
+							{
+								fprintf(fph,"%s : %s\r\n", r.mLongName ? r.mLongName : r.mName, iface->typeToStr(r.mDataType) );
+							}
 
+						}
+						fclose(fph);
+					
+						releaseParamList(count,result,this);
+					}
+
+				}
+#endif
+#if 1
 				PxU32 count;
-				const NxParameterized::ParamResult *result = getParamList(*iface,NULL,count,true);
+				const NxParameterized::ParamResult *result = getParamList(*iface,"RenderMeshAssetParameters",count,true,true,this);
 				if ( result )
 				{
-					printf("Debug me");
+					for (PxU32 i=0; i<count; i++)
+					{
+						importRenderMeshAsset( (NxParameterized::Interface *)result[i].mInterface, callback );
+					}
+					releaseParamList(count,result,this);
 				}
-
+#endif
 			}
 		}
 		s->release();
@@ -328,6 +359,38 @@ public:
 
 
   		return ret;
+	}
+
+	void importRenderMeshAsset(NxParameterized::Interface *iface,MeshImportInterface *callback)
+	{
+#if 0
+		{
+			PxU32 count;
+			const NxParameterized::ParamResult *result = getParamList(*iface,NULL,count,true,false,this);
+			if ( result )
+			{
+				FILE *fph = fopen("param.txt", "wb");
+				for (PxU32 i=0; i<count; i++)
+				{
+					const NxParameterized::ParamResult &r = result[i];
+					if ( r.mArraySize > 0 )
+					{
+						fprintf(fph,"%s[%d] : %s\r\n",r.mLongName ? r.mLongName : r.mName, r.mArraySize, iface->typeToStr(r.mDataType) );
+					}
+					else
+					{
+						fprintf(fph,"%s : %s\r\n", r.mLongName ? r.mLongName : r.mName, iface->typeToStr(r.mDataType) );
+					}
+
+				}
+				fclose(fph);
+
+				releaseParamList(count,result,this);
+			}
+
+		}
+
+#endif
 	}
 
 private:
