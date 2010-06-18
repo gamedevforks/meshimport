@@ -68,7 +68,7 @@
 #include "stable.h"
 #include "asc2bin.h"
 #include "inparser.h"
-#include "FastXml.h"
+#include "LegacyFastXml.h"
 
 #pragma warning(disable:4100)
 #pragma warning(disable:4996)

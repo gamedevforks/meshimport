@@ -159,7 +159,7 @@ Name="MeshImportFbx"
   <Filter Name="Common Include-Binding Files" Filter=""> <!--  -->
     <Filter Name="snippets" Filter=""> <!--  -->
       <File RelativePath="..\..\include\common\snippets\asc2bin.cpp"/>
-      <File RelativePath="..\..\include\common\snippets\FastXml.cpp"/>
+      <File RelativePath="..\..\include\common\snippets\LegacyFastXml.cpp"/>
       <File RelativePath="..\..\include\common\snippets\FileInterface.cpp"/>
       <File RelativePath="..\..\include\common\snippets\FloatMath.cpp"/>
       <File RelativePath="..\..\include\common\snippets\FloatMath.inl"/>
@@ -169,7 +169,7 @@ Name="MeshImportFbx"
       <File RelativePath="..\..\include\common\snippets\sutil.cpp"/>
       <File RelativePath="..\..\include\common\snippets\nvstl.cpp"/>
       <File RelativePath="..\..\include\common\snippets\asc2bin.h"/>
-      <File RelativePath="..\..\include\common\snippets\FastXml.h"/>
+      <File RelativePath="..\..\include\common\snippets\LegacyFastXml.h"/>
       <File RelativePath="..\..\include\common\snippets\FileInterface.h"/>
       <File RelativePath="..\..\include\common\snippets\filesystem.h"/>
       <File RelativePath="..\..\include\common\snippets\FloatMath.h"/>

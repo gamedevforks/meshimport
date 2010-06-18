@@ -167,8 +167,8 @@ Name="MeshImportEzm"
       <File RelativePath="..\..\include\common\snippets\sutil.cpp"/>
       <File RelativePath="..\..\include\common\snippets\sutil.h"/>
       <File RelativePath="..\..\include\common\snippets\nvstl.cpp"/>
-      <File RelativePath="..\..\include\common\snippets\FastXml.h"/>
-      <File RelativePath="..\..\include\common\snippets\FastXml.cpp"/>
+      <File RelativePath="..\..\include\common\snippets\LegacyFastXml.h"/>
+      <File RelativePath="..\..\include\common\snippets\LegacyFastXml.cpp"/>
       <File RelativePath="..\..\include\common\snippets\UserMemAlloc.h"/>
     </Filter>
   </Filter>

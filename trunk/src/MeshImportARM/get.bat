@@ -1,13 +1,7 @@
 rd foundation /s /q
 rd reviewed /s /q
 rd general /s /q
-
-md NxParameterized
-cd NxParameterized
-rd include /s /q
-rd public /s /q
-rd src /s /q
-cd ..
+rd NxParameterized /s /q
 
 md foundation
 cd foundation
@@ -44,6 +38,22 @@ cd ..
 
 md general
 cd general
+
+md string_parsing
+cd string_parsing
+
+md include
+cd include
+copy \p4\sw\physx\shared\general\string_parsing\2\include\FastXML.h
+cd ..
+
+md src
+cd src
+copy \p4\sw\physx\shared\general\string_parsing\2\src\FastXML.cpp
+cd ..
+
+cd ..
+
 
 md PxIOStream
 cd PxIOStream
