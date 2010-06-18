@@ -43,7 +43,7 @@
 				<Files name="Common Include-Binding Files" root="../../include/common" type="header">
                 snippets/asc2bin.cpp
                 snippets/AutoGeometry.cpp
-                snippets/FastXml.cpp
+                snippets/LegacyFastXml.cpp
                 snippets/FileInterface.cpp
                 snippets/filesystem.cpp
                 snippets/FloatMath.cpp
@@ -59,7 +59,7 @@
                 snippets/winmsg.cpp
                 snippets/asc2bin.h
                 snippets/AutoGeometry.h
-                snippets/FastXml.h
+                snippets/LegacyFastXml.h
                 snippets/FileInterface.h
                 snippets/filesystem.h
                 snippets/FloatMath.h

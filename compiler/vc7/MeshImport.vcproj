@@ -161,8 +161,8 @@ Name="MeshImport"
     <Filter Name="snippets" Filter=""> <!--  -->
       <File RelativePath="..\..\include\common\snippets\KeyValueIni.h"/>
       <File RelativePath="..\..\include\common\snippets\KeyValueIni.cpp"/>
-      <File RelativePath="..\..\include\common\snippets\FastXml.h"/>
-      <File RelativePath="..\..\include\common\snippets\FastXml.cpp"/>
+      <File RelativePath="..\..\include\common\snippets\LegacyFastXml.h"/>
+      <File RelativePath="..\..\include\common\snippets\LegacyFastXml.cpp"/>
       <File RelativePath="..\..\include\common\snippets\sutil.h"/>
       <File RelativePath="..\..\include\common\snippets\sutil.cpp"/>
       <File RelativePath="..\..\include\common\snippets\inparser.h"/>

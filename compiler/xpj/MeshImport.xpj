@@ -43,8 +43,8 @@
           snippets/KeyValueIni.cpp
           snippets/BlobIO.h
           snippets/BlobIO.cpp
-          snippets/FastXml.h
-          snippets/FastXml.cpp
+          snippets/LegacyFastXml.h
+          snippets/LegacyFastXml.cpp
           snippets/sutil.h
           snippets/sutil.cpp
           snippets/inparser.h

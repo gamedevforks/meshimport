@@ -11,7 +11,7 @@
 #include "MeshImport.h"
 #include "stringdict.h"
 #include "sutil.h"
-#include "FastXml.h"
+#include "LegacyFastXml.h"
 #include "UserMemAlloc.h"
 
 #pragma warning(disable:4100)

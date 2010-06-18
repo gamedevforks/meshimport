@@ -44,8 +44,8 @@
           snippets/inparser.cpp
           snippets/inparser.h
           snippets/nvstl.cpp
-          snippets/FastXml.h
-          snippets/FastXml.cpp
+          snippets/LegacyFastXml.h
+          snippets/LegacyFastXml.cpp
           snippets/UserMemAlloc.h
           snippets/Nx*.h
 				</Files>

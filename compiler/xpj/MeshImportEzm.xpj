@@ -46,8 +46,8 @@
           snippets/sutil.cpp
           snippets/sutil.h
           snippets/nvstl.cpp
-          snippets/FastXml.h
-          snippets/FastXml.cpp
+          snippets/LegacyFastXml.h
+          snippets/LegacyFastXml.cpp
           snippets/UserMemAlloc.h
 				</Files>
 				<OutDir>../../bin/win32</OutDir>

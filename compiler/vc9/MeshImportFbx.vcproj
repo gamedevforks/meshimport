@@ -299,14 +299,6 @@
 					>
 				</File>
 				<File
-					RelativePath="..\..\include\common\snippets\FastXml.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\include\common\snippets\FastXml.h"
-					>
-				</File>
-				<File
 					RelativePath="..\..\include\common\snippets\FileInterface.cpp"
 					>
 				</File>
@@ -344,6 +336,14 @@
 				</File>
 				<File
 					RelativePath="..\..\include\common\snippets\KeyValueIni.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\include\common\snippets\LegacyFastXml.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\include\common\snippets\LegacyFastXml.h"
 					>
 				</File>
 				<File

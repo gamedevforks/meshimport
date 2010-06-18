@@ -44,6 +44,8 @@
 					PxIOStream/include/*.inl
 					PxIOStream/public/*.h
 					shared/include/*.h
+					string_parsing/include/*.h
+					string_parsing/src/*.cpp
 				</Files>
 
 				<Files name="NxParameterized" root="../../src/MeshImportARM/NxParameterized" type="source">
@@ -88,19 +90,12 @@
 					*.h
 				</Files>
 				<Files name="Plugin Header Files" root="../../include" type="header">
-          MeshImport/*.h
+          			MeshImport/*.h
 				</Files>
 				<Files name="Common Include-Binding Files" root="../../include/common" type="header">
-          snippets/nvstl.cpp
-          snippets/UserMemAlloc.h
-          snippets/Nx*.h
-          snippets/sutil.h
-          snippets/sutil.cpp
-          snippets/FloatMath.h
-          snippets/FloatMath.inl
-          snippets/FloatMath.cpp
-          snippets/inparser.h
-          snippets/inparser.cpp
+          			snippets/nvstl.cpp
+			        snippets/UserMemAlloc.h
+          			snippets/Nx*.h
 				</Files>
 				<OutDir>../../bin/win32</OutDir>
 				<ImpDir>../../lib/win32</ImpDir>
@@ -113,6 +108,7 @@
                  ../../src/MeshImportARM/reviewed/include
                  ../../src/MeshImportARM/reviewed/include/windows
                  ../../src/MeshImportARM/general/PxIOStream/include
+                 ../../src/MeshImportARM/general/string_parsing/include
                  ../../src/MeshImportARM/general/PxIOStream/public
                  ../../src/MeshImportARM/general/shared/include
                  ../../src/MeshImportARM/NxParameterized/include
@@ -130,7 +126,7 @@
                  ../../src/MeshImportARM/params/wind
 				</SearchPaths>
 				<SearchPaths type="library">
-         ../../lib/win32
+         		../../lib/win32
 				</SearchPaths>
 				<Dependencies>
 				</Dependencies>

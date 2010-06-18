@@ -40,7 +40,7 @@
 				Name="VCCLCompilerTool"
 				AdditionalOptions=""
 				Optimization="4"
-				AdditionalIncludeDirectories="&quot;../../include/common/snippets&quot;;&quot;../../include/MeshImport&quot;;&quot;../../include&quot;;&quot;../../src/MeshImportARM/foundation&quot;;&quot;../../src/MeshImportARM/foundation/windows&quot;;&quot;../../src/MeshImportARM/reviewed/include&quot;;&quot;../../src/MeshImportARM/reviewed/include/windows&quot;;&quot;../../src/MeshImportARM/general/PxIOStream/include&quot;;&quot;../../src/MeshImportARM/general/PxIOStream/public&quot;;&quot;../../src/MeshImportARM/general/shared/include&quot;;&quot;../../src/MeshImportARM/NxParameterized/include&quot;;&quot;../../src/MeshImportARM/NxParameterized/public&quot;;&quot;../../src/MeshImportARM/params/basicios&quot;;&quot;../../src/MeshImportARM/params/clothing&quot;;&quot;../../src/MeshImportARM/params/common&quot;;&quot;../../src/MeshImportARM/params/destructible&quot;;&quot;../../src/MeshImportARM/params/emitter&quot;;&quot;../../src/MeshImportARM/params/explosion&quot;;&quot;../../src/MeshImportARM/params/forcefield&quot;;&quot;../../src/MeshImportARM/params/framework&quot;;&quot;../../src/MeshImportARM/params/iofx&quot;;&quot;../../src/MeshImportARM/params/particles&quot;;&quot;../../src/MeshImportARM/params/wind&quot;;&quot;../../include/common/snippets&quot;;&quot;../../include/MeshImport&quot;;&quot;../../include&quot;;&quot;../../src/MeshImportARM/foundation&quot;;&quot;../../src/MeshImportARM/foundation/windows&quot;;&quot;../../src/MeshImportARM/reviewed/include&quot;;&quot;../../src/MeshImportARM/reviewed/include/windows&quot;;&quot;../../src/MeshImportARM/general/PxIOStream/include&quot;;&quot;../../src/MeshImportARM/general/PxIOStream/public&quot;;&quot;../../src/MeshImportARM/general/shared/include&quot;;&quot;../../src/MeshImportARM/NxParameterized/include&quot;;&quot;../../src/MeshImportARM/NxParameterized/public&quot;;&quot;../../src/MeshImportARM/params/basicios&quot;;&quot;../../src/MeshImportARM/params/clothing&quot;;&quot;../../src/MeshImportARM/params/common&quot;;&quot;../../src/MeshImportARM/params/destructible&quot;;&quot;../../src/MeshImportARM/params/emitter&quot;;&quot;../../src/MeshImportARM/params/explosion&quot;;&quot;../../src/MeshImportARM/params/forcefield&quot;;&quot;../../src/MeshImportARM/params/framework&quot;;&quot;../../src/MeshImportARM/params/iofx&quot;;&quot;../../src/MeshImportARM/params/particles&quot;;&quot;../../src/MeshImportARM/params/wind&quot;;"
+				AdditionalIncludeDirectories="&quot;../../include/common/snippets&quot;;&quot;../../include/MeshImport&quot;;&quot;../../include&quot;;&quot;../../src/MeshImportARM/foundation&quot;;&quot;../../src/MeshImportARM/foundation/windows&quot;;&quot;../../src/MeshImportARM/reviewed/include&quot;;&quot;../../src/MeshImportARM/reviewed/include/windows&quot;;&quot;../../src/MeshImportARM/general/PxIOStream/include&quot;;&quot;../../src/MeshImportARM/general/string_parsing/include&quot;;&quot;../../src/MeshImportARM/general/PxIOStream/public&quot;;&quot;../../src/MeshImportARM/general/shared/include&quot;;&quot;../../src/MeshImportARM/NxParameterized/include&quot;;&quot;../../src/MeshImportARM/NxParameterized/public&quot;;&quot;../../src/MeshImportARM/params/basicios&quot;;&quot;../../src/MeshImportARM/params/clothing&quot;;&quot;../../src/MeshImportARM/params/common&quot;;&quot;../../src/MeshImportARM/params/destructible&quot;;&quot;../../src/MeshImportARM/params/emitter&quot;;&quot;../../src/MeshImportARM/params/explosion&quot;;&quot;../../src/MeshImportARM/params/forcefield&quot;;&quot;../../src/MeshImportARM/params/framework&quot;;&quot;../../src/MeshImportARM/params/iofx&quot;;&quot;../../src/MeshImportARM/params/particles&quot;;&quot;../../src/MeshImportARM/params/wind&quot;;&quot;../../include/common/snippets&quot;;&quot;../../include/MeshImport&quot;;&quot;../../include&quot;;&quot;../../src/MeshImportARM/foundation&quot;;&quot;../../src/MeshImportARM/foundation/windows&quot;;&quot;../../src/MeshImportARM/reviewed/include&quot;;&quot;../../src/MeshImportARM/reviewed/include/windows&quot;;&quot;../../src/MeshImportARM/general/PxIOStream/include&quot;;&quot;../../src/MeshImportARM/general/string_parsing/include&quot;;&quot;../../src/MeshImportARM/general/PxIOStream/public&quot;;&quot;../../src/MeshImportARM/general/shared/include&quot;;&quot;../../src/MeshImportARM/NxParameterized/include&quot;;&quot;../../src/MeshImportARM/NxParameterized/public&quot;;&quot;../../src/MeshImportARM/params/basicios&quot;;&quot;../../src/MeshImportARM/params/clothing&quot;;&quot;../../src/MeshImportARM/params/common&quot;;&quot;../../src/MeshImportARM/params/destructible&quot;;&quot;../../src/MeshImportARM/params/emitter&quot;;&quot;../../src/MeshImportARM/params/explosion&quot;;&quot;../../src/MeshImportARM/params/forcefield&quot;;&quot;../../src/MeshImportARM/params/framework&quot;;&quot;../../src/MeshImportARM/params/iofx&quot;;&quot;../../src/MeshImportARM/params/particles&quot;;&quot;../../src/MeshImportARM/params/wind&quot;;"
 				PreprocessorDefinitions="WIN32;_WINDOWS;UNICODE=1;_UNICODE=1;MESHIMPORTARM_EXPORTS;WIN32;_WINDOWS;UNICODE=1;_UNICODE=1;MESHIMPORTARM_EXPORTS;"
 				ExceptionHandling="1"
 				WarningLevel="3"
@@ -114,7 +114,7 @@
 				Name="VCCLCompilerTool"
 				AdditionalOptions="/WX /W4 /fp:fast /MDd /Zi "
 				Optimization="4"
-				AdditionalIncludeDirectories="&quot;../../include/common/snippets&quot;;&quot;../../include/MeshImport&quot;;&quot;../../include&quot;;&quot;../../src/MeshImportARM/foundation&quot;;&quot;../../src/MeshImportARM/foundation/windows&quot;;&quot;../../src/MeshImportARM/reviewed/include&quot;;&quot;../../src/MeshImportARM/reviewed/include/windows&quot;;&quot;../../src/MeshImportARM/general/PxIOStream/include&quot;;&quot;../../src/MeshImportARM/general/PxIOStream/public&quot;;&quot;../../src/MeshImportARM/general/shared/include&quot;;&quot;../../src/MeshImportARM/NxParameterized/include&quot;;&quot;../../src/MeshImportARM/NxParameterized/public&quot;;&quot;../../src/MeshImportARM/params/basicios&quot;;&quot;../../src/MeshImportARM/params/clothing&quot;;&quot;../../src/MeshImportARM/params/common&quot;;&quot;../../src/MeshImportARM/params/destructible&quot;;&quot;../../src/MeshImportARM/params/emitter&quot;;&quot;../../src/MeshImportARM/params/explosion&quot;;&quot;../../src/MeshImportARM/params/forcefield&quot;;&quot;../../src/MeshImportARM/params/framework&quot;;&quot;../../src/MeshImportARM/params/iofx&quot;;&quot;../../src/MeshImportARM/params/particles&quot;;&quot;../../src/MeshImportARM/params/wind&quot;;"
+				AdditionalIncludeDirectories="&quot;../../include/common/snippets&quot;;&quot;../../include/MeshImport&quot;;&quot;../../include&quot;;&quot;../../src/MeshImportARM/foundation&quot;;&quot;../../src/MeshImportARM/foundation/windows&quot;;&quot;../../src/MeshImportARM/reviewed/include&quot;;&quot;../../src/MeshImportARM/reviewed/include/windows&quot;;&quot;../../src/MeshImportARM/general/PxIOStream/include&quot;;&quot;../../src/MeshImportARM/general/string_parsing/include&quot;;&quot;../../src/MeshImportARM/general/PxIOStream/public&quot;;&quot;../../src/MeshImportARM/general/shared/include&quot;;&quot;../../src/MeshImportARM/NxParameterized/include&quot;;&quot;../../src/MeshImportARM/NxParameterized/public&quot;;&quot;../../src/MeshImportARM/params/basicios&quot;;&quot;../../src/MeshImportARM/params/clothing&quot;;&quot;../../src/MeshImportARM/params/common&quot;;&quot;../../src/MeshImportARM/params/destructible&quot;;&quot;../../src/MeshImportARM/params/emitter&quot;;&quot;../../src/MeshImportARM/params/explosion&quot;;&quot;../../src/MeshImportARM/params/forcefield&quot;;&quot;../../src/MeshImportARM/params/framework&quot;;&quot;../../src/MeshImportARM/params/iofx&quot;;&quot;../../src/MeshImportARM/params/particles&quot;;&quot;../../src/MeshImportARM/params/wind&quot;;"
 				PreprocessorDefinitions="WIN32;_WINDOWS;UNICODE=1;_UNICODE=1;MESHIMPORTARM_EXPORTS;_DEBUG;"
 				ExceptionHandling="1"
 				WarningLevel="3"
@@ -188,7 +188,7 @@
 				Name="VCCLCompilerTool"
 				AdditionalOptions="/Zi /WX /W4 /fp:fast /WX /MD /O2 "
 				Optimization="4"
-				AdditionalIncludeDirectories="&quot;../../include/common/snippets&quot;;&quot;../../include/MeshImport&quot;;&quot;../../include&quot;;&quot;../../src/MeshImportARM/foundation&quot;;&quot;../../src/MeshImportARM/foundation/windows&quot;;&quot;../../src/MeshImportARM/reviewed/include&quot;;&quot;../../src/MeshImportARM/reviewed/include/windows&quot;;&quot;../../src/MeshImportARM/general/PxIOStream/include&quot;;&quot;../../src/MeshImportARM/general/PxIOStream/public&quot;;&quot;../../src/MeshImportARM/general/shared/include&quot;;&quot;../../src/MeshImportARM/NxParameterized/include&quot;;&quot;../../src/MeshImportARM/NxParameterized/public&quot;;&quot;../../src/MeshImportARM/params/basicios&quot;;&quot;../../src/MeshImportARM/params/clothing&quot;;&quot;../../src/MeshImportARM/params/common&quot;;&quot;../../src/MeshImportARM/params/destructible&quot;;&quot;../../src/MeshImportARM/params/emitter&quot;;&quot;../../src/MeshImportARM/params/explosion&quot;;&quot;../../src/MeshImportARM/params/forcefield&quot;;&quot;../../src/MeshImportARM/params/framework&quot;;&quot;../../src/MeshImportARM/params/iofx&quot;;&quot;../../src/MeshImportARM/params/particles&quot;;&quot;../../src/MeshImportARM/params/wind&quot;;"
+				AdditionalIncludeDirectories="&quot;../../include/common/snippets&quot;;&quot;../../include/MeshImport&quot;;&quot;../../include&quot;;&quot;../../src/MeshImportARM/foundation&quot;;&quot;../../src/MeshImportARM/foundation/windows&quot;;&quot;../../src/MeshImportARM/reviewed/include&quot;;&quot;../../src/MeshImportARM/reviewed/include/windows&quot;;&quot;../../src/MeshImportARM/general/PxIOStream/include&quot;;&quot;../../src/MeshImportARM/general/string_parsing/include&quot;;&quot;../../src/MeshImportARM/general/PxIOStream/public&quot;;&quot;../../src/MeshImportARM/general/shared/include&quot;;&quot;../../src/MeshImportARM/NxParameterized/include&quot;;&quot;../../src/MeshImportARM/NxParameterized/public&quot;;&quot;../../src/MeshImportARM/params/basicios&quot;;&quot;../../src/MeshImportARM/params/clothing&quot;;&quot;../../src/MeshImportARM/params/common&quot;;&quot;../../src/MeshImportARM/params/destructible&quot;;&quot;../../src/MeshImportARM/params/emitter&quot;;&quot;../../src/MeshImportARM/params/explosion&quot;;&quot;../../src/MeshImportARM/params/forcefield&quot;;&quot;../../src/MeshImportARM/params/framework&quot;;&quot;../../src/MeshImportARM/params/iofx&quot;;&quot;../../src/MeshImportARM/params/particles&quot;;&quot;../../src/MeshImportARM/params/wind&quot;;"
 				PreprocessorDefinitions="WIN32;_WINDOWS;UNICODE=1;_UNICODE=1;MESHIMPORTARM_EXPORTS;NDEBUG;"
 				ExceptionHandling="1"
 				WarningLevel="3"
@@ -506,7 +506,7 @@
 						>
 					</File>
 					<File
-						RelativePath="..\..\src\MeshImportARM\general\PxIOStream\include\pxmemorybuffer.h"
+						RelativePath="..\..\src\MeshImportARM\general\PxIOStream\include\PxMemoryBuffer.h"
 						>
 					</File>
 				</Filter>
@@ -514,7 +514,7 @@
 					Name="public"
 					>
 					<File
-						RelativePath="..\..\src\MeshImportARM\general\PxIOStream\public\pxfilebuf.h"
+						RelativePath="..\..\src\MeshImportARM\general\PxIOStream\public\PxFileBuf.h"
 						>
 					</File>
 				</Filter>
@@ -535,6 +535,26 @@
 					</File>
 					<File
 						RelativePath="..\..\src\MeshImportARM\general\shared\include\PxMat34Legacy.h"
+						>
+					</File>
+				</Filter>
+			</Filter>
+			<Filter
+				Name="string_parsing"
+				>
+				<Filter
+					Name="include"
+					>
+					<File
+						RelativePath="..\..\src\MeshImportARM\general\string_parsing\include\FastXml.h"
+						>
+					</File>
+				</Filter>
+				<Filter
+					Name="src"
+					>
+					<File
+						RelativePath="..\..\src\MeshImportARM\general\string_parsing\src\FastXml.cpp"
 						>
 					</File>
 				</Filter>
@@ -579,6 +599,14 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\src\MeshImportARM\NxParameterized\public\NxParamUtils.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\src\MeshImportARM\NxParameterized\public\NxParamUtils.inl"
+					>
+				</File>
+				<File
 					RelativePath="..\..\src\MeshImportARM\NxParameterized\public\NxSerializer.h"
 					>
 				</File>
@@ -604,14 +632,6 @@
 				</File>
 				<File
 					RelativePath="..\..\src\MeshImportARM\NxParameterized\src\NxParameterizedTraits.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\src\MeshImportARM\NxParameterized\public\NxParamUtils.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\src\MeshImportARM\NxParameterized\public\NxParamUtils.h"
 					>
 				</File>
 				<File
@@ -1119,26 +1139,6 @@
 				Name="snippets"
 				>
 				<File
-					RelativePath="..\..\include\common\snippets\FloatMath.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\include\common\snippets\FloatMath.h"
-					>
-				</File>
-				<File
-					RelativePath="..\..\include\common\snippets\FloatMath.inl"
-					>
-				</File>
-				<File
-					RelativePath="..\..\include\common\snippets\inparser.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\include\common\snippets\inparser.h"
-					>
-				</File>
-				<File
 					RelativePath="..\..\include\common\snippets\nvstl.cpp"
 					>
 				</File>
@@ -1160,14 +1160,6 @@
 				</File>
 				<File
 					RelativePath="..\..\include\common\snippets\NxUserAllocator.h"
-					>
-				</File>
-				<File
-					RelativePath="..\..\include\common\snippets\sutil.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\include\common\snippets\sutil.h"
 					>
 				</File>
 				<File
