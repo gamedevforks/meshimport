@@ -922,8 +922,8 @@ bool MeshImportFBX::ImportAnimation()
 		outputMessage( message );
 		return false;
 	}
-	int numFrames = (int)(dDurationSecond / dTime);
-	float duration = (float)numFrames * dTime;
+	int numFrames = (int)(dDurationSecond / dTime + 1);
+	float duration = (float)(numFrames - 1)* dTime;
 
 	meshWorldAnimXforms.clear();
 	meshWorldAnimXforms.resize(meshBones.size());
