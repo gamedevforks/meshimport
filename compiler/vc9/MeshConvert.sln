@@ -2,39 +2,28 @@ Microsoft Visual Studio Solution File, Format Version 10.00
 # Visual Studio 2008
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MeshConvert", "MeshConvert.vcproj", "{6E37CFC1-CCA2-832E-A166-9103C14A8FFA}"
 	ProjectSection(ProjectDependencies) = postProject
-		{082FBBBD-9532-5712-DF18-A054AE91C0F0} = {082FBBBD-9532-5712-DF18-A054AE91C0F0}
-		{3454184B-5C28-0EE8-A994-F7B09BF0879C} = {3454184B-5C28-0EE8-A994-F7B09BF0879C}
-		{23550C12-8028-7C24-92CC-C9BAD660CFD0} = {23550C12-8028-7C24-92CC-C9BAD660CFD0}
+		{E85D2B0E-76C2-504F-66B0-102E6DDB0798} = {E85D2B0E-76C2-504F-66B0-102E6DDB0798}
 		{95616A0F-1651-8B98-68B7-3678C9EA5ACB} = {95616A0F-1651-8B98-68B7-3678C9EA5ACB}
+		{23550C12-8028-7C24-92CC-C9BAD660CFD0} = {23550C12-8028-7C24-92CC-C9BAD660CFD0}
+		{3454184B-5C28-0EE8-A994-F7B09BF0879C} = {3454184B-5C28-0EE8-A994-F7B09BF0879C}
+		{F65A6A6D-8257-C5DA-9620-9730FA78E23E} = {F65A6A6D-8257-C5DA-9620-9730FA78E23E}
+		{285507B1-ED5C-5646-8C30-665A8583D9F8} = {285507B1-ED5C-5646-8C30-665A8583D9F8}
+		{082FBBBD-9532-5712-DF18-A054AE91C0F0} = {082FBBBD-9532-5712-DF18-A054AE91C0F0}
 	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MeshImport", ".\/../vc9/MeshImport.vcproj", "{082FBBBD-9532-5712-DF18-A054AE91C0F0}"
-	ProjectSection(ProjectDependencies) = postProject
-	EndProjectSection
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MeshImport", "MeshImport.vcproj", "{082FBBBD-9532-5712-DF18-A054AE91C0F0}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MeshImportPSK", ".\/../vc9/MeshImportPSK.vcproj", "{F65A6A6D-8257-C5DA-9620-9730FA78E23E}"
-	ProjectSection(ProjectDependencies) = postProject
-	EndProjectSection
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MeshImportPSK", "MeshImportPSK.vcproj", "{F65A6A6D-8257-C5DA-9620-9730FA78E23E}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MeshImportEzm", ".\/../vc9/MeshImportEzm.vcproj", "{3454184B-5C28-0EE8-A994-F7B09BF0879C}"
-	ProjectSection(ProjectDependencies) = postProject
-	EndProjectSection
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MeshImportEzm", "MeshImportEzm.vcproj", "{3454184B-5C28-0EE8-A994-F7B09BF0879C}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MeshImportObj", ".\/../vc9/MeshImportObj.vcproj", "{23550C12-8028-7C24-92CC-C9BAD660CFD0}"
-	ProjectSection(ProjectDependencies) = postProject
-	EndProjectSection
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MeshImportObj", "MeshImportObj.vcproj", "{23550C12-8028-7C24-92CC-C9BAD660CFD0}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MeshImportARM", ".\/../vc9/MeshImportARM.vcproj", "{E85D2B0E-76C2-504F-66B0-102E6DDB0798}"
-	ProjectSection(ProjectDependencies) = postProject
-	EndProjectSection
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MeshImportARM", "MeshImportARM.vcproj", "{E85D2B0E-76C2-504F-66B0-102E6DDB0798}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MeshImportFbx", ".\/../vc9/MeshImportFbx.vcproj", "{285507B1-ED5C-5646-8C30-665A8583D9F8}"
-	ProjectSection(ProjectDependencies) = postProject
-	EndProjectSection
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MeshImportFbx", "MeshImportFbx.vcproj", "{285507B1-ED5C-5646-8C30-665A8583D9F8}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MeshImportOgre", ".\/../vc9/MeshImportOgre.vcproj", "{95616A0F-1651-8B98-68B7-3678C9EA5ACB}"
-	ProjectSection(ProjectDependencies) = postProject
-	EndProjectSection
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MeshImportOgre", "MeshImportOgre.vcproj", "{95616A0F-1651-8B98-68B7-3678C9EA5ACB}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -75,8 +64,7 @@ Global
 		{95616A0F-1651-8B98-68B7-3678C9EA5ACB}.release|Win32.ActiveCfg = release|Win32
 		{95616A0F-1651-8B98-68B7-3678C9EA5ACB}.release|Win32.Build.0 = release|Win32
 	EndGlobalSection
-	GlobalSection(ExtensibilityGlobals) = postSolution
-	EndGlobalSection
-	GlobalSection(ExtensibilityAddins) = postSolution
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
 	EndGlobalSection
 EndGlobal
