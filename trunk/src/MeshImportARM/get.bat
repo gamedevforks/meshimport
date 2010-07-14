@@ -45,6 +45,8 @@ cd string_parsing
 md include
 cd include
 copy \p4\sw\physx\shared\general\string_parsing\2\include\FastXML.h
+copy \p4\sw\physx\shared\general\string_parsing\2\include\PxAsciiConversion.h
+copy \p4\sw\physx\shared\general\string_parsing\2\include\PxAsciiConversion.inl
 cd ..
 
 md src

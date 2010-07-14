@@ -58,28 +58,8 @@
 				</Files>
 
 				<Files name="params" root="../../src/MeshImportARM/params" type="source">
-					basicios/*.h
-					basicios/*.cpp
-					clothing/*.h
-					clothing/*.cpp
-					common/*.cpp
-					common/*.h
-					destructible/*.cpp
-					destructible/*.h
-					emitter/*.cpp
-					emitter/*.h
-					explosion/*.cpp
-					explosion/*.h
-					forcefield/*.cpp
-					forcefield/*.h
-					framework/*.cpp
-					framework/*.h
-					iofx/*.cpp
-					iofx/*.h
-					particles/*.cpp
-					particles/*.h
-					wind/*.cpp
-					wind/*.h
+					*.cpp
+					*.h
 				</Files>
 
 
@@ -113,17 +93,7 @@
                  ../../src/MeshImportARM/general/shared/include
                  ../../src/MeshImportARM/NxParameterized/include
                  ../../src/MeshImportARM/NxParameterized/public
-                 ../../src/MeshImportARM/params/basicios
-                 ../../src/MeshImportARM/params/clothing
-                 ../../src/MeshImportARM/params/common
-                 ../../src/MeshImportARM/params/destructible
-                 ../../src/MeshImportARM/params/emitter
-                 ../../src/MeshImportARM/params/explosion
-                 ../../src/MeshImportARM/params/forcefield
-                 ../../src/MeshImportARM/params/framework
-                 ../../src/MeshImportARM/params/iofx
-                 ../../src/MeshImportARM/params/particles
-                 ../../src/MeshImportARM/params/wind
+                 ../../src/MeshImportARM/params
 				</SearchPaths>
 				<SearchPaths type="library">
          		../../lib/win32

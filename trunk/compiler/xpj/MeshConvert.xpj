@@ -75,8 +75,10 @@
     		MeshImportEzm
     		MeshImportLeveller
     		MeshImportObj
-        MeshImportAssimp
-        MeshImportOgre
+        	MeshImportAssimp
+        	MeshImportOgre
+        	MeshImportFbx
+        	MeshImportARM
 			</Dependencies>
 		</Target>
 	</Project>

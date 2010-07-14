@@ -18,7 +18,7 @@ Name="MeshImportARM"
     >
     <Tool
       Name="VCCLCompilerTool"
-      AdditionalIncludeDirectories="&quot;../../include/common/snippets&quot;;&quot;../../include/MeshImport&quot;;&quot;../../include&quot;;&quot;../../src/MeshImportARM/foundation&quot;;&quot;../../src/MeshImportARM/foundation/windows&quot;;&quot;../../src/MeshImportARM/reviewed/include&quot;;&quot;../../src/MeshImportARM/reviewed/include/windows&quot;;&quot;../../src/MeshImportARM/general/PxIOStream/include&quot;;&quot;../../src/MeshImportARM/general/string_parsing/include&quot;;&quot;../../src/MeshImportARM/general/PxIOStream/public&quot;;&quot;../../src/MeshImportARM/general/shared/include&quot;;&quot;../../src/MeshImportARM/NxParameterized/include&quot;;&quot;../../src/MeshImportARM/NxParameterized/public&quot;;&quot;../../src/MeshImportARM/params/basicios&quot;;&quot;../../src/MeshImportARM/params/clothing&quot;;&quot;../../src/MeshImportARM/params/common&quot;;&quot;../../src/MeshImportARM/params/destructible&quot;;&quot;../../src/MeshImportARM/params/emitter&quot;;&quot;../../src/MeshImportARM/params/explosion&quot;;&quot;../../src/MeshImportARM/params/forcefield&quot;;&quot;../../src/MeshImportARM/params/framework&quot;;&quot;../../src/MeshImportARM/params/iofx&quot;;&quot;../../src/MeshImportARM/params/particles&quot;;&quot;../../src/MeshImportARM/params/wind&quot;;&quot;../../include/common/snippets&quot;;&quot;../../include/MeshImport&quot;;&quot;../../include&quot;;&quot;../../src/MeshImportARM/foundation&quot;;&quot;../../src/MeshImportARM/foundation/windows&quot;;&quot;../../src/MeshImportARM/reviewed/include&quot;;&quot;../../src/MeshImportARM/reviewed/include/windows&quot;;&quot;../../src/MeshImportARM/general/PxIOStream/include&quot;;&quot;../../src/MeshImportARM/general/string_parsing/include&quot;;&quot;../../src/MeshImportARM/general/PxIOStream/public&quot;;&quot;../../src/MeshImportARM/general/shared/include&quot;;&quot;../../src/MeshImportARM/NxParameterized/include&quot;;&quot;../../src/MeshImportARM/NxParameterized/public&quot;;&quot;../../src/MeshImportARM/params/basicios&quot;;&quot;../../src/MeshImportARM/params/clothing&quot;;&quot;../../src/MeshImportARM/params/common&quot;;&quot;../../src/MeshImportARM/params/destructible&quot;;&quot;../../src/MeshImportARM/params/emitter&quot;;&quot;../../src/MeshImportARM/params/explosion&quot;;&quot;../../src/MeshImportARM/params/forcefield&quot;;&quot;../../src/MeshImportARM/params/framework&quot;;&quot;../../src/MeshImportARM/params/iofx&quot;;&quot;../../src/MeshImportARM/params/particles&quot;;&quot;../../src/MeshImportARM/params/wind&quot;;"
+      AdditionalIncludeDirectories="&quot;../../include/common/snippets&quot;;&quot;../../include/MeshImport&quot;;&quot;../../include&quot;;&quot;../../src/MeshImportARM/foundation&quot;;&quot;../../src/MeshImportARM/foundation/windows&quot;;&quot;../../src/MeshImportARM/reviewed/include&quot;;&quot;../../src/MeshImportARM/reviewed/include/windows&quot;;&quot;../../src/MeshImportARM/general/PxIOStream/include&quot;;&quot;../../src/MeshImportARM/general/string_parsing/include&quot;;&quot;../../src/MeshImportARM/general/PxIOStream/public&quot;;&quot;../../src/MeshImportARM/general/shared/include&quot;;&quot;../../src/MeshImportARM/NxParameterized/include&quot;;&quot;../../src/MeshImportARM/NxParameterized/public&quot;;&quot;../../src/MeshImportARM/params&quot;;&quot;../../include/common/snippets&quot;;&quot;../../include/MeshImport&quot;;&quot;../../include&quot;;&quot;../../src/MeshImportARM/foundation&quot;;&quot;../../src/MeshImportARM/foundation/windows&quot;;&quot;../../src/MeshImportARM/reviewed/include&quot;;&quot;../../src/MeshImportARM/reviewed/include/windows&quot;;&quot;../../src/MeshImportARM/general/PxIOStream/include&quot;;&quot;../../src/MeshImportARM/general/string_parsing/include&quot;;&quot;../../src/MeshImportARM/general/PxIOStream/public&quot;;&quot;../../src/MeshImportARM/general/shared/include&quot;;&quot;../../src/MeshImportARM/NxParameterized/include&quot;;&quot;../../src/MeshImportARM/NxParameterized/public&quot;;&quot;../../src/MeshImportARM/params&quot;;"
       PreprocessorDefinitions="WIN32;_WINDOWS;UNICODE=1;_UNICODE=1;MESHIMPORTARM_EXPORTS;WIN32;_WINDOWS;UNICODE=1;_UNICODE=1;MESHIMPORTARM_EXPORTS;"
       WarningLevel="3"
       Optimization="4"
@@ -62,7 +62,7 @@ Name="MeshImportARM"
     >
     <Tool
       Name="VCCLCompilerTool"
-      AdditionalIncludeDirectories="&quot;../../include/common/snippets&quot;;&quot;../../include/MeshImport&quot;;&quot;../../include&quot;;&quot;../../src/MeshImportARM/foundation&quot;;&quot;../../src/MeshImportARM/foundation/windows&quot;;&quot;../../src/MeshImportARM/reviewed/include&quot;;&quot;../../src/MeshImportARM/reviewed/include/windows&quot;;&quot;../../src/MeshImportARM/general/PxIOStream/include&quot;;&quot;../../src/MeshImportARM/general/string_parsing/include&quot;;&quot;../../src/MeshImportARM/general/PxIOStream/public&quot;;&quot;../../src/MeshImportARM/general/shared/include&quot;;&quot;../../src/MeshImportARM/NxParameterized/include&quot;;&quot;../../src/MeshImportARM/NxParameterized/public&quot;;&quot;../../src/MeshImportARM/params/basicios&quot;;&quot;../../src/MeshImportARM/params/clothing&quot;;&quot;../../src/MeshImportARM/params/common&quot;;&quot;../../src/MeshImportARM/params/destructible&quot;;&quot;../../src/MeshImportARM/params/emitter&quot;;&quot;../../src/MeshImportARM/params/explosion&quot;;&quot;../../src/MeshImportARM/params/forcefield&quot;;&quot;../../src/MeshImportARM/params/framework&quot;;&quot;../../src/MeshImportARM/params/iofx&quot;;&quot;../../src/MeshImportARM/params/particles&quot;;&quot;../../src/MeshImportARM/params/wind&quot;;"
+      AdditionalIncludeDirectories="&quot;../../include/common/snippets&quot;;&quot;../../include/MeshImport&quot;;&quot;../../include&quot;;&quot;../../src/MeshImportARM/foundation&quot;;&quot;../../src/MeshImportARM/foundation/windows&quot;;&quot;../../src/MeshImportARM/reviewed/include&quot;;&quot;../../src/MeshImportARM/reviewed/include/windows&quot;;&quot;../../src/MeshImportARM/general/PxIOStream/include&quot;;&quot;../../src/MeshImportARM/general/string_parsing/include&quot;;&quot;../../src/MeshImportARM/general/PxIOStream/public&quot;;&quot;../../src/MeshImportARM/general/shared/include&quot;;&quot;../../src/MeshImportARM/NxParameterized/include&quot;;&quot;../../src/MeshImportARM/NxParameterized/public&quot;;&quot;../../src/MeshImportARM/params&quot;;"
       PreprocessorDefinitions="WIN32;_WINDOWS;UNICODE=1;_UNICODE=1;MESHIMPORTARM_EXPORTS;_DEBUG;"
       WarningLevel="3"
       Optimization="4"
@@ -106,7 +106,7 @@ Name="MeshImportARM"
     >
     <Tool
       Name="VCCLCompilerTool"
-      AdditionalIncludeDirectories="&quot;../../include/common/snippets&quot;;&quot;../../include/MeshImport&quot;;&quot;../../include&quot;;&quot;../../src/MeshImportARM/foundation&quot;;&quot;../../src/MeshImportARM/foundation/windows&quot;;&quot;../../src/MeshImportARM/reviewed/include&quot;;&quot;../../src/MeshImportARM/reviewed/include/windows&quot;;&quot;../../src/MeshImportARM/general/PxIOStream/include&quot;;&quot;../../src/MeshImportARM/general/string_parsing/include&quot;;&quot;../../src/MeshImportARM/general/PxIOStream/public&quot;;&quot;../../src/MeshImportARM/general/shared/include&quot;;&quot;../../src/MeshImportARM/NxParameterized/include&quot;;&quot;../../src/MeshImportARM/NxParameterized/public&quot;;&quot;../../src/MeshImportARM/params/basicios&quot;;&quot;../../src/MeshImportARM/params/clothing&quot;;&quot;../../src/MeshImportARM/params/common&quot;;&quot;../../src/MeshImportARM/params/destructible&quot;;&quot;../../src/MeshImportARM/params/emitter&quot;;&quot;../../src/MeshImportARM/params/explosion&quot;;&quot;../../src/MeshImportARM/params/forcefield&quot;;&quot;../../src/MeshImportARM/params/framework&quot;;&quot;../../src/MeshImportARM/params/iofx&quot;;&quot;../../src/MeshImportARM/params/particles&quot;;&quot;../../src/MeshImportARM/params/wind&quot;;"
+      AdditionalIncludeDirectories="&quot;../../include/common/snippets&quot;;&quot;../../include/MeshImport&quot;;&quot;../../include&quot;;&quot;../../src/MeshImportARM/foundation&quot;;&quot;../../src/MeshImportARM/foundation/windows&quot;;&quot;../../src/MeshImportARM/reviewed/include&quot;;&quot;../../src/MeshImportARM/reviewed/include/windows&quot;;&quot;../../src/MeshImportARM/general/PxIOStream/include&quot;;&quot;../../src/MeshImportARM/general/string_parsing/include&quot;;&quot;../../src/MeshImportARM/general/PxIOStream/public&quot;;&quot;../../src/MeshImportARM/general/shared/include&quot;;&quot;../../src/MeshImportARM/NxParameterized/include&quot;;&quot;../../src/MeshImportARM/NxParameterized/public&quot;;&quot;../../src/MeshImportARM/params&quot;;"
       PreprocessorDefinitions="WIN32;_WINDOWS;UNICODE=1;_UNICODE=1;MESHIMPORTARM_EXPORTS;NDEBUG;"
       WarningLevel="3"
       Optimization="4"
@@ -234,6 +234,7 @@ Name="MeshImportARM"
     <Filter Name="string_parsing" Filter=""> <!--  -->
       <Filter Name="include" Filter=""> <!--  -->
         <File RelativePath="..\..\src\MeshImportARM\general\string_parsing\include\FastXml.h"/>
+        <File RelativePath="..\..\src\MeshImportARM\general\string_parsing\include\PxAsciiConversion.h"/>
       </Filter>
       <Filter Name="src" Filter=""> <!--  -->
         <File RelativePath="..\..\src\MeshImportARM\general\string_parsing\src\FastXml.cpp"/>
@@ -249,6 +250,7 @@ Name="MeshImportARM"
     <Filter Name="public" Filter=""> <!--  -->
       <File RelativePath="..\..\src\MeshImportARM\NxParameterized\public\NxParameterized.inl"/>
       <File RelativePath="..\..\src\MeshImportARM\NxParameterized\public\NxParamUtils.inl"/>
+      <File RelativePath="..\..\src\MeshImportARM\NxParameterized\public\NxSerializer.inl"/>
       <File RelativePath="..\..\src\MeshImportARM\NxParameterized\public\NxParameterized.h"/>
       <File RelativePath="..\..\src\MeshImportARM\NxParameterized\public\NxParameterizedTraits.h"/>
       <File RelativePath="..\..\src\MeshImportARM\NxParameterized\public\NxParameterized_types.h"/>
@@ -267,132 +269,142 @@ Name="MeshImportARM"
     </Filter>
   </Filter>
   <Filter Name="params" Filter=""> <!--  -->
-    <Filter Name="basicios" Filter=""> <!--  -->
-      <File RelativePath="..\..\src\MeshImportARM\params\basicios\ApexBasicIOSAssetParams.h"/>
-      <File RelativePath="..\..\src\MeshImportARM\params\basicios\ApexBasicIOSAssetParams.cpp"/>
-    </Filter>
-    <Filter Name="clothing" Filter=""> <!--  -->
-      <File RelativePath="..\..\src\MeshImportARM\params\clothing\ClothingActorParamSchema.h"/>
-      <File RelativePath="..\..\src\MeshImportARM\params\clothing\ClothingAssetParamSchema.h"/>
-      <File RelativePath="..\..\src\MeshImportARM\params\clothing\ClothingGraphicalLodParamSchema.h"/>
-      <File RelativePath="..\..\src\MeshImportARM\params\clothing\ClothingMaterialLibraryParamSchema.h"/>
-      <File RelativePath="..\..\src\MeshImportARM\params\clothing\ClothingPhysicalMeshParamSchema.h"/>
-      <File RelativePath="..\..\src\MeshImportARM\params\clothing\ClothingActorParamSchema.cpp"/>
-      <File RelativePath="..\..\src\MeshImportARM\params\clothing\ClothingAssetParamSchema.cpp"/>
-      <File RelativePath="..\..\src\MeshImportARM\params\clothing\ClothingGraphicalLodParamSchema.cpp"/>
-      <File RelativePath="..\..\src\MeshImportARM\params\clothing\ClothingMaterialLibraryParamSchema.cpp"/>
-      <File RelativePath="..\..\src\MeshImportARM\params\clothing\ClothingPhysicalMeshParamSchema.cpp"/>
-    </Filter>
-    <Filter Name="common" Filter=""> <!--  -->
-      <File RelativePath="..\..\src\MeshImportARM\params\common\ConvexHullParams.cpp"/>
-      <File RelativePath="..\..\src\MeshImportARM\params\common\ConvexHullParams.h"/>
-    </Filter>
-    <Filter Name="destructible" Filter=""> <!--  -->
-      <File RelativePath="..\..\src\MeshImportARM\params\destructible\ApexDestructibleActorParamSchema.cpp"/>
-      <File RelativePath="..\..\src\MeshImportARM\params\destructible\DestructibleAssetParameters.cpp"/>
-      <File RelativePath="..\..\src\MeshImportARM\params\destructible\SurfaceTraceParameters.cpp"/>
-      <File RelativePath="..\..\src\MeshImportARM\params\destructible\SurfaceTraceSetParameters.cpp"/>
-      <File RelativePath="..\..\src\MeshImportARM\params\destructible\ApexDestructibleActorParamSchema.h"/>
-      <File RelativePath="..\..\src\MeshImportARM\params\destructible\DestructibleAssetParameters.h"/>
-      <File RelativePath="..\..\src\MeshImportARM\params\destructible\SurfaceTraceParameters.h"/>
-      <File RelativePath="..\..\src\MeshImportARM\params\destructible\SurfaceTraceSetParameters.h"/>
-    </Filter>
-    <Filter Name="emitter" Filter=""> <!--  -->
-      <File RelativePath="..\..\src\MeshImportARM\params\emitter\ApexEmitterActorParameters.cpp"/>
-      <File RelativePath="..\..\src\MeshImportARM\params\emitter\ApexEmitterAssetParameters.cpp"/>
-      <File RelativePath="..\..\src\MeshImportARM\params\emitter\EmitterGeomBoxParams.cpp"/>
-      <File RelativePath="..\..\src\MeshImportARM\params\emitter\EmitterGeomExplicitParams.cpp"/>
-      <File RelativePath="..\..\src\MeshImportARM\params\emitter\EmitterGeomSphereParams.cpp"/>
-      <File RelativePath="..\..\src\MeshImportARM\params\emitter\EmitterGeomSphereShellParams.cpp"/>
-      <File RelativePath="..\..\src\MeshImportARM\params\emitter\GroundEmitterActorParameters.cpp"/>
-      <File RelativePath="..\..\src\MeshImportARM\params\emitter\GroundEmitterAssetParameters.cpp"/>
-      <File RelativePath="..\..\src\MeshImportARM\params\emitter\ImpactEmitterActorParameters.cpp"/>
-      <File RelativePath="..\..\src\MeshImportARM\params\emitter\ImpactEmitterAssetParameters.cpp"/>
-      <File RelativePath="..\..\src\MeshImportARM\params\emitter\ApexEmitterActorParameters.h"/>
-      <File RelativePath="..\..\src\MeshImportARM\params\emitter\ApexEmitterAssetParameters.h"/>
-      <File RelativePath="..\..\src\MeshImportARM\params\emitter\EmitterGeomBoxParams.h"/>
-      <File RelativePath="..\..\src\MeshImportARM\params\emitter\EmitterGeomExplicitParams.h"/>
-      <File RelativePath="..\..\src\MeshImportARM\params\emitter\EmitterGeomSphereParams.h"/>
-      <File RelativePath="..\..\src\MeshImportARM\params\emitter\EmitterGeomSphereShellParams.h"/>
-      <File RelativePath="..\..\src\MeshImportARM\params\emitter\GroundEmitterActorParameters.h"/>
-      <File RelativePath="..\..\src\MeshImportARM\params\emitter\GroundEmitterAssetParameters.h"/>
-      <File RelativePath="..\..\src\MeshImportARM\params\emitter\ImpactEmitterActorParameters.h"/>
-      <File RelativePath="..\..\src\MeshImportARM\params\emitter\ImpactEmitterAssetParameters.h"/>
-    </Filter>
-    <Filter Name="explosion" Filter=""> <!--  -->
-      <File RelativePath="..\..\src\MeshImportARM\params\explosion\ApexExplosionAssetParams.cpp"/>
-      <File RelativePath="..\..\src\MeshImportARM\params\explosion\ExplosionActorParameters.cpp"/>
-      <File RelativePath="..\..\src\MeshImportARM\params\explosion\ExplosionEnvParameters.cpp"/>
-      <File RelativePath="..\..\src\MeshImportARM\params\explosion\ApexExplosionAssetParams.h"/>
-      <File RelativePath="..\..\src\MeshImportARM\params\explosion\ExplosionActorParameters.h"/>
-      <File RelativePath="..\..\src\MeshImportARM\params\explosion\ExplosionEnvParameters.h"/>
-    </Filter>
-    <Filter Name="forcefield" Filter=""> <!--  -->
-      <File RelativePath="..\..\src\MeshImportARM\params\forcefield\FieldBoundaryActorParameters.cpp"/>
-      <File RelativePath="..\..\src\MeshImportARM\params\forcefield\FieldBoundaryAssetParameters.cpp"/>
-      <File RelativePath="..\..\src\MeshImportARM\params\forcefield\ShapeBoxParams.cpp"/>
-      <File RelativePath="..\..\src\MeshImportARM\params\forcefield\ShapeCapsuleParams.cpp"/>
-      <File RelativePath="..\..\src\MeshImportARM\params\forcefield\ShapeConvexParams.cpp"/>
-      <File RelativePath="..\..\src\MeshImportARM\params\forcefield\ShapeSphereParams.cpp"/>
-      <File RelativePath="..\..\src\MeshImportARM\params\forcefield\FieldBoundaryActorParameters.h"/>
-      <File RelativePath="..\..\src\MeshImportARM\params\forcefield\FieldBoundaryAssetParameters.h"/>
-      <File RelativePath="..\..\src\MeshImportARM\params\forcefield\ShapeBoxParams.h"/>
-      <File RelativePath="..\..\src\MeshImportARM\params\forcefield\ShapeCapsuleParams.h"/>
-      <File RelativePath="..\..\src\MeshImportARM\params\forcefield\ShapeConvexParams.h"/>
-      <File RelativePath="..\..\src\MeshImportARM\params\forcefield\ShapeSphereParams.h"/>
-    </Filter>
-    <Filter Name="framework" Filter=""> <!--  -->
-      <File RelativePath="..\..\src\MeshImportARM\params\framework\RenderMeshAssetParameters.cpp"/>
-      <File RelativePath="..\..\src\MeshImportARM\params\framework\SubmeshParameters.cpp"/>
-      <File RelativePath="..\..\src\MeshImportARM\params\framework\VertexBufferParameters.cpp"/>
-      <File RelativePath="..\..\src\MeshImportARM\params\framework\VertexFormatParameters.cpp"/>
-      <File RelativePath="..\..\src\MeshImportARM\params\framework\RenderMeshAssetParameters.h"/>
-      <File RelativePath="..\..\src\MeshImportARM\params\framework\SubmeshParameters.h"/>
-      <File RelativePath="..\..\src\MeshImportARM\params\framework\VertexBufferParameters.h"/>
-      <File RelativePath="..\..\src\MeshImportARM\params\framework\VertexFormatParameters.h"/>
-    </Filter>
-    <Filter Name="iofx" Filter=""> <!--  -->
-      <File RelativePath="..\..\src\MeshImportARM\params\iofx\ColorVsDensityModifierParams.cpp"/>
-      <File RelativePath="..\..\src\MeshImportARM\params\iofx\ColorVsLifeModifierParams.cpp"/>
-      <File RelativePath="..\..\src\MeshImportARM\params\iofx\IofxAssetParameters.cpp"/>
-      <File RelativePath="..\..\src\MeshImportARM\params\iofx\OrientAlongVelocityModifierParams.cpp"/>
-      <File RelativePath="..\..\src\MeshImportARM\params\iofx\RandomRotationModifierParams.cpp"/>
-      <File RelativePath="..\..\src\MeshImportARM\params\iofx\RandomScaleModifierParams.cpp"/>
-      <File RelativePath="..\..\src\MeshImportARM\params\iofx\RandomSubtextureModifierParams.cpp"/>
-      <File RelativePath="..\..\src\MeshImportARM\params\iofx\RotationModifierParams.cpp"/>
-      <File RelativePath="..\..\src\MeshImportARM\params\iofx\ScaleAlongVelocityModifierParams.cpp"/>
-      <File RelativePath="..\..\src\MeshImportARM\params\iofx\ScaleVsCameraDistanceModifierParams.cpp"/>
-      <File RelativePath="..\..\src\MeshImportARM\params\iofx\ScaleVsDensityModifierParams.cpp"/>
-      <File RelativePath="..\..\src\MeshImportARM\params\iofx\ScaleVsLifeModifierParams.cpp"/>
-      <File RelativePath="..\..\src\MeshImportARM\params\iofx\SimpleScaleModifierParams.cpp"/>
-      <File RelativePath="..\..\src\MeshImportARM\params\iofx\SubtextureVsLifeModifierParams.cpp"/>
-      <File RelativePath="..\..\src\MeshImportARM\params\iofx\ViewDirectionSortingModifierParams.cpp"/>
-      <File RelativePath="..\..\src\MeshImportARM\params\iofx\ColorVsDensityModifierParams.h"/>
-      <File RelativePath="..\..\src\MeshImportARM\params\iofx\ColorVsLifeModifierParams.h"/>
-      <File RelativePath="..\..\src\MeshImportARM\params\iofx\IofxAssetParameters.h"/>
-      <File RelativePath="..\..\src\MeshImportARM\params\iofx\OrientAlongVelocityModifierParams.h"/>
-      <File RelativePath="..\..\src\MeshImportARM\params\iofx\RandomRotationModifierParams.h"/>
-      <File RelativePath="..\..\src\MeshImportARM\params\iofx\RandomScaleModifierParams.h"/>
-      <File RelativePath="..\..\src\MeshImportARM\params\iofx\RandomSubtextureModifierParams.h"/>
-      <File RelativePath="..\..\src\MeshImportARM\params\iofx\RotationModifierParams.h"/>
-      <File RelativePath="..\..\src\MeshImportARM\params\iofx\ScaleAlongVelocityModifierParams.h"/>
-      <File RelativePath="..\..\src\MeshImportARM\params\iofx\ScaleVsCameraDistanceModifierParams.h"/>
-      <File RelativePath="..\..\src\MeshImportARM\params\iofx\ScaleVsDensityModifierParams.h"/>
-      <File RelativePath="..\..\src\MeshImportARM\params\iofx\ScaleVsLifeModifierParams.h"/>
-      <File RelativePath="..\..\src\MeshImportARM\params\iofx\SimpleScaleModifierParams.h"/>
-      <File RelativePath="..\..\src\MeshImportARM\params\iofx\SubtextureVsLifeModifierParams.h"/>
-      <File RelativePath="..\..\src\MeshImportARM\params\iofx\ViewDirectionSortingModifierParams.h"/>
-    </Filter>
-    <Filter Name="particles" Filter=""> <!--  -->
-      <File RelativePath="..\..\src\MeshImportARM\params\particles\NxFluidIosParameters.cpp"/>
-      <File RelativePath="..\..\src\MeshImportARM\params\particles\NxFluidIosParameters.h"/>
-    </Filter>
-    <Filter Name="wind" Filter=""> <!--  -->
-      <File RelativePath="..\..\src\MeshImportARM\params\wind\ApexWindAssetParameters.cpp"/>
-      <File RelativePath="..\..\src\MeshImportARM\params\wind\WindActorParameters.cpp"/>
-      <File RelativePath="..\..\src\MeshImportARM\params\wind\ApexWindAssetParameters.h"/>
-      <File RelativePath="..\..\src\MeshImportARM\params\wind\WindActorParameters.h"/>
-    </Filter>
+    <File RelativePath="..\..\src\MeshImportARM\params\ApexBasicIOSAssetParams.cpp"/>
+    <File RelativePath="..\..\src\MeshImportARM\params\ApexDestructibleActorParamSchema.cpp"/>
+    <File RelativePath="..\..\src\MeshImportARM\params\ApexEmitterActorParameters.cpp"/>
+    <File RelativePath="..\..\src\MeshImportARM\params\ApexEmitterAssetParameters.cpp"/>
+    <File RelativePath="..\..\src\MeshImportARM\params\ApexExplosionAssetParams.cpp"/>
+    <File RelativePath="..\..\src\MeshImportARM\params\ApexWindAssetParameters.cpp"/>
+    <File RelativePath="..\..\src\MeshImportARM\params\BufferF32x1.cpp"/>
+    <File RelativePath="..\..\src\MeshImportARM\params\BufferF32x2.cpp"/>
+    <File RelativePath="..\..\src\MeshImportARM\params\BufferF32x3.cpp"/>
+    <File RelativePath="..\..\src\MeshImportARM\params\BufferF32x4.cpp"/>
+    <File RelativePath="..\..\src\MeshImportARM\params\BufferU16x1.cpp"/>
+    <File RelativePath="..\..\src\MeshImportARM\params\BufferU16x2.cpp"/>
+    <File RelativePath="..\..\src\MeshImportARM\params\BufferU16x3.cpp"/>
+    <File RelativePath="..\..\src\MeshImportARM\params\BufferU16x4.cpp"/>
+    <File RelativePath="..\..\src\MeshImportARM\params\BufferU32x1.cpp"/>
+    <File RelativePath="..\..\src\MeshImportARM\params\BufferU32x2.cpp"/>
+    <File RelativePath="..\..\src\MeshImportARM\params\BufferU32x3.cpp"/>
+    <File RelativePath="..\..\src\MeshImportARM\params\BufferU32x4.cpp"/>
+    <File RelativePath="..\..\src\MeshImportARM\params\BufferU8x1.cpp"/>
+    <File RelativePath="..\..\src\MeshImportARM\params\BufferU8x2.cpp"/>
+    <File RelativePath="..\..\src\MeshImportARM\params\BufferU8x3.cpp"/>
+    <File RelativePath="..\..\src\MeshImportARM\params\BufferU8x4.cpp"/>
+    <File RelativePath="..\..\src\MeshImportARM\params\ClothingActorParamSchema.cpp"/>
+    <File RelativePath="..\..\src\MeshImportARM\params\ClothingAssetParamSchema.cpp"/>
+    <File RelativePath="..\..\src\MeshImportARM\params\ClothingGraphicalLodParamSchema.cpp"/>
+    <File RelativePath="..\..\src\MeshImportARM\params\ClothingMaterialLibraryParamSchema.cpp"/>
+    <File RelativePath="..\..\src\MeshImportARM\params\ClothingPhysicalMeshParamSchema.cpp"/>
+    <File RelativePath="..\..\src\MeshImportARM\params\ColorVsDensityModifierParams.cpp"/>
+    <File RelativePath="..\..\src\MeshImportARM\params\ColorVsLifeModifierParams.cpp"/>
+    <File RelativePath="..\..\src\MeshImportARM\params\ConvexHullParams.cpp"/>
+    <File RelativePath="..\..\src\MeshImportARM\params\DestructibleAssetParameters.cpp"/>
+    <File RelativePath="..\..\src\MeshImportARM\params\EmitterGeomBoxParams.cpp"/>
+    <File RelativePath="..\..\src\MeshImportARM\params\EmitterGeomExplicitParams.cpp"/>
+    <File RelativePath="..\..\src\MeshImportARM\params\EmitterGeomSphereParams.cpp"/>
+    <File RelativePath="..\..\src\MeshImportARM\params\EmitterGeomSphereShellParams.cpp"/>
+    <File RelativePath="..\..\src\MeshImportARM\params\ExplosionActorParameters.cpp"/>
+    <File RelativePath="..\..\src\MeshImportARM\params\ExplosionEnvParameters.cpp"/>
+    <File RelativePath="..\..\src\MeshImportARM\params\FieldBoundaryActorParameters.cpp"/>
+    <File RelativePath="..\..\src\MeshImportARM\params\FieldBoundaryAssetParameters.cpp"/>
+    <File RelativePath="..\..\src\MeshImportARM\params\GroundEmitterActorParameters.cpp"/>
+    <File RelativePath="..\..\src\MeshImportARM\params\GroundEmitterAssetParameters.cpp"/>
+    <File RelativePath="..\..\src\MeshImportARM\params\ImpactEmitterActorParameters.cpp"/>
+    <File RelativePath="..\..\src\MeshImportARM\params\ImpactEmitterAssetParameters.cpp"/>
+    <File RelativePath="..\..\src\MeshImportARM\params\IofxAssetParameters.cpp"/>
+    <File RelativePath="..\..\src\MeshImportARM\params\NxFluidIosParameters.cpp"/>
+    <File RelativePath="..\..\src\MeshImportARM\params\OrientAlongVelocityModifierParams.cpp"/>
+    <File RelativePath="..\..\src\MeshImportARM\params\RandomRotationModifierParams.cpp"/>
+    <File RelativePath="..\..\src\MeshImportARM\params\RandomScaleModifierParams.cpp"/>
+    <File RelativePath="..\..\src\MeshImportARM\params\RandomSubtextureModifierParams.cpp"/>
+    <File RelativePath="..\..\src\MeshImportARM\params\RenderMeshAssetParameters.cpp"/>
+    <File RelativePath="..\..\src\MeshImportARM\params\RotationModifierParams.cpp"/>
+    <File RelativePath="..\..\src\MeshImportARM\params\ScaleAlongVelocityModifierParams.cpp"/>
+    <File RelativePath="..\..\src\MeshImportARM\params\ScaleVsCameraDistanceModifierParams.cpp"/>
+    <File RelativePath="..\..\src\MeshImportARM\params\ScaleVsDensityModifierParams.cpp"/>
+    <File RelativePath="..\..\src\MeshImportARM\params\ScaleVsLifeModifierParams.cpp"/>
+    <File RelativePath="..\..\src\MeshImportARM\params\ShapeBoxParams.cpp"/>
+    <File RelativePath="..\..\src\MeshImportARM\params\ShapeCapsuleParams.cpp"/>
+    <File RelativePath="..\..\src\MeshImportARM\params\ShapeConvexParams.cpp"/>
+    <File RelativePath="..\..\src\MeshImportARM\params\ShapeSphereParams.cpp"/>
+    <File RelativePath="..\..\src\MeshImportARM\params\SimpleScaleModifierParams.cpp"/>
+    <File RelativePath="..\..\src\MeshImportARM\params\SubmeshParameters.cpp"/>
+    <File RelativePath="..\..\src\MeshImportARM\params\SubtextureVsLifeModifierParams.cpp"/>
+    <File RelativePath="..\..\src\MeshImportARM\params\SurfaceTraceParameters.cpp"/>
+    <File RelativePath="..\..\src\MeshImportARM\params\SurfaceTraceSetParameters.cpp"/>
+    <File RelativePath="..\..\src\MeshImportARM\params\VertexBufferParameters.cpp"/>
+    <File RelativePath="..\..\src\MeshImportARM\params\VertexFormatParameters.cpp"/>
+    <File RelativePath="..\..\src\MeshImportARM\params\ViewDirectionSortingModifierParams.cpp"/>
+    <File RelativePath="..\..\src\MeshImportARM\params\WindActorParameters.cpp"/>
+    <File RelativePath="..\..\src\MeshImportARM\params\ApexBasicIOSAssetParams.h"/>
+    <File RelativePath="..\..\src\MeshImportARM\params\ApexDestructibleActorParamSchema.h"/>
+    <File RelativePath="..\..\src\MeshImportARM\params\ApexEmitterActorParameters.h"/>
+    <File RelativePath="..\..\src\MeshImportARM\params\ApexEmitterAssetParameters.h"/>
+    <File RelativePath="..\..\src\MeshImportARM\params\ApexExplosionAssetParams.h"/>
+    <File RelativePath="..\..\src\MeshImportARM\params\ApexWindAssetParameters.h"/>
+    <File RelativePath="..\..\src\MeshImportARM\params\BufferF32x1.h"/>
+    <File RelativePath="..\..\src\MeshImportARM\params\BufferF32x2.h"/>
+    <File RelativePath="..\..\src\MeshImportARM\params\BufferF32x3.h"/>
+    <File RelativePath="..\..\src\MeshImportARM\params\BufferF32x4.h"/>
+    <File RelativePath="..\..\src\MeshImportARM\params\BufferU16x1.h"/>
+    <File RelativePath="..\..\src\MeshImportARM\params\BufferU16x2.h"/>
+    <File RelativePath="..\..\src\MeshImportARM\params\BufferU16x3.h"/>
+    <File RelativePath="..\..\src\MeshImportARM\params\BufferU16x4.h"/>
+    <File RelativePath="..\..\src\MeshImportARM\params\BufferU32x1.h"/>
+    <File RelativePath="..\..\src\MeshImportARM\params\BufferU32x2.h"/>
+    <File RelativePath="..\..\src\MeshImportARM\params\BufferU32x3.h"/>
+    <File RelativePath="..\..\src\MeshImportARM\params\BufferU32x4.h"/>
+    <File RelativePath="..\..\src\MeshImportARM\params\BufferU8x1.h"/>
+    <File RelativePath="..\..\src\MeshImportARM\params\BufferU8x2.h"/>
+    <File RelativePath="..\..\src\MeshImportARM\params\BufferU8x3.h"/>
+    <File RelativePath="..\..\src\MeshImportARM\params\BufferU8x4.h"/>
+    <File RelativePath="..\..\src\MeshImportARM\params\ClothingActorParamSchema.h"/>
+    <File RelativePath="..\..\src\MeshImportARM\params\ClothingAssetParamSchema.h"/>
+    <File RelativePath="..\..\src\MeshImportARM\params\ClothingGraphicalLodParamSchema.h"/>
+    <File RelativePath="..\..\src\MeshImportARM\params\ClothingMaterialLibraryParamSchema.h"/>
+    <File RelativePath="..\..\src\MeshImportARM\params\ClothingPhysicalMeshParamSchema.h"/>
+    <File RelativePath="..\..\src\MeshImportARM\params\ColorVsDensityModifierParams.h"/>
+    <File RelativePath="..\..\src\MeshImportARM\params\ColorVsLifeModifierParams.h"/>
+    <File RelativePath="..\..\src\MeshImportARM\params\ConvexHullParams.h"/>
+    <File RelativePath="..\..\src\MeshImportARM\params\DestructibleAssetParameters.h"/>
+    <File RelativePath="..\..\src\MeshImportARM\params\EmitterGeomBoxParams.h"/>
+    <File RelativePath="..\..\src\MeshImportARM\params\EmitterGeomExplicitParams.h"/>
+    <File RelativePath="..\..\src\MeshImportARM\params\EmitterGeomSphereParams.h"/>
+    <File RelativePath="..\..\src\MeshImportARM\params\EmitterGeomSphereShellParams.h"/>
+    <File RelativePath="..\..\src\MeshImportARM\params\ExplosionActorParameters.h"/>
+    <File RelativePath="..\..\src\MeshImportARM\params\ExplosionEnvParameters.h"/>
+    <File RelativePath="..\..\src\MeshImportARM\params\FieldBoundaryActorParameters.h"/>
+    <File RelativePath="..\..\src\MeshImportARM\params\FieldBoundaryAssetParameters.h"/>
+    <File RelativePath="..\..\src\MeshImportARM\params\GroundEmitterActorParameters.h"/>
+    <File RelativePath="..\..\src\MeshImportARM\params\GroundEmitterAssetParameters.h"/>
+    <File RelativePath="..\..\src\MeshImportARM\params\ImpactEmitterActorParameters.h"/>
+    <File RelativePath="..\..\src\MeshImportARM\params\ImpactEmitterAssetParameters.h"/>
+    <File RelativePath="..\..\src\MeshImportARM\params\IofxAssetParameters.h"/>
+    <File RelativePath="..\..\src\MeshImportARM\params\NxFluidIosParameters.h"/>
+    <File RelativePath="..\..\src\MeshImportARM\params\OrientAlongVelocityModifierParams.h"/>
+    <File RelativePath="..\..\src\MeshImportARM\params\RandomRotationModifierParams.h"/>
+    <File RelativePath="..\..\src\MeshImportARM\params\RandomScaleModifierParams.h"/>
+    <File RelativePath="..\..\src\MeshImportARM\params\RandomSubtextureModifierParams.h"/>
+    <File RelativePath="..\..\src\MeshImportARM\params\RenderMeshAssetParameters.h"/>
+    <File RelativePath="..\..\src\MeshImportARM\params\RotationModifierParams.h"/>
+    <File RelativePath="..\..\src\MeshImportARM\params\ScaleAlongVelocityModifierParams.h"/>
+    <File RelativePath="..\..\src\MeshImportARM\params\ScaleVsCameraDistanceModifierParams.h"/>
+    <File RelativePath="..\..\src\MeshImportARM\params\ScaleVsDensityModifierParams.h"/>
+    <File RelativePath="..\..\src\MeshImportARM\params\ScaleVsLifeModifierParams.h"/>
+    <File RelativePath="..\..\src\MeshImportARM\params\ShapeBoxParams.h"/>
+    <File RelativePath="..\..\src\MeshImportARM\params\ShapeCapsuleParams.h"/>
+    <File RelativePath="..\..\src\MeshImportARM\params\ShapeConvexParams.h"/>
+    <File RelativePath="..\..\src\MeshImportARM\params\ShapeSphereParams.h"/>
+    <File RelativePath="..\..\src\MeshImportARM\params\SimpleScaleModifierParams.h"/>
+    <File RelativePath="..\..\src\MeshImportARM\params\SubmeshParameters.h"/>
+    <File RelativePath="..\..\src\MeshImportARM\params\SubtextureVsLifeModifierParams.h"/>
+    <File RelativePath="..\..\src\MeshImportARM\params\SurfaceTraceParameters.h"/>
+    <File RelativePath="..\..\src\MeshImportARM\params\SurfaceTraceSetParameters.h"/>
+    <File RelativePath="..\..\src\MeshImportARM\params\VertexBufferParameters.h"/>
+    <File RelativePath="..\..\src\MeshImportARM\params\VertexFormatParameters.h"/>
+    <File RelativePath="..\..\src\MeshImportARM\params\ViewDirectionSortingModifierParams.h"/>
+    <File RelativePath="..\..\src\MeshImportARM\params\WindActorParameters.h"/>
   </Filter>
   <Filter Name="Header Files" Filter=""> <!--  -->
     <File RelativePath="..\..\src\MeshImportARM\ImportARM.h"/>

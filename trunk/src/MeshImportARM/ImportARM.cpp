@@ -66,9 +66,28 @@
 #include "NxSerializer.h"
 #include "PsUserAllocated.h"
 #include "PxUserOutputStream.h"
-#include "PxMemoryBuffer.h"
+#include "pxmemorybuffer.h"
 #include "VertexFormatParameters.h"
 
+#include "BufferF32x1.h"
+#include "BufferF32x2.h"
+#include "BufferF32x3.h"
+#include "BufferF32x4.h"
+
+#include "BufferU8x1.h"
+#include "BufferU8x2.h"
+#include "BufferU8x3.h"
+#include "BufferU8x4.h"
+
+#include "BufferU16x1.h"
+#include "BufferU16x2.h"
+#include "BufferU16x3.h"
+#include "BufferU16x4.h"
+
+#include "BufferU32x1.h"
+#include "BufferU32x2.h"
+#include "BufferU32x3.h"
+#include "BufferU32x4.h"
 #pragma warning(disable:4996)
 
 using namespace physx;
@@ -76,6 +95,173 @@ using namespace NxParameterized;
 
 namespace NVSHARE
 {
+
+	/**
+	\brief Enumeration of possible formats of various buffer semantics
+
+	N.B.: DO NOT CHANGE THE VALUES OF OLD FORMATS.
+	*/
+	struct NxRenderDataFormat
+	{
+		/** \brief the enum type */
+		enum Enum
+		{
+			UNSPECIFIED =			0,	//!< No format (semantic not used)
+
+			//!< Integer formats
+			UBYTE1 =				1,	//!< One unsigned 8-bit integer (PxU8[1])
+			UBYTE2 =				2,	//!< Two unsigned 8-bit integers (PxU8[2])
+			UBYTE3 =				3,	//!< Three unsigned 8-bit integers (PxU8[3])
+			UBYTE4 =				4,	//!< Four unsigned 8-bit integers (PxU8[4])
+
+			USHORT1 =				5,	//!< One unsigned 16-bit integer (PxU16[1])
+			USHORT2 =				6,	//!< Two unsigned 16-bit integers (PxU16[2])
+			USHORT3 =				7,	//!< Three unsigned 16-bit integers (PxU16[3])
+			USHORT4 =				8,	//!< Four unsigned 16-bit integers (PxU16[4])
+
+			SHORT1 =				9,	//!< One signed 16-bit integer (PxI16[1])
+			SHORT2 =				10,	//!< Two signed 16-bit integers (PxI16[2])
+			SHORT3 =				11,	//!< Three signed 16-bit integers (PxI16[3])
+			SHORT4 =				12,	//!< Four signed 16-bit integers (PxI16[4])
+
+			UINT1 =					13,	//!< One unsigned integer (PxU32[1])
+			UINT2 =					14,	//!< Two unsigned integers (PxU32[2])
+			UINT3 =					15,	//!< Three unsigned integers (PxU32[3])
+			UINT4 =					16,	//!< Four unsigned integers (PxU32[4])
+
+			//!< Color formats
+			R8G8B8A8 =				17,	//!< Four unsigned bytes (PxU8[4]) representing red, green, blue, alpha
+			B8G8R8A8 =				18,	//!< Four unsigned bytes (PxU8[4]) representing blue, green, red, alpha
+			R32G32B32A32_FLOAT =	19,	//!< Four floats (PxF32[4]) representing red, green, blue, alpha
+			B32G32R32A32_FLOAT =	20,	//!< Four floats (PxF32[4]) representing blue, green, red, alpha
+
+			//!< Normalized formats
+			BYTE_UNORM1 =			21,	//!< One unsigned normalized value in the range [0,1], packed into 8 bits (PxU8[1])
+			BYTE_UNORM2 =			22,	//!< Two unsigned normalized value in the range [0,1], each packed into 8 bits (PxU8[2])
+			BYTE_UNORM3 =			23,	//!< Three unsigned normalized value in the range [0,1], each packed into bits (PxU8[3])
+			BYTE_UNORM4 =			24,	//!< Four unsigned normalized value in the range [0,1], each packed into 8 bits (PxU8[4])
+
+			SHORT_UNORM1 =			25,	//!< One unsigned normalized value in the range [0,1], packed into 16 bits (PxU16[1])
+			SHORT_UNORM2 =			26,	//!< Two unsigned normalized value in the range [0,1], each packed into 16 bits (PxU16[2])
+			SHORT_UNORM3 =			27,	//!< Three unsigned normalized value in the range [0,1], each packed into 16 bits (PxU16[3])
+			SHORT_UNORM4 =			28,	//!< Four unsigned normalized value in the range [0,1], each packed into 16 bits (PxU16[4])
+
+			BYTE_SNORM1 =			29,	//!< One signed normalized value in the range [-1,1], packed into 8 bits (PxU8[1])
+			BYTE_SNORM2 =			30,	//!< Two signed normalized value in the range [-1,1], each packed into 8 bits (PxU8[2])
+			BYTE_SNORM3 =			31,	//!< Three signed normalized value in the range [-1,1], each packed into bits (PxU8[3])
+			BYTE_SNORM4 =			32,	//!< Four signed normalized value in the range [-1,1], each packed into 8 bits (PxU8[4])
+
+			SHORT_SNORM1 =			33,	//!< One signed normalized value in the range [-1,1], packed into 16 bits (PxU16[1])
+			SHORT_SNORM2 =			34,	//!< Two signed normalized value in the range [-1,1], each packed into 16 bits (PxU16[2])
+			SHORT_SNORM3 =			35,	//!< Three signed normalized value in the range [-1,1], each packed into 16 bits (PxU16[3])
+			SHORT_SNORM4 =			36,	//!< Four signed normalized value in the range [-1,1], each packed into 16 bits (PxU16[4])
+
+			//!< Float formats
+			HALF1 =					37,	//!< One 16-bit floating point value
+			HALF2 =					38,	//!< Two 16-bit floating point values
+			HALF3 =					39,	//!< Three 16-bit floating point values
+			HALF4 =					40,	//!< Four 16-bit floating point values
+
+			FLOAT1 =				41,	//!< One 32-bit floating point value
+			FLOAT2 =				42,	//!< Two 32-bit floating point values
+			FLOAT3 =				43,	//!< Three 32-bit floating point values
+			FLOAT4 =				44,	//!< Four 32-bit floating point values
+
+			FLOAT3x4 =				45,	//!< A 3x4 matrix (see PxMat34)
+			FLOAT3x3 =				46,	//!< A 3x3 matrix (see PxMat33)
+			QUAT =					47,	//!< A quaternion (see PxQuat)
+		};
+
+		/// Get byte size of format type
+		static PX_INLINE physx::PxU32 getFormatDataSize( Enum format )
+		{
+			switch( format )
+			{
+			default:
+				PX_ALWAYS_ASSERT();
+			case UNSPECIFIED:
+				return 0;
+
+			case UBYTE1:
+			case BYTE_UNORM1:
+			case BYTE_SNORM1:
+				return sizeof(physx::PxU8);
+			case UBYTE2:
+			case BYTE_UNORM2:
+			case BYTE_SNORM2:
+				return sizeof(physx::PxU8) * 2;
+			case UBYTE3:
+			case BYTE_UNORM3:
+			case BYTE_SNORM3:
+				return sizeof(physx::PxU8) * 3;
+			case UBYTE4:
+			case BYTE_UNORM4:
+			case BYTE_SNORM4:
+				return sizeof(physx::PxU8) * 4;
+
+			case USHORT1:
+			case SHORT1:
+			case HALF1:
+			case SHORT_UNORM1:
+			case SHORT_SNORM1:
+				return sizeof(physx::PxU16);
+			case USHORT2:
+			case SHORT2:
+			case HALF2:
+			case SHORT_UNORM2:
+			case SHORT_SNORM2:
+				return sizeof(physx::PxU16) * 2;
+			case USHORT3:
+			case SHORT3:
+			case HALF3:
+			case SHORT_UNORM3:
+			case SHORT_SNORM3:
+				return sizeof(physx::PxU16) * 3;
+			case USHORT4:
+			case SHORT4:
+			case HALF4:
+			case SHORT_UNORM4:
+			case SHORT_SNORM4:
+				return sizeof(physx::PxU16) * 4;
+
+			case UINT1:
+				return sizeof(physx::PxU32);
+			case UINT2:
+				return sizeof(physx::PxU32) * 2;
+			case UINT3:
+				return sizeof(physx::PxU32) * 3;
+			case UINT4:
+				return sizeof(physx::PxU32) * 4;
+
+			case R8G8B8A8:
+			case B8G8R8A8:
+				return sizeof(physx::PxU8) * 4;
+
+			case R32G32B32A32_FLOAT:
+			case B32G32R32A32_FLOAT:
+				return sizeof(physx::PxF32) * 4;
+
+			case FLOAT1:
+				return sizeof(physx::PxF32);
+			case FLOAT2:
+				return sizeof(physx::PxF32) * 2;
+			case FLOAT3:
+				return sizeof(physx::PxF32) * 3;
+			case FLOAT4:
+				return sizeof(physx::PxF32) * 4;
+
+			case FLOAT3x4:
+				return sizeof(physx::PxMat34Legacy);
+
+			case FLOAT3x3:
+				return sizeof(physx::PxMat33);
+
+			case QUAT:
+				return sizeof(physx::PxQuat);
+			}
+		}
+	};
+
 
 
 class AppUserAllocator : public physx::PxUserAllocator
@@ -128,9 +314,16 @@ public:
 		mFactories.pushBack(p);
 	}
 
-	virtual void removeFactory( const char * name )
+	virtual NxParameterized::Factory * removeFactory( const char * name )
 	{
 		PX_ALWAYS_ASSERT(); // not expected/implemented
+		return NULL;
+	}
+
+	virtual NxParameterized::Factory * removeFactory( const char * name,physx::PxU32 versionNumber )
+	{
+		PX_ALWAYS_ASSERT(); // not expected/implemented
+		return NULL;
 	}
 
 	virtual NxParameterized::Interface * createNxParameterized( const char * name )
@@ -287,6 +480,27 @@ public:
 		registerFactory(mNxApexWindAssetParamFactory);
 		registerFactory(mWindActorParametersFactory);
 		registerFactory(mVertexFormatParametersFactory);
+
+		registerFactory(mBufferF32x1Factory);
+		registerFactory(mBufferF32x2Factory);
+		registerFactory(mBufferF32x3Factory);
+		registerFactory(mBufferF32x4Factory);
+
+		registerFactory(mBufferU8x1Factory);
+		registerFactory(mBufferU8x2Factory);
+		registerFactory(mBufferU8x3Factory);
+		registerFactory(mBufferU8x4Factory);
+
+		registerFactory(mBufferU16x1Factory);
+		registerFactory(mBufferU16x2Factory);
+		registerFactory(mBufferU16x3Factory);
+		registerFactory(mBufferU16x4Factory);
+
+		registerFactory(mBufferU32x1Factory);
+		registerFactory(mBufferU32x2Factory);
+		registerFactory(mBufferU32x3Factory);
+		registerFactory(mBufferU32x4Factory);
+
 	}
   	virtual NxI32              getExtensionCount(void) { return 2; }; // most importers support just one file name extension.
 
@@ -312,90 +526,300 @@ public:
 		{
 			for (PxU32 i=0; i<desdata.size(); i++)
 			{
-				NxParameterized::Interface *iface = desdata.getObject(i);
-#if 1
-				{
-					PxU32 count;
-					const NxParameterized::ParamResult *result = getParamList(*iface,NULL,count,true,false,this);
-					if ( result )
-					{
-						FILE *fph = fopen("param.txt", "wb");
-						for (PxU32 i=0; i<count; i++)
-						{
-							const NxParameterized::ParamResult &r = result[i];
-							if ( r.mArraySize > 0 )
-							{
-								fprintf(fph,"%s[%d] : %s\r\n",r.mLongName ? r.mLongName : r.mName, r.mArraySize, iface->typeToStr(r.mDataType) );
-							}
-							else
-							{
-								fprintf(fph,"%s : %s\r\n", r.mLongName ? r.mLongName : r.mName, iface->typeToStr(r.mDataType) );
-							}
-
-						}
-						fclose(fph);
-					
-						releaseParamList(count,result,this);
-					}
-
-				}
-#endif
-#if 1
+				NxParameterized::Interface *iface = desdata[i];
 				PxU32 count;
-				const NxParameterized::ParamResult *result = getParamList(*iface,"RenderMeshAssetParameters",count,true,true,this);
+				const NxParameterized::ParamResult *result = getParamList(*iface,"RenderMeshAssetParameters",NULL,count,true,true,this);
 				if ( result )
 				{
 					for (PxU32 i=0; i<count; i++)
 					{
-						importRenderMeshAsset( (NxParameterized::Interface *)result[i].mInterface, callback );
+						importRenderMeshAsset(meshName, (NxParameterized::Interface *)result[i].mHandle.getInterface(), callback );
+						ret = true;
 					}
 					releaseParamList(count,result,this);
 				}
-#endif
 			}
 		}
 		s->release();
 
-
-
   		return ret;
 	}
 
-	void importRenderMeshAsset(NxParameterized::Interface *iface,MeshImportInterface *callback)
+	void importRenderMeshAsset(const char *meshName,NxParameterized::Interface *renderMesh,MeshImportInterface *callback)
 	{
-#if 0
+		if ( renderMesh )
 		{
-			PxU32 count;
-			const NxParameterized::ParamResult *result = getParamList(*iface,NULL,count,true,false,this);
-			if ( result )
+			NxParameterized::Handle handle(*renderMesh);
+			NxParameterized::Interface *iface = NxParameterized::findParam(*renderMesh,"submeshes",handle);
+			if ( iface )
 			{
-				FILE *fph = fopen("param.txt", "wb");
-				for (PxU32 i=0; i<count; i++)
+				physx::PxI32 size=0;
+				if ( handle.getArraySize(size,0) == ::NxParameterized::ERROR_NONE )
 				{
-					const NxParameterized::ParamResult &r = result[i];
-					if ( r.mArraySize > 0 )
+					for (physx::PxI32 i=0; i<size; i++)
 					{
-						fprintf(fph,"%s[%d] : %s\r\n",r.mLongName ? r.mLongName : r.mName, r.mArraySize, iface->typeToStr(r.mDataType) );
+						handle.set(i);
+						NxParameterized::Interface *paramPtr = 0;
+						handle.getParamRef(paramPtr);
+						if ( paramPtr )
+						{
+							const char *materialName = "material";
+							char scratch[512];
+							NxParameterized::Handle materialHandle(*renderMesh);
+							physx::string::sprintf_s(scratch,512,"materialNames[%d]",i);
+							NxParameterized::Interface *mat = NxParameterized::findParam(*renderMesh,scratch,materialHandle);
+							PX_ASSERT(mat);
+							if ( mat )
+							{
+								materialHandle.getParamString(materialName);
+							}
+							importSubMesh(meshName, paramPtr, callback, materialName );
+						}
+
+						handle.popIndex();
+					}
+				}
+			}
+		}
+	}
+
+	void copyBufferVec3(void *_dest,physx::PxU32 stride,NxParameterized::Interface *subMesh,physx::PxU32 vcount,physx::PxU32 index)
+	{
+		physx::PxU8 *dest = (physx::PxU8 *)_dest;
+		NxParameterized::Handle handle(*subMesh);
+		char scratch[512];
+		physx::string::sprintf_s(scratch,512,"vertexBuffer.buffers[%d]",index);
+		NxParameterized::Interface *buffer = NxParameterized::findParam(*subMesh,scratch,handle);
+		PX_ASSERT(buffer);
+		if ( buffer )
+		{
+			NxParameterized::Interface *paramPtr = 0;
+			handle.getParamRef(paramPtr);
+			PX_ASSERT(paramPtr);
+			if ( paramPtr )
+			{
+				NxParameterized::Handle bufferHandle(*paramPtr);
+				NxParameterized::Interface *f = NxParameterized::findParam(*paramPtr,"data",bufferHandle);
+				PX_ASSERT(f);
+				if ( f )
+				{
+					physx::PxI32 bufferSize=0;
+					if ( bufferHandle.getArraySize(bufferSize,0) == ::NxParameterized::ERROR_NONE )
+					{
+						PX_ASSERT( bufferSize == (physx::PxI32)vcount );
+						if ( bufferSize == (physx::PxI32)vcount )
+						{
+							for (physx::PxU32 i=0; i<vcount; i++)
+							{
+								bufferHandle.getParamVec3Array((physx::PxVec3 *)dest,1,i);
+								dest+=stride;
+							}
+						}
 					}
 					else
 					{
-						fprintf(fph,"%s : %s\r\n", r.mLongName ? r.mLongName : r.mName, iface->typeToStr(r.mDataType) );
+						PX_ALWAYS_ASSERT();
 					}
-
 				}
-				fclose(fph);
+			}
+		}
+	}
 
-				releaseParamList(count,result,this);
+	void copyBufferVec2(void *_dest,physx::PxU32 stride,NxParameterized::Interface *subMesh,physx::PxU32 vcount,physx::PxU32 index)
+	{
+		physx::PxU8 *dest = (physx::PxU8 *)_dest;
+		NxParameterized::Handle handle(*subMesh);
+		char scratch[512];
+		physx::string::sprintf_s(scratch,512,"vertexBuffer.buffers[%d]",index);
+		NxParameterized::Interface *buffer = NxParameterized::findParam(*subMesh,scratch,handle);
+		PX_ASSERT(buffer);
+		if ( buffer )
+		{
+			NxParameterized::Interface *paramPtr = 0;
+			handle.getParamRef(paramPtr);
+			PX_ASSERT(paramPtr);
+			if ( paramPtr )
+			{
+				NxParameterized::Handle bufferHandle(*paramPtr);
+				NxParameterized::Interface *f = NxParameterized::findParam(*paramPtr,"data",bufferHandle);
+				PX_ASSERT(f);
+				if ( f )
+				{
+					physx::PxI32 bufferSize=0;
+					if ( bufferHandle.getArraySize(bufferSize,0) == ::NxParameterized::ERROR_NONE )
+					{
+						PX_ASSERT( bufferSize == (physx::PxI32)vcount );
+						if ( bufferSize == (physx::PxI32)vcount )
+						{
+							for (physx::PxU32 i=0; i<vcount; i++)
+							{
+								bufferHandle.getParamF32Array((physx::PxF32 *)dest,2,i*2);
+								dest+=stride;
+							}
+						}
+					}
+					else
+					{
+						PX_ALWAYS_ASSERT();
+					}
+				}
+			}
+		}
+	}
+
+
+	void importSubMesh(const char *meshName,NxParameterized::Interface *subMesh,MeshImportInterface *callback,const char *materialName)
+	{
+		physx::PxU32 vcount;
+		NxParameterized::Handle handle(*subMesh);
+
+		if ( NxParameterized::getParamU32(*subMesh,"vertexBuffer.vertexCount",vcount) )
+		{
+			physx::PxU32 flags = 0;
+			MeshVertex *vertices = new MeshVertex[vcount];
+			NxParameterized::Interface *iface = NxParameterized::findParam(*subMesh,"vertexBuffer.vertexFormat.bufferFormats",handle);
+			if ( iface )
+			{
+				physx::PxI32 size=0;
+				if ( handle.getArraySize(size,0) == ::NxParameterized::ERROR_NONE )
+				{
+					for (physx::PxI32 i=0; i<size; i++)
+					{
+						physx::PxU32 format;
+						char scratch[512];
+						physx::string::sprintf_s(scratch,512,"vertexBuffer.vertexFormat.bufferFormats[%d].name",i);
+						NxParameterized::Interface *f = NxParameterized::findParam(*subMesh,scratch,handle);
+						PX_ASSERT(f);
+						if ( f )
+						{
+							const char *val;
+							handle.getParamString(val);
+							physx::string::sprintf_s(scratch,512,"vertexBuffer.vertexFormat.bufferFormats[%d].format",i);
+							f = NxParameterized::findParam(*subMesh,scratch,handle);
+							PX_ASSERT(f);
+							if ( f )
+							{
+								handle.getParamU32(format);
+								// ready to copy the data now!
+								if ( strcmp(val,"SEMANTIC_POSITION") == 0 )
+								{
+									PX_ASSERT( format == NxRenderDataFormat::FLOAT3 );
+									if ( format == NxRenderDataFormat::FLOAT3 )
+									{
+										flags|=MIVF_POSITION;
+										copyBufferVec3(&vertices[0].mPos,sizeof(MeshVertex),subMesh,vcount,i);
+									}
+								}
+								else if ( strcmp(val,"SEMANTIC_NORMAL") == 0 )
+								{
+									PX_ASSERT( format == NxRenderDataFormat::FLOAT3 );
+									if ( format == NxRenderDataFormat::FLOAT3 )
+									{
+										flags|=MIVF_NORMAL;
+										copyBufferVec3(&vertices[0].mNormal,sizeof(MeshVertex),subMesh,vcount,i);
+									}
+								}
+								else if ( strcmp(val,"SEMANTIC_TANGENT") == 0 )
+								{
+									PX_ASSERT( format == NxRenderDataFormat::FLOAT3 );
+									if ( format == NxRenderDataFormat::FLOAT3 )
+									{
+										flags|=MIVF_TANGENT;
+										copyBufferVec3(&vertices[0].mTangent,sizeof(MeshVertex),subMesh,vcount,i);
+									}
+								}
+								else if ( strcmp(val,"SEMANTIC_BINORMAL") == 0  )
+								{
+									PX_ASSERT( format == NxRenderDataFormat::FLOAT3 );
+									if ( format == NxRenderDataFormat::FLOAT3 )
+									{
+										flags|=MIVF_BINORMAL;
+										copyBufferVec3(&vertices[0].mTangent,sizeof(MeshVertex),subMesh,vcount,i);
+									}
+								}
+								else if ( strcmp(val,"SEMANTIC_TEXCOORD0") == 0 )
+								{
+									PX_ASSERT( format == NxRenderDataFormat::FLOAT2 );
+									if ( format == NxRenderDataFormat::FLOAT2 )
+									{
+										flags|=MIVF_TEXEL1;
+										copyBufferVec2(&vertices[0].mTexel1,sizeof(MeshVertex),subMesh,vcount,i);
+									}
+								}
+								else if ( strcmp(val,"SEMANTIC_TEXCOORD1") == 0 )
+								{
+									PX_ASSERT( format == NxRenderDataFormat::FLOAT2 );
+									if ( format == NxRenderDataFormat::FLOAT2 )
+									{
+										flags|=MIVF_TEXEL2;
+										copyBufferVec2(&vertices[0].mTexel2,sizeof(MeshVertex),subMesh,vcount,i);
+									}
+								}
+								else if ( strcmp(val,"SEMANTIC_TEXCOORD2") == 0 )
+								{
+									PX_ASSERT( format == NxRenderDataFormat::FLOAT2 );
+									if ( format == NxRenderDataFormat::FLOAT2 )
+									{
+										flags|=MIVF_TEXEL3;
+										copyBufferVec2(&vertices[0].mTexel3,sizeof(MeshVertex),subMesh,vcount,i);
+									}
+								}
+								else if ( strcmp(val,"SEMANTIC_TEXCOORD3") == 0 )
+								{
+									PX_ASSERT( format == NxRenderDataFormat::FLOAT2 );
+									if ( format == NxRenderDataFormat::FLOAT2 )
+									{
+										flags|=MIVF_TEXEL4;
+										copyBufferVec2(&vertices[0].mTexel4,sizeof(MeshVertex),subMesh,vcount,i);
+									}
+								}
+								else if ( strcmp(val,"SEMANTIC_BONE_INDEX") == 0 )
+								{
+									printf("Not yet supported.\r\n");
+								}
+								else
+								{
+									printf("Format: %s not yet supported.\r\n", val );
+								}
+							}
+						}
+
+					}
+				}
 			}
 
-		}
+			// ok..now grab the index buffer...
+			iface = NxParameterized::findParam(*subMesh,"indexBuffer",handle);
+			if ( iface )
+			{
 
-#endif
+				physx::PxI32 size=0;
+				if ( handle.getArraySize(size,0) == ::NxParameterized::ERROR_NONE )
+				{
+					physx::PxI32 tcount = size/3;
+					for (physx::PxI32 i=0; i<tcount; i++)
+					{
+						physx::PxU32 tri[3];
+						handle.getParamU32Array(tri,3,i*3);
+						physx::PxU32 i1 = tri[0];
+						physx::PxU32 i2 = tri[1];
+						physx::PxU32 i3 = tri[2];
+
+						PX_ASSERT( i1 < vcount );
+						PX_ASSERT( i2 < vcount );
+						PX_ASSERT( i3 < vcount );
+						callback->importTriangle(meshName,materialName,flags,vertices[i1],vertices[i2],vertices[i3]);
+					}
+				}
+			}
+			delete []vertices;
+		}
 	}
 
 private:
 
 	InterfaceVector				mObjects;
+
 	NxApexBasicIOSAssetParamFactory mNxApexBasicIOSAssetParamFactory;
 	NxApexClothingActorParamFactory mNxApexClothingActorParamFactory;
 	ClothingAssetParametersFactory mClothingAssetParametersFactory;
@@ -448,6 +872,28 @@ private:
 	NxApexWindAssetParamFactory mNxApexWindAssetParamFactory;
 	WindActorParametersFactory mWindActorParametersFactory;
 	VertexFormatParametersFactory mVertexFormatParametersFactory;
+
+	BufferF32x1Factory mBufferF32x1Factory;
+	BufferF32x2Factory mBufferF32x2Factory;
+	BufferF32x3Factory mBufferF32x3Factory;
+	BufferF32x4Factory mBufferF32x4Factory;
+
+	BufferU8x1Factory mBufferU8x1Factory;
+	BufferU8x2Factory mBufferU8x2Factory;
+	BufferU8x3Factory mBufferU8x3Factory;
+	BufferU8x4Factory mBufferU8x4Factory;
+
+	BufferU16x1Factory mBufferU16x1Factory;
+	BufferU16x2Factory mBufferU16x2Factory;
+	BufferU16x3Factory mBufferU16x3Factory;
+	BufferU16x4Factory mBufferU16x4Factory;
+
+	BufferU32x1Factory mBufferU32x1Factory;
+	BufferU32x2Factory mBufferU32x2Factory;
+	BufferU32x3Factory mBufferU32x3Factory;
+	BufferU32x4Factory mBufferU32x4Factory;
+
+
 };
 
 
