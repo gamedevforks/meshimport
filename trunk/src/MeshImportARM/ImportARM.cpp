@@ -95,6 +95,31 @@ using namespace NxParameterized;
 
 namespace NVSHARE
 {
+	/**
+	\brief Potential semantics of a vertex buffer
+	*/
+	struct NxRenderVertexSemantic
+	{
+		enum Enum
+		{
+			CUSTOM = -1,			//!< User-defined
+
+			POSITION = 0,			//!< Position of vertex
+			NORMAL,					//!< Normal at vertex
+			TANGENT,				//!< Tangent at vertex
+			BINORMAL,				//!< Binormal at vertex
+			COLOR,					//!< Color at vertex
+			TEXCOORD0,				//!< Texture coord 0 of vertex
+			TEXCOORD1,				//!< Texture coord 1 of vertex
+			TEXCOORD2,				//!< Texture coord 2 of vertex
+			TEXCOORD3,				//!< Texture coord 3 of vertex
+			BONE_INDEX,				//!< Bone index of vertex
+			BONE_WEIGHT,			//!< Bone weight of vertex
+
+			NUM_SEMANTICS			//!< Count of standard semantics, not a valid semantic
+		};
+	};
+
 
 	/**
 	\brief Enumeration of possible formats of various buffer semantics
@@ -583,6 +608,100 @@ public:
 		}
 	}
 
+	void getBufferVec3(const void *_src,physx::PxU32 stride,NxParameterized::Interface *subMesh,physx::PxU32 vcount,physx::PxU32 index)
+	{
+		const physx::PxU8 *src = (physx::PxU8 *)_src;
+		NxParameterized::Handle handle(*subMesh);
+		char scratch[512];
+		physx::string::sprintf_s(scratch,512,"vertexBuffer.buffers[%d]",index);
+		NxParameterized::Interface *buffer = NxParameterized::findParam(*subMesh,scratch,handle);
+		PX_ASSERT(buffer);
+		if ( buffer )
+		{
+			NxParameterized::Interface *paramPtr = this->createNxParameterized("BufferF32x3");
+			handle.setParamRef(paramPtr);
+			PX_ASSERT(paramPtr);
+			if ( paramPtr )
+			{
+				NxParameterized::Handle bufferHandle(*paramPtr);
+				NxParameterized::Interface *f = NxParameterized::findParam(*paramPtr,"data",bufferHandle);
+				PX_ASSERT(f);
+				if ( f )
+				{
+					if ( bufferHandle.resizeArray(vcount) == ::NxParameterized::ERROR_NONE )
+					{
+						for (physx::PxU32 i=0; i<vcount; i++)
+						{
+							bufferHandle.setParamVec3Array((const physx::PxVec3 *)src,1,i);
+							src+=stride;
+						}
+					}
+					else
+					{
+						PX_ALWAYS_ASSERT();
+					}
+				}
+			}
+		}
+	}
+
+	void getBufferVec2(const void *_src,physx::PxU32 stride,NxParameterized::Interface *subMesh,physx::PxU32 vcount,physx::PxU32 index)
+	{
+		const physx::PxU8 *src = (physx::PxU8 *)_src;
+		NxParameterized::Handle handle(*subMesh);
+		char scratch[512];
+		physx::string::sprintf_s(scratch,512,"vertexBuffer.buffers[%d]",index);
+		NxParameterized::Interface *buffer = NxParameterized::findParam(*subMesh,scratch,handle);
+		PX_ASSERT(buffer);
+		if ( buffer )
+		{
+			NxParameterized::Interface *paramPtr = this->createNxParameterized("BufferF32x2");
+			handle.setParamRef(paramPtr);
+			PX_ASSERT(paramPtr);
+			if ( paramPtr )
+			{
+				NxParameterized::Handle bufferHandle(*paramPtr);
+				NxParameterized::Interface *f = NxParameterized::findParam(*paramPtr,"data",bufferHandle);
+				PX_ASSERT(f);
+				if ( f )
+				{
+					if ( bufferHandle.resizeArray(vcount) == ::NxParameterized::ERROR_NONE )
+					{
+						NxParameterized::ErrorType err;
+						for (physx::PxU32 i=0; i<vcount; i++)
+						{
+							err = bufferHandle.set(i);
+							PX_ASSERT( err == NxParameterized::ERROR_NONE );
+
+							const physx::PxF32 *coord = (const physx::PxF32 *)src;
+							err = bufferHandle.set(0);
+							PX_ASSERT( err == NxParameterized::ERROR_NONE );
+							err = bufferHandle.setParamF32(coord[0]);
+							PX_ASSERT( err == NxParameterized::ERROR_NONE );
+							bufferHandle.popIndex();
+
+							err = bufferHandle.set(1);
+							PX_ASSERT( err == NxParameterized::ERROR_NONE );
+							err = bufferHandle.setParamF32(coord[1]);
+							PX_ASSERT( err == NxParameterized::ERROR_NONE );
+							bufferHandle.popIndex();
+
+							bufferHandle.popIndex();
+
+							src+=stride;
+						}
+					}
+					else
+					{
+						PX_ALWAYS_ASSERT();
+					}
+				}
+			}
+		}
+	}
+
+
+
 	void copyBufferVec3(void *_dest,physx::PxU32 stride,NxParameterized::Interface *subMesh,physx::PxU32 vcount,physx::PxU32 index)
 	{
 		physx::PxU8 *dest = (physx::PxU8 *)_dest;
@@ -611,7 +730,9 @@ public:
 						{
 							for (physx::PxU32 i=0; i<vcount; i++)
 							{
-								bufferHandle.getParamVec3Array((physx::PxVec3 *)dest,1,i);
+								NxParameterized::ErrorType err = bufferHandle.getParamVec3Array((physx::PxVec3 *)dest,1,i);
+								PX_FORCE_PARAMETER_REFERENCE(err);
+								PX_ASSERT( err == NxParameterized::ERROR_NONE );
 								dest+=stride;
 							}
 						}
@@ -624,6 +745,7 @@ public:
 			}
 		}
 	}
+
 
 	void copyBufferVec2(void *_dest,physx::PxU32 stride,NxParameterized::Interface *subMesh,physx::PxU32 vcount,physx::PxU32 index)
 	{
@@ -651,9 +773,30 @@ public:
 						PX_ASSERT( bufferSize == (physx::PxI32)vcount );
 						if ( bufferSize == (physx::PxI32)vcount )
 						{
+							NxParameterized::ErrorType err;
 							for (physx::PxU32 i=0; i<vcount; i++)
 							{
-								bufferHandle.getParamF32Array((physx::PxF32 *)dest,2,i*2);
+								bufferHandle.set(i);
+
+								physx::PxF32 *texel = (physx::PxF32 *)dest;
+
+								// 
+								// read first float
+								err = bufferHandle.set(0);
+								PX_ASSERT( err == NxParameterized::ERROR_NONE );
+								err = bufferHandle.getParamF32(texel[0]);
+								PX_ASSERT( err == NxParameterized::ERROR_NONE );
+								bufferHandle.popIndex();
+
+								// read second float
+								err = bufferHandle.set(1);
+								PX_ASSERT( err == NxParameterized::ERROR_NONE );
+								err = bufferHandle.getParamF32(texel[1]);
+								PX_ASSERT( err == NxParameterized::ERROR_NONE );
+								bufferHandle.popIndex();
+
+
+								bufferHandle.popIndex();
 								dest+=stride;
 							}
 						}
@@ -816,14 +959,323 @@ public:
 		}
 	}
 
+	PX_INLINE physx::PxU32 hash( const char *string )
+	{
+		// "DJB" string hash 
+		physx::PxU32 h = 5381;
+		char c;
+		while( (c = *string++) != '\0' )
+		{
+			h = ((h<<5)+h)^c;
+		}
+		return h;
+	}
+
+
+	void getVertexBuffers(NxParameterized::Interface *subMesh,const MeshVertex *vertices,physx::PxU32 vcount,physx::PxU32 vflags)
+	{
+		char *formatNames[256];
+		NxRenderDataFormat::Enum formatTypes[256];
+		physx::PxI32 semanticTypes[256];
+		physx::PxU32 hashId[256];
+
+		physx::PxU32 formatCount=0;
+		if ( vflags & MIVF_POSITION ) 
+		{
+			formatNames[formatCount] = "SEMANTIC_POSITION";
+			semanticTypes[formatCount] = NxRenderVertexSemantic::POSITION;
+			formatTypes[formatCount] = NxRenderDataFormat::FLOAT3;
+			formatCount++;
+		}
+
+		if ( vflags & MIVF_NORMAL ) 
+		{
+			formatNames[formatCount] = "SEMANTIC_NORMAL";
+			semanticTypes[formatCount] = NxRenderVertexSemantic::NORMAL;
+			formatTypes[formatCount] = NxRenderDataFormat::FLOAT3;
+			formatCount++;
+		}
+		if ( vflags & MIVF_TANGENT ) 
+		{
+			formatNames[formatCount] = "SEMANTIC_TANGENT";
+			semanticTypes[formatCount] = NxRenderVertexSemantic::TANGENT;
+			formatTypes[formatCount] = NxRenderDataFormat::FLOAT3;
+			formatCount++;
+		}
+		if ( vflags & MIVF_BINORMAL ) 
+		{
+			formatNames[formatCount] = "SEMANTIC_BINORMAL";
+			semanticTypes[formatCount] = NxRenderVertexSemantic::BINORMAL;
+			formatTypes[formatCount] = NxRenderDataFormat::FLOAT3;
+			formatCount++;
+		}
+		if ( vflags & MIVF_TEXEL1 ) 
+		{
+			formatNames[formatCount] = "SEMANTIC_TEXCOORD0";
+			semanticTypes[formatCount] = NxRenderVertexSemantic::TEXCOORD0;
+			formatTypes[formatCount] = NxRenderDataFormat::FLOAT2;
+			formatCount++;
+		}
+		if ( vflags & MIVF_TEXEL2 ) 
+		{
+			formatNames[formatCount] = "SEMANTIC_TEXCOORD1";
+			semanticTypes[formatCount] = NxRenderVertexSemantic::TEXCOORD1;
+			formatTypes[formatCount] = NxRenderDataFormat::FLOAT2;
+			formatCount++;
+		}
+		if ( vflags & MIVF_TEXEL3 ) 
+		{
+			formatNames[formatCount] = "SEMANTIC_TEXCOORD2";
+			formatTypes[formatCount] = NxRenderDataFormat::FLOAT2;
+			semanticTypes[formatCount] = NxRenderVertexSemantic::TEXCOORD2;
+			formatCount++;
+		}
+		if ( vflags & MIVF_TEXEL4 ) 
+		{
+			formatNames[formatCount] = "SEMANTIC_TEXCOORD3";
+			formatTypes[formatCount] = NxRenderDataFormat::FLOAT2;
+			semanticTypes[formatCount] = NxRenderVertexSemantic::TEXCOORD3;
+			formatCount++;
+		}
+		for (physx::PxU32 i=0; i<formatCount; i++)
+		{
+			hashId[i] = hash( formatNames[i] );
+		}
+
+		NxParameterized::Handle handle(*subMesh);
+		NxParameterized::Interface *iface = NxParameterized::findParam(*subMesh,"vertexBuffer",handle);
+		if ( iface )
+		{
+			NxParameterized::Interface *vbuff = this->createNxParameterized("VertexBufferParameters");
+			PX_ASSERT(vbuff);
+			if ( vbuff )
+			{
+				handle.setParamRef(vbuff);
+			}
+		}
+		NxParameterized::setParamU32(*subMesh,"vertexBuffer.vertexCount",vcount);
+
+		iface = NxParameterized::findParam(*subMesh,"vertexBuffer.vertexFormat",handle);
+		if ( iface )
+		{
+			NxParameterized::Interface *vf = this->createNxParameterized("VertexFormatParameters");
+			PX_ASSERT(vf);
+			if ( vf )
+			{
+				handle.setParamRef(vf);
+			}
+		}
+
+		iface = NxParameterized::findParam(*subMesh,"vertexBuffer.vertexFormat.bufferFormats",handle);
+		if ( iface )
+		{
+			if ( handle.resizeArray(formatCount) == ::NxParameterized::ERROR_NONE )
+			{
+				for (physx::PxU32 i=0; i<formatCount; i++)
+				{
+					char scratch[512];
+					physx::string::sprintf_s(scratch,512,"vertexBuffer.vertexFormat.bufferFormats[%d].name",i);
+					NxParameterized::Interface *f = NxParameterized::findParam(*subMesh,scratch,handle);
+					PX_ASSERT(f);
+					if ( f )
+					{
+						handle.setParamString(formatNames[i]);
+					}
+					physx::string::sprintf_s(scratch,512,"vertexBuffer.vertexFormat.bufferFormats[%d].semantic",i);
+					f = NxParameterized::findParam(*subMesh,scratch,handle);
+					PX_ASSERT(f);
+					if ( f )
+					{
+						handle.setParamI32( semanticTypes[i] );
+					}
+					physx::string::sprintf_s(scratch,512,"vertexBuffer.vertexFormat.bufferFormats[%d].id",i);
+					f = NxParameterized::findParam(*subMesh,scratch,handle);
+					PX_ASSERT(f);
+					if ( f )
+					{
+						handle.setParamU32(hashId[i]);
+					}
+					physx::string::sprintf_s(scratch,512,"vertexBuffer.vertexFormat.bufferFormats[%d].format",i);
+					f = NxParameterized::findParam(*subMesh,scratch,handle);
+					PX_ASSERT(f);
+					if ( f )
+					{
+						handle.setParamU32( formatTypes[i] );
+					}
+					physx::string::sprintf_s(scratch,512,"vertexBuffer.vertexFormat.bufferFormats[%d].serialize",i);
+					f = NxParameterized::findParam(*subMesh,scratch,handle);
+					PX_ASSERT(f);
+					if ( f )
+					{
+						handle.setParamBool(true);
+					}
+				}
+			}
+		}
+
+		NxParameterized::Interface *buffers = NxParameterized::findParam(*subMesh,"vertexBuffer.buffers",handle);
+		if ( buffers )
+		{
+			handle.resizeArray(formatCount);
+		}
+
+
+		for (physx::PxU32 i=0; i<formatCount; i++)
+		{
+			switch ( semanticTypes[i] )
+			{
+				case NxRenderVertexSemantic::POSITION:
+					getBufferVec3(&vertices[0].mPos,sizeof(MeshVertex),subMesh,vcount,i);
+					break;
+				case NxRenderVertexSemantic::NORMAL:
+					getBufferVec3(&vertices[0].mNormal,sizeof(MeshVertex),subMesh,vcount,i);
+					break;
+				case NxRenderVertexSemantic::TANGENT:
+					getBufferVec3(&vertices[0].mNormal,sizeof(MeshVertex),subMesh,vcount,i);
+					break;
+				case NxRenderVertexSemantic::BINORMAL:
+					getBufferVec3(&vertices[0].mNormal,sizeof(MeshVertex),subMesh,vcount,i);
+					break;
+				case NxRenderVertexSemantic::TEXCOORD0:
+					getBufferVec2(&vertices[0].mTexel1,sizeof(MeshVertex),subMesh,vcount,i);
+					break;
+				case NxRenderVertexSemantic::TEXCOORD1:
+					getBufferVec2(&vertices[0].mTexel2,sizeof(MeshVertex),subMesh,vcount,i);
+					break;
+				case NxRenderVertexSemantic::TEXCOORD2:
+					getBufferVec2(&vertices[0].mTexel3,sizeof(MeshVertex),subMesh,vcount,i);
+					break;
+				case NxRenderVertexSemantic::TEXCOORD3:
+					getBufferVec2(&vertices[0].mTexel4,sizeof(MeshVertex),subMesh,vcount,i);
+					break;
+
+
+
+			}
+		}
+	}
+
+	void getSubMesh(NxParameterized::Interface *subMesh,SubMesh *sm,Mesh *m)
+	{
+		NxParameterized::Handle handle(*subMesh);
+
+		physx::PxU32 vcount=0;
+		MeshVertex *vertices = new MeshVertex[m->mVertexCount];
+		physx::PxU8 *indexRemapIn = new physx::PxU8[m->mVertexCount];
+		memset(indexRemapIn,0,sizeof(physx::PxU8)*m->mVertexCount);
+
+		physx::PxU32 *indexRemapOut = new physx::PxU32[m->mVertexCount];
+
+		for (physx::PxU32 i=0; i<sm->mTriCount*3; i++)
+		{
+			physx::PxU32 index = sm->mIndices[i];
+			if ( indexRemapIn[index] == 0 )
+			{
+				indexRemapIn[index] = 1; // represented
+				indexRemapOut[index] = vcount;
+				vertices[vcount] = m->mVertices[index];
+				vcount++;
+			}
+		}
+
+		getVertexBuffers(subMesh,vertices,vcount,m->mVertexFlags);
+
+		delete []indexRemapIn;
+
+		NxParameterized::Interface *iface = NxParameterized::findParam(*subMesh,"indexBuffer",handle);
+		if ( iface )
+		{
+			if ( handle.resizeArray(sm->mTriCount*3) == ::NxParameterized::ERROR_NONE )
+			{
+				for (physx::PxU32 i=0; i<sm->mTriCount; i++)
+				{
+					physx::PxU32 tri[3];
+					tri[0] = indexRemapOut[sm->mIndices[i*3+0]];
+					tri[1] = indexRemapOut[sm->mIndices[i*3+1]];
+					tri[2] = indexRemapOut[sm->mIndices[i*3+2]];
+					handle.setParamU32Array(tri,3,i*3);
+				}
+			}
+		}
+
+		delete []vertices;
+		delete []indexRemapOut;
+
+	}
+
+	NxParameterized::Interface * getApexRenderMesh(Mesh *mesh)
+	{
+		NxParameterized::Interface *renderMesh = this->createNxParameterized("RenderMeshAssetParameters");
+
+		NxParameterized::Handle handle(*renderMesh);
+		NxParameterized::Interface *iface = NxParameterized::findParam(*renderMesh,"materialNames",handle);
+		if ( iface )
+		{
+			handle.resizeArray(mesh->mSubMeshCount);
+		}
+		iface = NxParameterized::findParam(*renderMesh,"submeshes",handle);
+		if ( iface )
+		{
+			handle.resizeArray(mesh->mSubMeshCount);
+			for (physx::PxU32 i=0; i<mesh->mSubMeshCount; i++)
+			{
+				SubMesh *subMesh = mesh->mSubMeshes[i];
+				handle.set(i);
+				NxParameterized::Interface *paramPtr = this->createNxParameterized("SubmeshParameters");
+				handle.setParamRef(paramPtr);
+				if ( paramPtr )
+				{
+					NxParameterized::Handle materialHandle(*renderMesh);
+					char scratch[512];
+					physx::string::sprintf_s(scratch,512,"materialNames[%d]",i);
+					NxParameterized::Interface *mat = NxParameterized::findParam(*renderMesh,scratch,materialHandle);
+					PX_ASSERT(mat);
+					if ( mat )
+					{
+						materialHandle.setParamString(subMesh->mMaterialName);
+					}
+					getSubMesh(paramPtr,subMesh,mesh);
+				}
+				handle.popIndex();
+			}
+		}
+		return renderMesh;
+	}
+
 	virtual const void * saveMeshSystem(MeshSystem *ms,NxU32 &dlen,bool binary)
 	{
-		return NULL;
+
+		const void *ret = NULL;
+
+		NxParameterized::Interface ** meshes = new NxParameterized::Interface *[ms->mMeshCount];
+		for (physx::PxU32 i=0; i<ms->mMeshCount; i++)
+		{
+			meshes[i] = getApexRenderMesh(ms->mMeshes[i] );
+		}
+		NxParameterized::NxSerializer *ser = internalCreateNxSerializer(binary ? NxSerializer::NST_BINARY : NxSerializer::NST_XML, this );
+		PX_ASSERT(ser);
+		physx::PxMemoryBuffer mbuff;
+		ser->serialize(mbuff,(const NxParameterized::Interface **)meshes,ms->mMeshCount);
+		if ( mbuff.getWriteBufferSize() > 0 )
+		{
+			void *mem = ::malloc(mbuff.getWriteBufferSize());
+			PX_ASSERT(mem);
+			memcpy(mem,mbuff.getWriteBuffer(),mbuff.getWriteBufferSize());
+			dlen = mbuff.getWriteBufferSize();
+			ret = mem;
+		}
+		for (physx::PxU32 i=0; i<ms->mMeshCount; i++)
+		{
+			meshes[i]->destroy();
+		}
+		delete []meshes;
+
+		return ret;
 	}
 
 	virtual void releaseSavedMeshSystem(const void *mem)
 	{
-
+		::free((void *)mem);
 	}
 
 

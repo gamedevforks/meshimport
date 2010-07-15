@@ -87,15 +87,15 @@ md NxParameterized
 cd NxParameterized
 md include
 cd include
-copy \p4\sw\physx\APEXSDK\1.0\trunk\NxParameterized\include\*.*
+copy \p4\sw\physx\APEXSDK\1.0\feature\UE3_APEX\NxParameterized\include\*.*
 cd ..
 md public
 cd public
-copy \p4\sw\physx\APEXSDK\1.0\trunk\NxParameterized\public\*.*
+copy \p4\sw\physx\APEXSDK\1.0\feature\UE3_APEX\NxParameterized\public\*.*
 cd ..
 md src
 cd src
-copy \p4\sw\physx\APEXSDK\1.0\trunk\NxParameterized\src\*.*
+copy \p4\sw\physx\APEXSDK\1.0\feature\UE3_APEX\NxParameterized\src\*.*
 cd ..
 cd ..
 
