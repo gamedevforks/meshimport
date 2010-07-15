@@ -67,6 +67,16 @@ public:
     return ret;
   }
 
+  virtual const void * saveMeshSystem(MeshSystem *ms,NxU32 &dlen,bool binary) 
+  {
+	  return NULL;
+  }
+
+  virtual void releaseSavedMeshSystem(const void *mem) 
+  {
+
+  }
+
 
 
 };

@@ -2074,6 +2074,20 @@ public:
         }
         fi_fclose(exfph);
       }
+	  else if ( data.mFormat == MSF_ARM_XML || data.mFormat == MSF_ARM_BINARY )
+	  {
+		  MeshImporter *imp = locateMeshImporter("mesh.apx");
+		  if ( imp )
+		  {
+			  NxU32 dlen;
+			  const void *mem = imp->saveMeshSystem(mesh,dlen, data.mFormat == MSF_ARM_BINARY );
+			  if( mem )
+			  {
+				  fi_fwrite(mem,dlen,1,fph);
+				  imp->releaseSavedMeshSystem(mem);
+			  }
+		  }
+	  }
 
       size_t olen;
       void *temp = fi_getMemBuffer(fph,&olen);

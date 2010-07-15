@@ -29,10 +29,12 @@ class MyMeshImportARM : public MeshImporter, public Memalloc
 public:
   MyMeshImportARM(void)
   {
+	  mMeshImporter = NVSHARE::createMeshImportARM();
   }
 
   virtual ~MyMeshImportARM(void)
   {
+	  NVSHARE::releaseMeshImportARM(mMeshImporter);
   }
 
   bool shutdown(void)
@@ -54,20 +56,20 @@ public:
 
   virtual bool importMesh(const char *meshName,const void *data,NxU32 dlen,NVSHARE::MeshImportInterface *callback,const char *options,MeshImportApplicationResource *appResource)
   {
-    bool ret = false;
-
-    NVSHARE::MeshImporter *mi = NVSHARE::createMeshImportARM();
-
-    if ( mi )
-    {
-      ret = mi->importMesh(meshName,data,dlen,callback,options,appResource);
-      NVSHARE::releaseMeshImportARM(mi);
-    }
-
-    return ret;
+    return mMeshImporter->importMesh(meshName,data,dlen,callback,options,appResource);
   }
 
+  virtual const void * saveMeshSystem(MeshSystem *ms,NxU32 &dlen,bool binary) 
+  {
+	  return mMeshImporter->saveMeshSystem(ms,dlen,binary);
+  }
 
+  virtual void releaseSavedMeshSystem(const void *mem) 
+  {
+	mMeshImporter->releaseSavedMeshSystem(mem);
+  }
+
+  MeshImporter *mMeshImporter;
 
 };
 
