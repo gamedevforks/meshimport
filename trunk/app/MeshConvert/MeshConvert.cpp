@@ -328,6 +328,7 @@ void main(NxI32 argc,const char **argv)
                             }
 
                             NVSHARE::MeshSerialize ms(outputFormat);
+							ms.mSaveFileName = fname;
 							NVSHARE::MeshSystem *msystem = meshImport->getMeshSystem(msc);
                             meshImport->serializeMeshSystem(msystem,ms);
 
