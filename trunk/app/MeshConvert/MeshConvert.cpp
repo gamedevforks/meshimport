@@ -193,8 +193,13 @@ void main(NxI32 argc,const char **argv)
 					}
 					else if ( stricmp(value,"apx") == 0 )
 					{
-						outputFormat = NVSHARE::MSF_ARM;
-						printf("Setting output format to APEX Render Mesh\r\n");
+						outputFormat = NVSHARE::MSF_ARM_XML;
+						printf("Setting output format to APEX Render Mesh XML\r\n");
+					}
+					else if ( stricmp(value,"apb") == 0 )
+					{
+						outputFormat = NVSHARE::MSF_ARM_BINARY;
+						printf("Setting output format to APEX Render Mesh Binary\r\n");
 					}
                     else
                     {
@@ -257,8 +262,13 @@ void main(NxI32 argc,const char **argv)
             }
 			else if ( strstr(fname,".apx") )
 			{
-				inputFormat = NVSHARE::MSF_ARM;
+				inputFormat = NVSHARE::MSF_ARM_XML;
 			}
+			else if ( strstr(fname,".apb") )
+			{
+				inputFormat = NVSHARE::MSF_ARM_BINARY;
+			}
+
 
 			strncpy(fname,argv[1],512);
 			FILE *fph = fopen(fname,"rb");
@@ -313,8 +323,11 @@ void main(NxI32 argc,const char **argv)
 							  case NVSHARE::MSF_FBX:
 								  strcat(fname,".fbx");
 								  break;
-							  case NVSHARE::MSF_ARM:
+							  case NVSHARE::MSF_ARM_XML:
 								  strcat(fname,".apx");
+								  break;
+							  case NVSHARE::MSF_ARM_BINARY:
+								  strcat(fname,".apb");
 								  break;
                             }
 

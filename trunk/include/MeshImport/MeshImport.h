@@ -1301,7 +1301,6 @@ public:
 
   virtual void importPlane(const NxF32 *p) = 0;
 
-  
 };
 
 // allows the application to load external resources.
@@ -1325,6 +1324,14 @@ public:
 
   virtual bool             importMesh(const char *meshName,const void *data,NxU32 dlen,MeshImportInterface *callback,const char *options,MeshImportApplicationResource *appResource) = 0;
 
+  virtual const void * saveMeshSystem(MeshSystem *ms,NxU32 &dlen,bool binary) 
+  {
+	return NULL;
+  }
+  virtual void releaseSavedMeshSystem(const void *mem) 
+  {
+
+  }
 };
 
 enum MeshSerializeFormat
@@ -1334,7 +1341,8 @@ enum MeshSerializeFormat
   MSF_WAVEFRONT, // save as wavefront OBJ
   MSF_PSK, // save it back out as a PSK format file.
   MSF_FBX,  // FBX import is supported by FBX output is not yet.
-  MSF_ARM,   // APEX render mesh
+  MSF_ARM_XML,   // APEX render mesh
+  MSF_ARM_BINARY,
   MSF_LAST
 };
 
