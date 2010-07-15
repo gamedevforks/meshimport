@@ -1324,11 +1324,11 @@ public:
 
   virtual bool             importMesh(const char *meshName,const void *data,NxU32 dlen,MeshImportInterface *callback,const char *options,MeshImportApplicationResource *appResource) = 0;
 
-  virtual const void * saveMeshSystem(MeshSystem *ms,NxU32 &dlen,bool binary) 
+  virtual const void * saveMeshSystem(MeshSystem * /*ms*/,NxU32 & /*dlen*/,bool /*binary*/) 
   {
 	return NULL;
   }
-  virtual void releaseSavedMeshSystem(const void *mem) 
+  virtual void releaseSavedMeshSystem(const void * /*mem*/) 
   {
 
   }

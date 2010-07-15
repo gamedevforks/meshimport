@@ -94,17 +94,13 @@ public:
 
 void main(NxI32 argc,const char **argv)
 {
-
-
-
-
     if ( argc < 2 )
     {
         printf("Usage: MeshConvert <name> (options)\r\n");
         printf("\r\n");
         printf("-r x y z   : Rotates the mesh by this euler rotation. 90 0 0 rotates a Y-up axis mesh to be Z-up.\r\n");
         printf("-s scale   : Scales the input mesh by this amount.  50 to go from metric to UE3 and 0.02 to go from UE3 to metric.\r\n");
-        printf("-f format  : Output formats are OBJ, EZM, XML (Ogre3d), PSK\r\n");
+        printf("-f format  : Output formats are OBJ, EZM, XML (Ogre3d), PSK, APX, and APB\r\n");
     }
     else
     {
