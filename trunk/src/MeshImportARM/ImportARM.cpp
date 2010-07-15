@@ -1197,6 +1197,25 @@ public:
 				}
 			}
 		}
+		iface = NxParameterized::findParam(*subMesh,"vertexPartition",handle);
+		if ( iface )
+		{
+			if ( handle.resizeArray(2) == ::NxParameterized::ERROR_NONE )
+			{
+				physx::PxU32 store[2] = { 0, vcount };
+				handle.setParamU32Array(store,2,0);
+			}
+		}
+		iface = NxParameterized::findParam(*subMesh,"indexPartition",handle);
+		if ( iface )
+		{
+			if ( handle.resizeArray(2) == ::NxParameterized::ERROR_NONE )
+			{
+				physx::PxU32 store[2] = { 0, sm->mTriCount*3 };
+				handle.setParamU32Array(store,2,0);
+			}
+		}
+
 
 		delete []vertices;
 		delete []indexRemapOut;

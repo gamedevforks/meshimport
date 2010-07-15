@@ -629,7 +629,6 @@ public:
 		switch ( mType )
 		{
       case NT_NONE:
-        assert(0);
         break;
       case NT_MESH_COLLISION_REPRESENTATION:
         delete mMeshCollisionRepresentation;
