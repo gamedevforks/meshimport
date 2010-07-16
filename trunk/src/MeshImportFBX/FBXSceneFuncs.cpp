@@ -333,21 +333,14 @@ void MeshImportFBX::AddMeshNode(KFbxNode* pNode)
 				continue;
 
 			int lNbTex = lProperty.GetSrcObjectCount( KFbxTexture::ClassId );
-			bool prev = false;
-
 			for (int lTextureIndex = 0; lTextureIndex < lNbTex; ++lTextureIndex )
 			{
 				KFbxTexture * lTexture = KFbxCast<KFbxTexture>( lProperty.GetSrcObject( KFbxTexture::ClassId, lTextureIndex ) ); 
 				if ( !lTexture )
 					continue;
 				KString textureFileName = lTexture->GetFileName( );
-				if ( prev )
-				{
-					info+="+";
-					prev = false;
-				}
-				info+=textureFileName.Buffer();
-				prev = true;
+				info = "diffuse=" + textureFileName;
+				break;
 			}
 		}
 
