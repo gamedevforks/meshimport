@@ -1,350 +1,180 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
-	ProjectType="Visual C++"
-	Version="9.00"
-	Name="MeshImportOgre"
-	ProjectGUID="{95616A0F-1651-8B98-68B7-3678C9EA5ACB}"
-	TargetFrameworkVersion="0"
-	>
-	<Platforms>
-		<Platform
-			Name="Win32"
-		/>
-	</Platforms>
-	<ToolFiles>
-	</ToolFiles>
-	<Configurations>
-		<Configuration
-			Name="default|Win32"
-			OutputDirectory="../../bin/win32"
-			IntermediateDirectory="Win32/MeshImportOgre/default"
-			ConfigurationType="2"
-			CharacterSet="2"
-			>
-			<Tool
-				Name="VCPreBuildEventTool"
-			/>
-			<Tool
-				Name="VCCustomBuildTool"
-			/>
-			<Tool
-				Name="VCXMLDataGeneratorTool"
-			/>
-			<Tool
-				Name="VCWebServiceProxyGeneratorTool"
-			/>
-			<Tool
-				Name="VCMIDLTool"
-			/>
-			<Tool
-				Name="VCCLCompilerTool"
-				AdditionalOptions=""
-				Optimization="4"
-				AdditionalIncludeDirectories="&quot;../../include/common/snippets&quot;;&quot;../../include/MeshImport&quot;;&quot;../../include&quot;;&quot;../../include/common/snippets&quot;;&quot;../../include/MeshImport&quot;;&quot;../../include&quot;;"
-				PreprocessorDefinitions="WIN32;_WINDOWS;UNICODE=1;_UNICODE=1;MESHIMPORTOGRE_EXPORTS;WIN32;_WINDOWS;UNICODE=1;_UNICODE=1;MESHIMPORTOGRE_EXPORTS;"
-				ExceptionHandling="1"
-				WarningLevel="3"
-			/>
-			<Tool
-				Name="VCManagedResourceCompilerTool"
-			/>
-			<Tool
-				Name="VCResourceCompilerTool"
-			/>
-			<Tool
-				Name="VCPreLinkEventTool"
-			/>
-			<Tool
-				Name="VCLinkerTool"
-				AdditionalOptions=""
-				AdditionalDependencies=""
-				OutputFile="$(OutDir)/MeshImportOgre.dll"
-				AdditionalLibraryDirectories="&quot;../../lib/win32&quot;;&quot;../../lib/win32&quot;;"
-				ProgramDatabaseFile="$(OutDir)/MeshImportOgre.dll.pdb"
-				GenerateMapFile="true"
-				MapFileName="$(OutDir)/MeshImportOgre.dll.map"
-				SubSystem="1"
-				ImportLibrary="../../lib/win32/$(TargetName).lib"
-			/>
-			<Tool
-				Name="VCALinkTool"
-			/>
-			<Tool
-				Name="VCManifestTool"
-			/>
-			<Tool
-				Name="VCXDCMakeTool"
-			/>
-			<Tool
-				Name="VCBscMakeTool"
-			/>
-			<Tool
-				Name="VCFxCopTool"
-			/>
-			<Tool
-				Name="VCAppVerifierTool"
-			/>
-			<Tool
-				Name="VCPostBuildEventTool"
-			/>
-		</Configuration>
-		<Configuration
-			Name="debug|Win32"
-			OutputDirectory="../../bin/win32"
-			IntermediateDirectory="Win32/MeshImportOgre/debug"
-			ConfigurationType="2"
-			CharacterSet="2"
-			>
-			<Tool
-				Name="VCPreBuildEventTool"
-			/>
-			<Tool
-				Name="VCCustomBuildTool"
-			/>
-			<Tool
-				Name="VCXMLDataGeneratorTool"
-			/>
-			<Tool
-				Name="VCWebServiceProxyGeneratorTool"
-			/>
-			<Tool
-				Name="VCMIDLTool"
-			/>
-			<Tool
-				Name="VCCLCompilerTool"
-				AdditionalOptions="/WX /W4 /fp:fast /MDd /Zi "
-				Optimization="4"
-				AdditionalIncludeDirectories="&quot;../../include/common/snippets&quot;;&quot;../../include/MeshImport&quot;;&quot;../../include&quot;;"
-				PreprocessorDefinitions="WIN32;_WINDOWS;UNICODE=1;_UNICODE=1;MESHIMPORTOGRE_EXPORTS;_DEBUG;"
-				ExceptionHandling="1"
-				WarningLevel="3"
-			/>
-			<Tool
-				Name="VCManagedResourceCompilerTool"
-			/>
-			<Tool
-				Name="VCResourceCompilerTool"
-			/>
-			<Tool
-				Name="VCPreLinkEventTool"
-			/>
-			<Tool
-				Name="VCLinkerTool"
-				AdditionalOptions="/DEBUG "
-				AdditionalDependencies=""
-				OutputFile="$(OutDir)/MeshImportOgre.dll"
-				AdditionalLibraryDirectories="&quot;../../lib/win32&quot;;"
-				ProgramDatabaseFile="$(OutDir)/MeshImportOgre.dll.pdb"
-				GenerateMapFile="true"
-				MapFileName="$(OutDir)/MeshImportOgre.dll.map"
-				SubSystem="1"
-				ImportLibrary="../../lib/win32/$(TargetName).lib"
-			/>
-			<Tool
-				Name="VCALinkTool"
-			/>
-			<Tool
-				Name="VCManifestTool"
-			/>
-			<Tool
-				Name="VCXDCMakeTool"
-			/>
-			<Tool
-				Name="VCBscMakeTool"
-			/>
-			<Tool
-				Name="VCFxCopTool"
-			/>
-			<Tool
-				Name="VCAppVerifierTool"
-			/>
-			<Tool
-				Name="VCPostBuildEventTool"
-			/>
-		</Configuration>
-		<Configuration
-			Name="release|Win32"
-			OutputDirectory="../../bin/win32"
-			IntermediateDirectory="Win32/MeshImportOgre/release"
-			ConfigurationType="2"
-			CharacterSet="2"
-			>
-			<Tool
-				Name="VCPreBuildEventTool"
-			/>
-			<Tool
-				Name="VCCustomBuildTool"
-			/>
-			<Tool
-				Name="VCXMLDataGeneratorTool"
-			/>
-			<Tool
-				Name="VCWebServiceProxyGeneratorTool"
-			/>
-			<Tool
-				Name="VCMIDLTool"
-			/>
-			<Tool
-				Name="VCCLCompilerTool"
-				AdditionalOptions="/Zi /WX /W4 /fp:fast /WX /MD /O2 "
-				Optimization="4"
-				AdditionalIncludeDirectories="&quot;../../include/common/snippets&quot;;&quot;../../include/MeshImport&quot;;&quot;../../include&quot;;"
-				PreprocessorDefinitions="WIN32;_WINDOWS;UNICODE=1;_UNICODE=1;MESHIMPORTOGRE_EXPORTS;NDEBUG;"
-				ExceptionHandling="1"
-				WarningLevel="3"
-			/>
-			<Tool
-				Name="VCManagedResourceCompilerTool"
-			/>
-			<Tool
-				Name="VCResourceCompilerTool"
-			/>
-			<Tool
-				Name="VCPreLinkEventTool"
-			/>
-			<Tool
-				Name="VCLinkerTool"
-				AdditionalOptions="/DEBUG "
-				AdditionalDependencies=""
-				OutputFile="$(OutDir)/MeshImportOgre.dll"
-				AdditionalLibraryDirectories="&quot;../../lib/win32&quot;;"
-				ProgramDatabaseFile="$(OutDir)/MeshImportOgre.dll.pdb"
-				GenerateMapFile="true"
-				MapFileName="$(OutDir)/MeshImportOgre.dll.map"
-				SubSystem="1"
-				ImportLibrary="../../lib/win32/$(TargetName).lib"
-			/>
-			<Tool
-				Name="VCALinkTool"
-			/>
-			<Tool
-				Name="VCManifestTool"
-			/>
-			<Tool
-				Name="VCXDCMakeTool"
-			/>
-			<Tool
-				Name="VCBscMakeTool"
-			/>
-			<Tool
-				Name="VCFxCopTool"
-			/>
-			<Tool
-				Name="VCAppVerifierTool"
-			/>
-			<Tool
-				Name="VCPostBuildEventTool"
-			/>
-		</Configuration>
-	</Configurations>
-	<References>
-	</References>
-	<Files>
-		<Filter
-			Name="Source Files"
-			>
-			<File
-				RelativePath="..\..\src\MeshImportOgre\ImportOgre.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\src\MeshImportOgre\MeshImportOgre.cpp"
-				>
-			</File>
-		</Filter>
-		<Filter
-			Name="Header Files"
-			>
-			<File
-				RelativePath="..\..\src\MeshImportOgre\ImportOgre.h"
-				>
-			</File>
-		</Filter>
-		<Filter
-			Name="Plugin Header Files"
-			>
-			<Filter
-				Name="MeshImport"
-				>
-				<File
-					RelativePath="..\..\include\MeshImport\MeshImport.h"
-					>
-				</File>
-			</Filter>
-		</Filter>
-		<Filter
-			Name="Common Include-Binding Files"
-			>
-			<Filter
-				Name="snippets"
-				>
-				<File
-					RelativePath="..\..\include\common\snippets\inparser.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\include\common\snippets\inparser.h"
-					>
-				</File>
-				<File
-					RelativePath="..\..\include\common\snippets\LegacyFastXml.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\include\common\snippets\LegacyFastXml.h"
-					>
-				</File>
-				<File
-					RelativePath="..\..\include\common\snippets\nvstl.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\include\common\snippets\Nx.h"
-					>
-				</File>
-				<File
-					RelativePath="..\..\include\common\snippets\NxAssert.h"
-					>
-				</File>
-				<File
-					RelativePath="..\..\include\common\snippets\NxMath.h"
-					>
-				</File>
-				<File
-					RelativePath="..\..\include\common\snippets\NxSimpleTypes.h"
-					>
-				</File>
-				<File
-					RelativePath="..\..\include\common\snippets\NxUserAllocator.h"
-					>
-				</File>
-				<File
-					RelativePath="..\..\include\common\snippets\stable.h"
-					>
-				</File>
-				<File
-					RelativePath="..\..\include\common\snippets\stringdict.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\include\common\snippets\stringdict.h"
-					>
-				</File>
-				<File
-					RelativePath="..\..\include\common\snippets\sutil.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\include\common\snippets\sutil.h"
-					>
-				</File>
-				<File
-					RelativePath="..\..\include\common\snippets\UserMemAlloc.h"
-					>
-				</File>
-			</Filter>
-		</Filter>
-	</Files>
-	<Globals>
-	</Globals>
+ProjectType="Visual C++"
+Version="9.00"
+Name="MeshImportOgre"
+>
+<Platforms>
+<Platform Name="Win32"/>
+</Platforms>
+<Configurations>
+  <Configuration
+    Name="default|Win32"
+    OutputDirectory="../../bin/win32"
+    IntermediateDirectory="Win32/MeshImportOgre/default"
+    ConfigurationType="2"
+    InheritedPropertySheets=""
+    CharacterSet="2"
+    >
+    <Tool
+      Name="VCCLCompilerTool"
+      AdditionalIncludeDirectories="&quot;../../include/common/snippets&quot;;&quot;../../include/MeshImport&quot;;&quot;../../include&quot;;&quot;../../include/common/snippets&quot;;&quot;../../include/MeshImport&quot;;&quot;../../include&quot;;"
+      PreprocessorDefinitions="WIN32;_WINDOWS;UNICODE=1;_UNICODE=1;MESHIMPORTOGRE_EXPORTS;WIN32;_WINDOWS;UNICODE=1;_UNICODE=1;MESHIMPORTOGRE_EXPORTS;"
+      WarningLevel="3"
+      Optimization="4"
+      AdditionalOptions=""
+      ExceptionHandling="1"
+      DebugInformationFormat=""
+      RuntimeLibrary=""
+      />
+    <Tool Name="VCCustomBuildTool"/>
+    <Tool 
+      Name="VCLinkerTool" 
+      OutputFile="$(OutDir)/MeshImportOgre.dll" 
+      ProgramDatabaseFile="$(OutDir)/MeshImportOgre.dll.pdb" 
+      AdditionalOptions=""
+      AdditionalDependencies=""
+      AdditionalLibraryDirectories="&quot;../../lib/win32&quot;;&quot;../../lib/win32&quot;;"
+      ImportLibrary="../../lib/win32/$(TargetName).lib"
+      GenerateMapFile="TRUE"
+      MapFileName="$(OutDir)/MeshImportOgre.dll.map"
+      SubSystem="1"
+      GenerateDebugInformation=""
+      />
+    <Tool Name="VCMIDLTool"/>
+    <Tool Name="VCPreBuildEventTool"/>
+    <Tool Name="VCPostBuildEventTool"/>
+    <Tool Name="VCPreLinkEventTool"/>
+    <Tool Name="VCResourceCompilerTool"/>
+    <Tool Name="VCWebServiceProxyGeneratorTool"/>
+    <Tool Name="VCXMLDataGeneratorTool"/>
+    <Tool Name="VCWebDeploymentTool"/>
+    <Tool Name="VCManagedWrapperGeneratorTool"/>
+    <Tool Name="VCAuxiliaryManagedWrapperGeneratorTool"/>
+  </Configuration>
+  <Configuration
+    Name="debug|Win32"
+    OutputDirectory="../../bin/win32"
+    IntermediateDirectory="Win32/MeshImportOgre/debug"
+    ConfigurationType="2"
+    InheritedPropertySheets=""
+    CharacterSet="2"
+    >
+    <Tool
+      Name="VCCLCompilerTool"
+      AdditionalIncludeDirectories="&quot;../../include/common/snippets&quot;;&quot;../../include/MeshImport&quot;;&quot;../../include&quot;;"
+      PreprocessorDefinitions="WIN32;_WINDOWS;UNICODE=1;_UNICODE=1;MESHIMPORTOGRE_EXPORTS;_DEBUG;"
+      WarningLevel="3"
+      Optimization="4"
+      AdditionalOptions="/WX /W4 /fp:fast /MDd /Zi "
+      ExceptionHandling="1"
+      DebugInformationFormat=""
+      RuntimeLibrary=""
+      />
+    <Tool Name="VCCustomBuildTool"/>
+    <Tool 
+      Name="VCLinkerTool" 
+      OutputFile="$(OutDir)/MeshImportOgre.dll" 
+      ProgramDatabaseFile="$(OutDir)/MeshImportOgre.dll.pdb" 
+      AdditionalOptions="/DEBUG "
+      AdditionalDependencies=""
+      AdditionalLibraryDirectories="&quot;../../lib/win32&quot;;"
+      ImportLibrary="../../lib/win32/$(TargetName).lib"
+      GenerateMapFile="TRUE"
+      MapFileName="$(OutDir)/MeshImportOgre.dll.map"
+      SubSystem="1"
+      GenerateDebugInformation=""
+      />
+    <Tool Name="VCMIDLTool"/>
+    <Tool Name="VCPreBuildEventTool"/>
+    <Tool Name="VCPostBuildEventTool"/>
+    <Tool Name="VCPreLinkEventTool"/>
+    <Tool Name="VCResourceCompilerTool"/>
+    <Tool Name="VCWebServiceProxyGeneratorTool"/>
+    <Tool Name="VCXMLDataGeneratorTool"/>
+    <Tool Name="VCWebDeploymentTool"/>
+    <Tool Name="VCManagedWrapperGeneratorTool"/>
+    <Tool Name="VCAuxiliaryManagedWrapperGeneratorTool"/>
+  </Configuration>
+  <Configuration
+    Name="release|Win32"
+    OutputDirectory="../../bin/win32"
+    IntermediateDirectory="Win32/MeshImportOgre/release"
+    ConfigurationType="2"
+    InheritedPropertySheets=""
+    CharacterSet="2"
+    >
+    <Tool
+      Name="VCCLCompilerTool"
+      AdditionalIncludeDirectories="&quot;../../include/common/snippets&quot;;&quot;../../include/MeshImport&quot;;&quot;../../include&quot;;"
+      PreprocessorDefinitions="WIN32;_WINDOWS;UNICODE=1;_UNICODE=1;MESHIMPORTOGRE_EXPORTS;NDEBUG;"
+      WarningLevel="3"
+      Optimization="4"
+      AdditionalOptions="/Zi /WX /W4 /fp:fast /WX /MD /O2 "
+      ExceptionHandling="1"
+      DebugInformationFormat=""
+      RuntimeLibrary=""
+      />
+    <Tool Name="VCCustomBuildTool"/>
+    <Tool 
+      Name="VCLinkerTool" 
+      OutputFile="$(OutDir)/MeshImportOgre.dll" 
+      ProgramDatabaseFile="$(OutDir)/MeshImportOgre.dll.pdb" 
+      AdditionalOptions="/DEBUG "
+      AdditionalDependencies=""
+      AdditionalLibraryDirectories="&quot;../../lib/win32&quot;;"
+      ImportLibrary="../../lib/win32/$(TargetName).lib"
+      GenerateMapFile="TRUE"
+      MapFileName="$(OutDir)/MeshImportOgre.dll.map"
+      SubSystem="1"
+      GenerateDebugInformation=""
+      />
+    <Tool Name="VCMIDLTool"/>
+    <Tool Name="VCPreBuildEventTool"/>
+    <Tool Name="VCPostBuildEventTool"/>
+    <Tool Name="VCPreLinkEventTool"/>
+    <Tool Name="VCResourceCompilerTool"/>
+    <Tool Name="VCWebServiceProxyGeneratorTool"/>
+    <Tool Name="VCXMLDataGeneratorTool"/>
+    <Tool Name="VCWebDeploymentTool"/>
+    <Tool Name="VCManagedWrapperGeneratorTool"/>
+    <Tool Name="VCAuxiliaryManagedWrapperGeneratorTool"/>
+  </Configuration>
+</Configurations>
+<References></References>
+<Files>
+  <Filter Name="Source Files" Filter=""> <!--  -->
+    <File RelativePath="..\..\src\MeshImportOgre\ImportOgre.cpp"/>
+    <File RelativePath="..\..\src\MeshImportOgre\MeshImportOgre.cpp"/>
+  </Filter>
+  <Filter Name="Header Files" Filter=""> <!--  -->
+    <File RelativePath="..\..\src\MeshImportOgre\ImportOgre.h"/>
+  </Filter>
+  <Filter Name="Plugin Header Files" Filter=""> <!--  -->
+    <Filter Name="MeshImport" Filter=""> <!--  -->
+      <File RelativePath="..\..\include\MeshImport\MeshImport.h"/>
+    </Filter>
+  </Filter>
+  <Filter Name="Common Include-Binding Files" Filter=""> <!--  -->
+    <Filter Name="snippets" Filter=""> <!--  -->
+      <File RelativePath="..\..\include\common\snippets\stable.h"/>
+      <File RelativePath="..\..\include\common\snippets\stringdict.h"/>
+      <File RelativePath="..\..\include\common\snippets\stringdict.cpp"/>
+      <File RelativePath="..\..\include\common\snippets\sutil.cpp"/>
+      <File RelativePath="..\..\include\common\snippets\sutil.h"/>
+      <File RelativePath="..\..\include\common\snippets\inparser.cpp"/>
+      <File RelativePath="..\..\include\common\snippets\inparser.h"/>
+      <File RelativePath="..\..\include\common\snippets\nvstl.cpp"/>
+      <File RelativePath="..\..\include\common\snippets\LegacyFastXml.h"/>
+      <File RelativePath="..\..\include\common\snippets\LegacyFastXml.cpp"/>
+      <File RelativePath="..\..\include\common\snippets\UserMemAlloc.h"/>
+      <File RelativePath="..\..\include\common\snippets\Nx.h"/>
+      <File RelativePath="..\..\include\common\snippets\NxAssert.h"/>
+      <File RelativePath="..\..\include\common\snippets\NxMath.h"/>
+      <File RelativePath="..\..\include\common\snippets\NxSimpleTypes.h"/>
+      <File RelativePath="..\..\include\common\snippets\NxUserAllocator.h"/>
+    </Filter>
+  </Filter>
+</Files>
+<Globals></Globals>
 </VisualStudioProject>
