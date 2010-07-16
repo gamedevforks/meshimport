@@ -324,6 +324,32 @@ void MeshImportFBX::AddMeshNode(KFbxNode* pNode)
 		// PH: Why on earth do we need a material prefix?
 		//KString materialName = lMaterial ? (materialNamePrefix+lMaterial->GetName()) : KString("");
 		KString materialName = lMaterial ? lMaterial->GetName() : KString("");
+		std::string info;
+
+		if ( lMaterial )
+		{
+			KFbxProperty lProperty = lMaterial->FindProperty( KFbxSurfaceMaterial::sDiffuse );
+			if( !lProperty.IsValid( ) )
+				continue;
+
+			int lNbTex = lProperty.GetSrcObjectCount( KFbxTexture::ClassId );
+			bool prev = false;
+
+			for (int lTextureIndex = 0; lTextureIndex < lNbTex; ++lTextureIndex )
+			{
+				KFbxTexture * lTexture = KFbxCast<KFbxTexture>( lProperty.GetSrcObject( KFbxTexture::ClassId, lTextureIndex ) ); 
+				if ( !lTexture )
+					continue;
+				KString textureFileName = lTexture->GetFileName( );
+				if ( prev )
+				{
+					info+="+";
+					prev = false;
+				}
+				info+=textureFileName.Buffer();
+				prev = true;
+			}
+		}
 
 		for (int lSortedPolygonIndex = partition[submeshIndex]; lSortedPolygonIndex < partition[submeshIndex+1]; lSortedPolygonIndex++)
 		{
@@ -487,6 +513,8 @@ void MeshImportFBX::AddMeshNode(KFbxNode* pNode)
 				meshVertex.mWeight[2] = vertexSkinInfo.mWeight[2];
 				meshVertex.mWeight[3] = vertexSkinInfo.mWeight[3];
 			}
+
+			m_callback->importMaterial(materialName,info.c_str());
 
 			for (int lPolyLocalVertexIndex=0; lPolyLocalVertexIndex < lPolyLocalVertexCount-2; lPolyLocalVertexIndex++)
 			{

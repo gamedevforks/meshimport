@@ -26,11 +26,11 @@ static void *getMeshBindingInterface(const char *dll,NxI32 version_number) // lo
 {
   void *ret = 0;
 
-  UINT errorMode = 0;
-  errorMode = SEM_FAILCRITICALERRORS;
-  UINT oldErrorMode = SetErrorMode(errorMode);
+//  UINT errorMode = 0;
+//  errorMode = SEM_FAILCRITICALERRORS;
+//  UINT oldErrorMode = SetErrorMode(errorMode);
   HMODULE module = LoadLibraryA(dll);
-  SetErrorMode(oldErrorMode);
+//  SetErrorMode(oldErrorMode);
   if ( module )
   {
     void *proc = GetProcAddress(module,"getInterface");
