@@ -3,7 +3,12 @@
 xpj -v 4 -t VC7 -p WIN32 -x %1
 xpj -v 4 -t VC8 -p WIN32 -x %1
 xpj -v 4 -t VC9 -p WIN32 -x %1
+
+xpj -v 4 -t VC7 -p WIN64 -x %1
+xpj -v 4 -t VC8 -p WIN64 -x %1
+xpj -v 4 -t VC9 -p WIN64 -x %1
+
 cd ..
-cd vc8
+cd vc8win64
 
 

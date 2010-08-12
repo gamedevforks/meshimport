@@ -26,11 +26,11 @@ static void *getMeshBindingInterface(const char *dll,NxI32 version_number) // lo
 {
   void *ret = 0;
 
-//  UINT errorMode = 0;
-//  errorMode = SEM_FAILCRITICALERRORS;
-//  UINT oldErrorMode = SetErrorMode(errorMode);
+  UINT errorMode = 0;
+  errorMode = SEM_FAILCRITICALERRORS;
+  UINT oldErrorMode = SetErrorMode(errorMode);
   HMODULE module = LoadLibraryA(dll);
-//  SetErrorMode(oldErrorMode);
+  SetErrorMode(oldErrorMode);
   if ( module )
   {
     void *proc = GetProcAddress(module,"getInterface");
@@ -191,15 +191,19 @@ static const char *lastSlash(const char *foo)
 NVSHARE::MeshImport * loadMeshImporters(const char * directory) // loads the mesh import library (dll) and all available importers from the same directory.
 {
   NVSHARE::MeshImport *ret = 0;
-
+#ifdef _M_IX86
+  const char *baseImporter = "MeshImport_x86.dll";
+#else
+  const char * baseImporter = "MeshImport_x64.dll";
+#endif
   char scratch[512];
   if ( directory && strlen(directory) )
   {
-    sprintf(scratch,"%s\\MeshImport.dll", directory);
+    sprintf(scratch,"%s\\%s", directory, baseImporter);
   }
   else
   {
-    strcpy(scratch,"MeshImport.dll");
+    strcpy(scratch,baseImporter);
   }
 
 #ifdef WIN32
@@ -210,14 +214,18 @@ NVSHARE::MeshImport * loadMeshImporters(const char * directory) // loads the mes
 
   if ( ret )
   {
-    NVSHARE::FileFind ff(directory,"MeshImport*.dll");
+#ifdef _M_IX86
+      NVSHARE::FileFind ff(directory,"MeshImport*_x86.dll");
+#else
+    NVSHARE::FileFind ff(directory,"MeshImport*_x64.dll");
+#endif
     char name[MAXNAME];
     if ( ff.FindFirst(name) )
     {
       do
       {
         const char *scan = lastSlash(name);
-        if ( stricmp(scan,"MeshImport.dll") == 0 )
+        if ( stricmp(scan,baseImporter) == 0 )
         {
           printf("Skipping 'MeshImport.dll'\r\n");
         }

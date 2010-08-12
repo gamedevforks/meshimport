@@ -292,7 +292,7 @@ void OBJ::GetVertex(MeshVertex &v,const char *face,bool minusIndexing) const
     index--;
 
   if ( index < 0 )
-    index = mVerts.size()+index+1;
+    index = (NxI32)mVerts.size()+index+1;
 
   if ( index >= 0 && index < (NxI32)mVerts.size() )
   {
@@ -312,7 +312,7 @@ void OBJ::GetVertex(MeshVertex &v,const char *face,bool minusIndexing) const
     NxI32 tindex = atoi( texel+1) - 1;
 
     if ( tindex < 0 )
-      tindex = mTexels.size()+tindex+1;
+      tindex = (NxI32)mTexels.size()+tindex+1;
 
     if ( tindex >=0 && tindex < (NxI32)mTexels.size() )
     {
@@ -329,7 +329,7 @@ void OBJ::GetVertex(MeshVertex &v,const char *face,bool minusIndexing) const
     {
       NxI32 nindex = atoi( normal+1 ) - 1;
       if ( nindex < 0 )
-        nindex = mNormals.size()+nindex+1;
+        nindex = (NxI32)mNormals.size()+nindex+1;
 
       if (nindex >= 0 && nindex < (NxI32)mNormals.size() )
       {

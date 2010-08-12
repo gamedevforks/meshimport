@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="Windows-1252"?>
+<VisualStudioProject
+ProjectType="Visual C++"
+Version="7.10"
+Name="MeshConvert"
+>
+<Platforms>
+<Platform Name="x64"/>
+</Platforms>
+<Configurations>
+  <Configuration
+    Name="default|x64"
+    OutputDirectory="$(SolutionDir)/out"
+    IntermediateDirectory="x64/MeshConvert/default"
+    ConfigurationType="1"
+    InheritedPropertySheets=""
+    CharacterSet="2"
+    >
+    <Tool
+      Name="VCCLCompilerTool"
+      AdditionalIncludeDirectories="&quot;../../include/MeshImport&quot;;&quot;../../include/common/snippets&quot;;&quot;../../include/MeshImport&quot;;&quot;../../include/common/snippets&quot;;"
+      PreprocessorDefinitions="WIN32;_WINDOWS;UNICODE=1;_CRT_SECURE_NO_DEPRECATE;OPEN_SOURCE=1;WIN32;_WINDOWS;UNICODE=1;_CRT_SECURE_NO_DEPRECATE;OPEN_SOURCE=1;"
+      WarningLevel="3"
+      Optimization="4"
+      AdditionalOptions=""
+      ExceptionHandling="1"
+      DebugInformationFormat=""
+      RuntimeLibrary=""
+      />
+    <Tool Name="VCCustomBuildTool"/>
+    <Tool 
+      Name="VCLinkerTool" 
+      OutputFile="$(OutDir)/.exe" 
+      ProgramDatabaseFile="$(OutDir)/.exe.pdb" 
+      AdditionalOptions=""
+      AdditionalDependencies=""
+      AdditionalLibraryDirectories=""
+      ImportLibrary="$(OutDir)/$(TargetName).lib"
+      GenerateMapFile="TRUE"
+      MapFileName="$(OutDir)/.exe.map"
+      SubSystem="1"
+      GenerateDebugInformation=""
+      />
+    <Tool Name="VCMIDLTool"/>
+    <Tool Name="VCPreBuildEventTool"/>
+    <Tool Name="VCPostBuildEventTool"/>
+    <Tool Name="VCPreLinkEventTool"/>
+    <Tool Name="VCResourceCompilerTool"/>
+    <Tool Name="VCWebServiceProxyGeneratorTool"/>
+    <Tool Name="VCXMLDataGeneratorTool"/>
+    <Tool Name="VCWebDeploymentTool"/>
+    <Tool Name="VCManagedWrapperGeneratorTool"/>
+    <Tool Name="VCAuxiliaryManagedWrapperGeneratorTool"/>
+  </Configuration>
+  <Configuration
+    Name="debug|x64"
+    OutputDirectory="../../bin/win64"
+    IntermediateDirectory="x64/MeshConvert/debug"
+    ConfigurationType="1"
+    InheritedPropertySheets=""
+    CharacterSet="2"
+    >
+    <Tool
+      Name="VCCLCompilerTool"
+      AdditionalIncludeDirectories="&quot;../../include/MeshImport&quot;;&quot;../../include/common/snippets&quot;;"
+      PreprocessorDefinitions="WIN32;_WINDOWS;UNICODE=1;_CRT_SECURE_NO_DEPRECATE;OPEN_SOURCE=1;_DEBUG;"
+      WarningLevel="3"
+      Optimization="4"
+      AdditionalOptions="/fp:fast /W4 /WX /MDd /Zi "
+      ExceptionHandling="1"
+      DebugInformationFormat=""
+      RuntimeLibrary=""
+      />
+    <Tool Name="VCCustomBuildTool"/>
+    <Tool 
+      Name="VCLinkerTool" 
+      OutputFile="$(OutDir)/MeshConvertDEBUG_x64.exe" 
+      ProgramDatabaseFile="$(OutDir)/MeshConvertDEBUG_x64.exe.pdb" 
+      AdditionalOptions="/DEBUG "
+      AdditionalDependencies=""
+      AdditionalLibraryDirectories=""
+      ImportLibrary="$(OutDir)/$(TargetName).lib"
+      GenerateMapFile="TRUE"
+      MapFileName="$(OutDir)/MeshConvertDEBUG_x64.exe.map"
+      SubSystem="1"
+      GenerateDebugInformation=""
+      />
+    <Tool Name="VCMIDLTool"/>
+    <Tool Name="VCPreBuildEventTool"/>
+    <Tool Name="VCPostBuildEventTool"/>
+    <Tool Name="VCPreLinkEventTool"/>
+    <Tool Name="VCResourceCompilerTool"/>
+    <Tool Name="VCWebServiceProxyGeneratorTool"/>
+    <Tool Name="VCXMLDataGeneratorTool"/>
+    <Tool Name="VCWebDeploymentTool"/>
+    <Tool Name="VCManagedWrapperGeneratorTool"/>
+    <Tool Name="VCAuxiliaryManagedWrapperGeneratorTool"/>
+  </Configuration>
+  <Configuration
+    Name="release|x64"
+    OutputDirectory="../../bin/win64"
+    IntermediateDirectory="x64/MeshConvert/release"
+    ConfigurationType="1"
+    InheritedPropertySheets=""
+    CharacterSet="2"
+    >
+    <Tool
+      Name="VCCLCompilerTool"
+      AdditionalIncludeDirectories="&quot;../../include/MeshImport&quot;;&quot;../../include/common/snippets&quot;;"
+      PreprocessorDefinitions="WIN32;_WINDOWS;UNICODE=1;_CRT_SECURE_NO_DEPRECATE;OPEN_SOURCE=1;NDEBUG;"
+      WarningLevel="3"
+      Optimization="4"
+      AdditionalOptions="/fp:fast /WX /W4 /MD /Zi /O2 "
+      ExceptionHandling="1"
+      DebugInformationFormat=""
+      RuntimeLibrary=""
+      />
+    <Tool Name="VCCustomBuildTool"/>
+    <Tool 
+      Name="VCLinkerTool" 
+      OutputFile="$(OutDir)/MeshConvert_x64.exe" 
+      ProgramDatabaseFile="$(OutDir)/MeshConvert_x64.exe.pdb" 
+      AdditionalOptions="/DEBUG "
+      AdditionalDependencies=""
+      AdditionalLibraryDirectories=""
+      ImportLibrary="$(OutDir)/$(TargetName).lib"
+      GenerateMapFile="TRUE"
+      MapFileName="$(OutDir)/MeshConvert_x64.exe.map"
+      SubSystem="1"
+      GenerateDebugInformation=""
+      />
+    <Tool Name="VCMIDLTool"/>
+    <Tool Name="VCPreBuildEventTool"/>
+    <Tool Name="VCPostBuildEventTool"/>
+    <Tool Name="VCPreLinkEventTool"/>
+    <Tool Name="VCResourceCompilerTool"/>
+    <Tool Name="VCWebServiceProxyGeneratorTool"/>
+    <Tool Name="VCXMLDataGeneratorTool"/>
+    <Tool Name="VCWebDeploymentTool"/>
+    <Tool Name="VCManagedWrapperGeneratorTool"/>
+    <Tool Name="VCAuxiliaryManagedWrapperGeneratorTool"/>
+  </Configuration>
+</Configurations>
+<References></References>
+<Files>
+  <Filter Name="MeshImport Files" Filter=""> <!--  -->
+    <File RelativePath="..\..\include\MeshImport\MeshImport.cpp"/>
+    <File RelativePath="..\..\include\MeshImport\MeshImport.h"/>
+  </Filter>
+  <Filter Name="Common Include-Binding Files" Filter=""> <!--  -->
+    <Filter Name="snippets" Filter=""> <!--  -->
+      <File RelativePath="..\..\include\common\snippets\UserMemAlloc.h"/>
+    </Filter>
+  </Filter>
+  <Filter Name="MeshConvert" Filter=""> <!--  -->
+    <File RelativePath="..\..\app\MeshConvert\MeshConvert.cpp"/>
+  </Filter>
+</Files>
+<Globals></Globals>
+</VisualStudioProject>

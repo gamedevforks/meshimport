@@ -1,0 +1,21 @@
+Microsoft Visual Studio Solution File, Format Version 8.00
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MeshImportARM", "MeshImportARM.vcproj", "{E85D2B0E-76C2-504F-66B0-102E6DDB0798}"
+	ProjectSection(ProjectDependencies) = postProject
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfiguration) = preSolution
+		debug = debug
+		release = release
+	EndGlobalSection
+	GlobalSection(ProjectConfiguration) = postSolution
+		{E85D2B0E-76C2-504F-66B0-102E6DDB0798}.debug.ActiveCfg = debug|x64
+		{E85D2B0E-76C2-504F-66B0-102E6DDB0798}.debug.Build.0 = debug|x64
+		{E85D2B0E-76C2-504F-66B0-102E6DDB0798}.release.ActiveCfg = release|x64
+		{E85D2B0E-76C2-504F-66B0-102E6DDB0798}.release.Build.0 = release|x64
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+	EndGlobalSection
+	GlobalSection(ExtensibilityAddins) = postSolution
+	EndGlobalSection
+EndGlobal

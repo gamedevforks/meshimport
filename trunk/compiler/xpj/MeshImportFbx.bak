@@ -1,0 +1,136 @@
+<XPJ version="4">
+
+	<Project name="MeshImportFbx" version="1">
+
+		<Export platform="win32" tool="vc9">../vc9win32</Export>
+		<Export platform="win32" tool="vc8">../vc8win32</Export>
+		<Export platform="win32" tool="vc7">../vc7win32</Export>
+
+		<Export platform="win64" tool="vc9">../vc9win64</Export>
+		<Export platform="win64" tool="vc8">../vc8win64</Export>
+		<Export platform="win64" tool="vc7">../vc7win64</Export>
+
+
+		<Target name="MeshImportFbx">
+
+			<Export platform="win32" tool="vc9">../vc9win32</Export>
+			<Export platform="win32" tool="vc8">../vc8win32</Export>
+			<Export platform="win32" tool="vc7">../vc7win32</Export>
+
+			<Export platform="win64" tool="vc9">../vc9win64</Export>
+			<Export platform="win64" tool="vc8">../vc8win64</Export>
+			<Export platform="win64" tool="vc7">../vc7win64</Export>
+
+			<Configuration name="default" type="dll">
+				<Preprocessor type="define">
+					WIN32
+					_WINDOWS
+                    _CONSOLE
+					UNICODE=1
+					_UNICODE=1
+                    K_PLUGIN
+                    K_FBXSDK
+                    K_NODLL
+                    _CRT_SECURET_NO_DEPRECATE
+                    FBXIMPORTER_EXPORTS
+          			MESHIMPORTFBX_EXPORTS
+				</Preprocessor>
+				<Files name="Source Files" root="../../src/MeshImportFbx" type="source">
+					*.cpp
+					*.c
+				</Files>
+				<Files name="Header Files" root="../../src/MeshImportFbx" type="header">
+					*.h
+				</Files>
+				<Files name="Public Header Files" root="../../include/MeshImportFbx" type="header">
+					*.h
+				</Files>
+				<Files name="External SDK Header Files" root="../../ext" type="header">
+				</Files>
+				<Files name="Plugin Header Files" root="../../include" type="header">
+				</Files>
+				<Files name="Common Include-Binding Files" root="../../include/common" type="header">
+                snippets/asc2bin.cpp
+                snippets/AutoGeometry.cpp
+                snippets/LegacyFastXml.cpp
+                snippets/FileInterface.cpp
+                snippets/filesystem.cpp
+                snippets/FloatMath.cpp
+                snippets/FloatMath.inl
+                snippets/inparser.cpp
+                snippets/KeyValueIni.cpp
+                snippets/StanHull.cpp
+                snippets/stringdict.cpp
+                snippets/sutil.cpp
+                snippets/nvstl.cpp
+                snippets/telnet.cpp
+                snippets/VtxWeld.cpp
+                snippets/winmsg.cpp
+                snippets/asc2bin.h
+                snippets/AutoGeometry.h
+                snippets/LegacyFastXml.h
+                snippets/FileInterface.h
+                snippets/filesystem.h
+                snippets/FloatMath.h
+                snippets/inparser.h
+                snippets/KeyValueIni.h
+                snippets/stable.h
+                snippets/StanHull.h
+                snippets/SendTextMessage.h
+                snippets/stringdict.h
+                snippets/sutil.h
+                snippets/telnet.h
+                snippets/UserMemAlloc.h
+                snippets/VtxWeld.h
+                snippets/winmsg.h
+                snippets/Nx*.h
+				</Files>
+				<SearchPaths type="header">
+                 ../../include
+                 ../../include/common/snippets
+                 ../../include/MeshImport
+                 ../../ext/fbx/include
+				</SearchPaths>
+				<SearchPaths type="library">
+                ../../lib/win32
+                ../../ext/fbx/lib
+				</SearchPaths>
+				<Dependencies>
+				</Dependencies>
+				<Libraries>
+                fbxsdk_md2005.lib
+				wininet.lib
+				</Libraries>
+ 				<LFlags tool="vc8">/NODEFAULTLIB:libcp.lib</LFlags>
+			</Configuration>
+
+			<Configuration name="debug" platform="win32">
+				<OutFile>MeshImportFbx_x86.dll</OutFile>
+				<OutDir>../../bin/win32</OutDir>
+				<ImpDir>../../lib/win32</ImpDir>
+				<CFlags>/W3 /fp:fast /MDd /Zi</CFlags>
+				<LFlags>/DEBUG</LFlags>
+				<Preprocessor type="define">
+					_DEBUG
+				</Preprocessor>
+				<Libraries>
+				</Libraries>
+			</Configuration>
+
+			<Configuration name="release" platform="win32">
+				<OutFile>MeshImportFbx_x86.dll</OutFile>
+				<OutDir>../../bin/win32</OutDir>
+				<ImpDir>../../lib/win32</ImpDir>
+				<CFlags>/Zi /W3 /fp:fast /WX /MD /O2</CFlags>
+				<LFlags>/DEBUG</LFlags>
+				<Preprocessor type="define">
+					NDEBUG
+				</Preprocessor>
+				<Libraries>
+				</Libraries>
+			</Configuration>
+
+		</Target>
+	</Project>
+
+</XPJ>
