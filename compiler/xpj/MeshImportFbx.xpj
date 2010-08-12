@@ -1,18 +1,27 @@
 <XPJ version="4">
 
 	<Project name="MeshImportFbx" version="1">
-		<Export platform="win32" tool="vc9">../vc9</Export>
-		<Export platform="win32" tool="vc8">../vc8</Export>
-		<Export platform="win32" tool="vc7">../vc7</Export>
+
+		<Export platform="win32" tool="vc9">../vc9win32</Export>
+		<Export platform="win32" tool="vc8">../vc8win32</Export>
+		<Export platform="win32" tool="vc7">../vc7win32</Export>
+
+		<Export platform="win64" tool="vc9">../vc9win64</Export>
+		<Export platform="win64" tool="vc8">../vc8win64</Export>
+		<Export platform="win64" tool="vc7">../vc7win64</Export>
 
 
 		<Target name="MeshImportFbx">
-			<Export platform="win32" tool="vc9">../vc9</Export>
-			<Export platform="win32" tool="vc8">../vc8</Export>
-			<Export platform="win32" tool="vc7">../vc7</Export>
 
-			<Configuration name="default" platform="Win32" type="dll">
-				<OutFile>MeshImportFbx.dll</OutFile>
+			<Export platform="win32" tool="vc9">../vc9win32</Export>
+			<Export platform="win32" tool="vc8">../vc8win32</Export>
+			<Export platform="win32" tool="vc7">../vc7win32</Export>
+
+			<Export platform="win64" tool="vc9">../vc9win64</Export>
+			<Export platform="win64" tool="vc8">../vc8win64</Export>
+			<Export platform="win64" tool="vc7">../vc7win64</Export>
+
+			<Configuration name="default" type="dll">
 				<Preprocessor type="define">
 					WIN32
 					_WINDOWS
@@ -24,7 +33,7 @@
                     K_NODLL
                     _CRT_SECURET_NO_DEPRECATE
                     FBXIMPORTER_EXPORTS
-          MESHIMPORTFBX_EXPORTS
+          			MESHIMPORTFBX_EXPORTS
 				</Preprocessor>
 				<Files name="Source Files" root="../../src/MeshImportFbx" type="source">
 					*.cpp
@@ -76,8 +85,6 @@
                 snippets/winmsg.h
                 snippets/Nx*.h
 				</Files>
-				<OutDir>../../bin/win32</OutDir>
-				<ImpDir>../../lib/win32</ImpDir>
 				<SearchPaths type="header">
                  ../../include
                  ../../include/common/snippets
@@ -91,29 +98,64 @@
 				<Dependencies>
 				</Dependencies>
 				<Libraries>
-                fbxsdk_md2005.lib
 				wininet.lib
 				</Libraries>
  				<LFlags tool="vc8">/NODEFAULTLIB:libcp.lib</LFlags>
 			</Configuration>
 
-			<Configuration name="debug">
+			<Configuration name="debug" platform="win32">
+				<OutFile>MeshImportFbx_x86.dll</OutFile>
+				<OutDir>../../bin/win32</OutDir>
+				<ImpDir>../../lib/win32</ImpDir>
 				<CFlags>/W3 /fp:fast /MDd /Zi</CFlags>
 				<LFlags>/DEBUG</LFlags>
 				<Preprocessor type="define">
 					_DEBUG
 				</Preprocessor>
 				<Libraries>
+                fbxsdk_md2005.lib
 				</Libraries>
 			</Configuration>
 
-			<Configuration name="release">
+			<Configuration name="release" platform="win32">
+				<OutFile>MeshImportFbx_x86.dll</OutFile>
+				<OutDir>../../bin/win32</OutDir>
+				<ImpDir>../../lib/win32</ImpDir>
 				<CFlags>/Zi /W3 /fp:fast /WX /MD /O2</CFlags>
 				<LFlags>/DEBUG</LFlags>
 				<Preprocessor type="define">
 					NDEBUG
 				</Preprocessor>
 				<Libraries>
+                fbxsdk_md2005.lib
+				</Libraries>
+			</Configuration>
+
+			<Configuration name="debug" platform="win64">
+				<OutFile>MeshImportFbx_x64.dll</OutFile>
+				<OutDir>../../bin/win64</OutDir>
+				<ImpDir>../../lib/win64</ImpDir>
+				<CFlags>/W3 /fp:fast /MDd /Zi</CFlags>
+				<LFlags>/DEBUG</LFlags>
+				<Preprocessor type="define">
+					_DEBUG
+				</Preprocessor>
+				<Libraries>
+                fbxsdk_md2005_amd64.lib
+				</Libraries>
+			</Configuration>
+
+			<Configuration name="release" platform="win64">
+				<OutFile>MeshImportFbx_x64.dll</OutFile>
+				<OutDir>../../bin/win64</OutDir>
+				<ImpDir>../../lib/win64</ImpDir>
+				<CFlags>/Zi /W3 /fp:fast /WX /MD /O2</CFlags>
+				<LFlags>/DEBUG</LFlags>
+				<Preprocessor type="define">
+					NDEBUG
+				</Preprocessor>
+				<Libraries>
+                fbxsdk_md2005_amd64.lib
 				</Libraries>
 			</Configuration>
 

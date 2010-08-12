@@ -1,9 +1,13 @@
 <XPJ version="4">
 	<Project name="MeshConvert" version="1">
 
-		<Export platform="win32" tool="vc9">../vc9</Export>
-		<Export platform="win32" tool="vc8">../vc8</Export>
-		<Export platform="win32" tool="vc7">../vc7</Export>
+		<Export platform="win32" tool="vc9">../vc9win32</Export>
+		<Export platform="win32" tool="vc8">../vc8win32</Export>
+		<Export platform="win32" tool="vc7">../vc7win32</Export>
+
+		<Export platform="win64" tool="vc9">../vc9win64</Export>
+		<Export platform="win64" tool="vc8">../vc8win64</Export>
+		<Export platform="win64" tool="vc7">../vc7win64</Export>
 
 		<Import root=".\" file="MeshImport.xpj"/>
 		<Import root=".\" file="MeshImportPSK.xpj"/>
@@ -14,11 +18,16 @@
 		<Import root=".\" file="MeshImportOgre.xpj"/>
 
 		<Target name="MeshConvert">
-			<Export platform="win32" tool="vc9">../vc9</Export>
-			<Export platform="win32" tool="vc8">../vc8</Export>
-			<Export platform="win32" tool="vc7">../vc7</Export>
 
-			<Configuration name="default" platform="Win32" type="console">
+			<Export platform="win32" tool="vc9">../vc9win32</Export>
+			<Export platform="win32" tool="vc8">../vc8win32</Export>
+			<Export platform="win32" tool="vc7">../vc7win32</Export>
+
+			<Export platform="win64" tool="vc9">../vc9win64</Export>
+			<Export platform="win64" tool="vc8">../vc8win64</Export>
+			<Export platform="win64" tool="vc7">../vc7win64</Export>
+
+			<Configuration name="default" type="console">
 				<Preprocessor type="define">
 					WIN32
 					_WINDOWS
@@ -28,19 +37,18 @@
 				</Preprocessor>
 				<CFlags tool="vc8">/wd4996</CFlags>
  				<LFlags tool="vc8">/NODEFAULTLIB:libcp.lib</LFlags>
-				<OutDir>../../bin/win32</OutDir>
 				<SearchPaths type="header">
                  ../../include/MeshImport
                  ../../include/common/snippets
 				</SearchPaths>
 				<Files name="MeshImport Files" root="../../include/MeshImport" type="header">
-        *.cpp
-        *.h
+		        *.cpp
+		        *.h
 				</Files>
 				<Files name="Common Include-Binding Files" root="../../include/common" type="header">
-         snippets/UserMemAlloc.h
-         snippets/SystemServices.h
-         snippets/SystemServices.cpp
+         		snippets/UserMemAlloc.h
+		         snippets/SystemServices.h
+		         snippets/SystemServices.cpp
 				</Files>
 			<Files name="MeshConvert" root="../../app/MeshConvert" type="header">
 				*.h
@@ -53,8 +61,9 @@
 				</Libraries>
 			</Configuration>
 
-			<Configuration name="debug">
-				<OutFile>MeshConvertDEBUG.exe</OutFile>
+			<Configuration name="debug" platform="win32">
+				<OutDir>../../bin/win32</OutDir>
+				<OutFile>MeshConvertDEBUG_x86.exe</OutFile>
 				<CFlags>/fp:fast /W4 /WX /MDd /Zi</CFlags>
 				<LFlags>/DEBUG</LFlags>
 				<Preprocessor type="define">
@@ -62,12 +71,32 @@
 				</Preprocessor>
 			</Configuration>
 
-			<Configuration name="release">
-				<OutFile>MeshConvert.exe</OutFile>
+			<Configuration name="release" platform="win32">
+				<OutDir>../../bin/win32</OutDir>
+				<OutFile>MeshConvert_x86.exe</OutFile>
 				<CFlags>/fp:fast /WX /W4 /MD /Zi /O2</CFlags>
 				<LFlags>/DEBUG</LFlags>
 				<Preprocessor type="define">NDEBUG</Preprocessor>
 			</Configuration>
+
+			<Configuration name="debug" platform="win64">
+				<OutDir>../../bin/win64</OutDir>
+				<OutFile>MeshConvertDEBUG_x64.exe</OutFile>
+				<CFlags>/fp:fast /W4 /WX /MDd /Zi</CFlags>
+				<LFlags>/DEBUG</LFlags>
+				<Preprocessor type="define">
+					_DEBUG
+				</Preprocessor>
+			</Configuration>
+
+			<Configuration name="release" platform="win64">
+				<OutDir>../../bin/win64</OutDir>
+				<OutFile>MeshConvert_x64.exe</OutFile>
+				<CFlags>/fp:fast /WX /W4 /MD /Zi /O2</CFlags>
+				<LFlags>/DEBUG</LFlags>
+				<Preprocessor type="define">NDEBUG</Preprocessor>
+			</Configuration>
+
 			<Libraries>
 			</Libraries>
 			<Dependencies type="link">

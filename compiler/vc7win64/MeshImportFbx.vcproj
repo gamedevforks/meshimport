@@ -1,0 +1,191 @@
+<?xml version="1.0" encoding="Windows-1252"?>
+<VisualStudioProject
+ProjectType="Visual C++"
+Version="7.10"
+Name="MeshImportFbx"
+>
+<Platforms>
+<Platform Name="x64"/>
+</Platforms>
+<Configurations>
+  <Configuration
+    Name="default|x64"
+    OutputDirectory="$(SolutionDir)/out"
+    IntermediateDirectory="x64/MeshImportFbx/default"
+    ConfigurationType="2"
+    InheritedPropertySheets=""
+    CharacterSet="2"
+    >
+    <Tool
+      Name="VCCLCompilerTool"
+      AdditionalIncludeDirectories="&quot;../../include&quot;;&quot;../../include/common/snippets&quot;;&quot;../../include/MeshImport&quot;;&quot;../../ext/fbx/include&quot;;&quot;../../include&quot;;&quot;../../include/common/snippets&quot;;&quot;../../include/MeshImport&quot;;&quot;../../ext/fbx/include&quot;;"
+      PreprocessorDefinitions="WIN32;_WINDOWS;_CONSOLE;UNICODE=1;_UNICODE=1;K_PLUGIN;K_FBXSDK;K_NODLL;_CRT_SECURET_NO_DEPRECATE;FBXIMPORTER_EXPORTS;MESHIMPORTFBX_EXPORTS;WIN32;_WINDOWS;_CONSOLE;UNICODE=1;_UNICODE=1;K_PLUGIN;K_FBXSDK;K_NODLL;_CRT_SECURET_NO_DEPRECATE;FBXIMPORTER_EXPORTS;MESHIMPORTFBX_EXPORTS;"
+      WarningLevel="3"
+      Optimization="4"
+      AdditionalOptions=""
+      ExceptionHandling="1"
+      DebugInformationFormat=""
+      RuntimeLibrary=""
+      />
+    <Tool Name="VCCustomBuildTool"/>
+    <Tool 
+      Name="VCLinkerTool" 
+      OutputFile="$(OutDir)/.dll" 
+      ProgramDatabaseFile="$(OutDir)/.dll.pdb" 
+      AdditionalOptions=""
+      AdditionalDependencies="&quot;wininet.lib&quot; &quot;wininet.lib&quot; "
+      AdditionalLibraryDirectories="&quot;../../lib/win32&quot;;&quot;../../ext/fbx/lib&quot;;&quot;../../lib/win32&quot;;&quot;../../ext/fbx/lib&quot;;"
+      ImportLibrary="$(OutDir)/$(TargetName).lib"
+      GenerateMapFile="TRUE"
+      MapFileName="$(OutDir)/.dll.map"
+      SubSystem="1"
+      GenerateDebugInformation=""
+      />
+    <Tool Name="VCMIDLTool"/>
+    <Tool Name="VCPreBuildEventTool"/>
+    <Tool Name="VCPostBuildEventTool"/>
+    <Tool Name="VCPreLinkEventTool"/>
+    <Tool Name="VCResourceCompilerTool"/>
+    <Tool Name="VCWebServiceProxyGeneratorTool"/>
+    <Tool Name="VCXMLDataGeneratorTool"/>
+    <Tool Name="VCWebDeploymentTool"/>
+    <Tool Name="VCManagedWrapperGeneratorTool"/>
+    <Tool Name="VCAuxiliaryManagedWrapperGeneratorTool"/>
+  </Configuration>
+  <Configuration
+    Name="debug|x64"
+    OutputDirectory="../../bin/win64"
+    IntermediateDirectory="x64/MeshImportFbx/debug"
+    ConfigurationType="2"
+    InheritedPropertySheets=""
+    CharacterSet="2"
+    >
+    <Tool
+      Name="VCCLCompilerTool"
+      AdditionalIncludeDirectories="&quot;../../include&quot;;&quot;../../include/common/snippets&quot;;&quot;../../include/MeshImport&quot;;&quot;../../ext/fbx/include&quot;;"
+      PreprocessorDefinitions="WIN32;_WINDOWS;_CONSOLE;UNICODE=1;_UNICODE=1;K_PLUGIN;K_FBXSDK;K_NODLL;_CRT_SECURET_NO_DEPRECATE;FBXIMPORTER_EXPORTS;MESHIMPORTFBX_EXPORTS;_DEBUG;"
+      WarningLevel="3"
+      Optimization="4"
+      AdditionalOptions="/W3 /fp:fast /MDd /Zi "
+      ExceptionHandling="1"
+      DebugInformationFormat=""
+      RuntimeLibrary=""
+      />
+    <Tool Name="VCCustomBuildTool"/>
+    <Tool 
+      Name="VCLinkerTool" 
+      OutputFile="$(OutDir)/MeshImportFbx_x64.dll" 
+      ProgramDatabaseFile="$(OutDir)/MeshImportFbx_x64.dll.pdb" 
+      AdditionalOptions="/DEBUG "
+      AdditionalDependencies="&quot;wininet.lib&quot; &quot;fbxsdk_md2005_amd64.lib&quot; "
+      AdditionalLibraryDirectories="&quot;../../lib/win32&quot;;&quot;../../ext/fbx/lib&quot;;"
+      ImportLibrary="../../lib/win64/$(TargetName).lib"
+      GenerateMapFile="TRUE"
+      MapFileName="$(OutDir)/MeshImportFbx_x64.dll.map"
+      SubSystem="1"
+      GenerateDebugInformation=""
+      />
+    <Tool Name="VCMIDLTool"/>
+    <Tool Name="VCPreBuildEventTool"/>
+    <Tool Name="VCPostBuildEventTool"/>
+    <Tool Name="VCPreLinkEventTool"/>
+    <Tool Name="VCResourceCompilerTool"/>
+    <Tool Name="VCWebServiceProxyGeneratorTool"/>
+    <Tool Name="VCXMLDataGeneratorTool"/>
+    <Tool Name="VCWebDeploymentTool"/>
+    <Tool Name="VCManagedWrapperGeneratorTool"/>
+    <Tool Name="VCAuxiliaryManagedWrapperGeneratorTool"/>
+  </Configuration>
+  <Configuration
+    Name="release|x64"
+    OutputDirectory="../../bin/win64"
+    IntermediateDirectory="x64/MeshImportFbx/release"
+    ConfigurationType="2"
+    InheritedPropertySheets=""
+    CharacterSet="2"
+    >
+    <Tool
+      Name="VCCLCompilerTool"
+      AdditionalIncludeDirectories="&quot;../../include&quot;;&quot;../../include/common/snippets&quot;;&quot;../../include/MeshImport&quot;;&quot;../../ext/fbx/include&quot;;"
+      PreprocessorDefinitions="WIN32;_WINDOWS;_CONSOLE;UNICODE=1;_UNICODE=1;K_PLUGIN;K_FBXSDK;K_NODLL;_CRT_SECURET_NO_DEPRECATE;FBXIMPORTER_EXPORTS;MESHIMPORTFBX_EXPORTS;NDEBUG;"
+      WarningLevel="3"
+      Optimization="4"
+      AdditionalOptions="/Zi /W3 /fp:fast /WX /MD /O2 "
+      ExceptionHandling="1"
+      DebugInformationFormat=""
+      RuntimeLibrary=""
+      />
+    <Tool Name="VCCustomBuildTool"/>
+    <Tool 
+      Name="VCLinkerTool" 
+      OutputFile="$(OutDir)/MeshImportFbx_x64.dll" 
+      ProgramDatabaseFile="$(OutDir)/MeshImportFbx_x64.dll.pdb" 
+      AdditionalOptions="/DEBUG "
+      AdditionalDependencies="&quot;wininet.lib&quot; &quot;fbxsdk_md2005_amd64.lib&quot; "
+      AdditionalLibraryDirectories="&quot;../../lib/win32&quot;;&quot;../../ext/fbx/lib&quot;;"
+      ImportLibrary="../../lib/win64/$(TargetName).lib"
+      GenerateMapFile="TRUE"
+      MapFileName="$(OutDir)/MeshImportFbx_x64.dll.map"
+      SubSystem="1"
+      GenerateDebugInformation=""
+      />
+    <Tool Name="VCMIDLTool"/>
+    <Tool Name="VCPreBuildEventTool"/>
+    <Tool Name="VCPostBuildEventTool"/>
+    <Tool Name="VCPreLinkEventTool"/>
+    <Tool Name="VCResourceCompilerTool"/>
+    <Tool Name="VCWebServiceProxyGeneratorTool"/>
+    <Tool Name="VCXMLDataGeneratorTool"/>
+    <Tool Name="VCWebDeploymentTool"/>
+    <Tool Name="VCManagedWrapperGeneratorTool"/>
+    <Tool Name="VCAuxiliaryManagedWrapperGeneratorTool"/>
+  </Configuration>
+</Configurations>
+<References></References>
+<Files>
+  <Filter Name="Source Files" Filter=""> <!--  -->
+    <File RelativePath="..\..\src\MeshImportFbx\FBXReader.cpp"/>
+    <File RelativePath="..\..\src\MeshImportFbx\FBXSceneFuncs.cpp"/>
+    <File RelativePath="..\..\src\MeshImportFbx\ImportFBX.cpp"/>
+    <File RelativePath="..\..\src\MeshImportFbx\MeshImportFbx.cpp"/>
+  </Filter>
+  <Filter Name="Header Files" Filter=""> <!--  -->
+    <File RelativePath="..\..\src\MeshImportFbx\FBXReader.h"/>
+    <File RelativePath="..\..\src\MeshImportFbx\fmi_math.h"/>
+    <File RelativePath="..\..\src\MeshImportFbx\ImportFBX.h"/>
+    <File RelativePath="..\..\src\MeshImportFbx\MeshImportFbx.h"/>
+    <File RelativePath="..\..\src\MeshImportFbx\Texture.h"/>
+  </Filter>
+  <Filter Name="Common Include-Binding Files" Filter=""> <!--  -->
+    <Filter Name="snippets" Filter=""> <!--  -->
+      <File RelativePath="..\..\include\common\snippets\asc2bin.cpp"/>
+      <File RelativePath="..\..\include\common\snippets\LegacyFastXml.cpp"/>
+      <File RelativePath="..\..\include\common\snippets\FileInterface.cpp"/>
+      <File RelativePath="..\..\include\common\snippets\FloatMath.cpp"/>
+      <File RelativePath="..\..\include\common\snippets\FloatMath.inl"/>
+      <File RelativePath="..\..\include\common\snippets\inparser.cpp"/>
+      <File RelativePath="..\..\include\common\snippets\KeyValueIni.cpp"/>
+      <File RelativePath="..\..\include\common\snippets\stringdict.cpp"/>
+      <File RelativePath="..\..\include\common\snippets\sutil.cpp"/>
+      <File RelativePath="..\..\include\common\snippets\nvstl.cpp"/>
+      <File RelativePath="..\..\include\common\snippets\asc2bin.h"/>
+      <File RelativePath="..\..\include\common\snippets\LegacyFastXml.h"/>
+      <File RelativePath="..\..\include\common\snippets\FileInterface.h"/>
+      <File RelativePath="..\..\include\common\snippets\filesystem.h"/>
+      <File RelativePath="..\..\include\common\snippets\FloatMath.h"/>
+      <File RelativePath="..\..\include\common\snippets\inparser.h"/>
+      <File RelativePath="..\..\include\common\snippets\KeyValueIni.h"/>
+      <File RelativePath="..\..\include\common\snippets\stable.h"/>
+      <File RelativePath="..\..\include\common\snippets\stringdict.h"/>
+      <File RelativePath="..\..\include\common\snippets\sutil.h"/>
+      <File RelativePath="..\..\include\common\snippets\UserMemAlloc.h"/>
+      <File RelativePath="..\..\include\common\snippets\Nx.h"/>
+      <File RelativePath="..\..\include\common\snippets\NxAssert.h"/>
+      <File RelativePath="..\..\include\common\snippets\NxMath.h"/>
+      <File RelativePath="..\..\include\common\snippets\NxSimpleTypes.h"/>
+      <File RelativePath="..\..\include\common\snippets\NxUserAllocator.h"/>
+    </Filter>
+  </Filter>
+</Files>
+<Globals></Globals>
+</VisualStudioProject>

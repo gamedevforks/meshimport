@@ -1,24 +1,29 @@
 <XPJ version="4">
 
 	<Project name="MeshImportEzm" version="1">
-		<Export platform="win32" tool="vc9">../vc9</Export>
-		<Export platform="win32" tool="vc8">../vc8</Export>
-		<Export platform="win32" tool="vc7">../vc7</Export>
+		<Export platform="win32" tool="vc9">../vc9win32</Export>
+		<Export platform="win32" tool="vc8">../vc8win32</Export>
+		<Export platform="win32" tool="vc7">../vc7win32</Export>
+		<Export platform="win64" tool="vc9">../vc9win64</Export>
+		<Export platform="win64" tool="vc8">../vc8win64</Export>
+		<Export platform="win64" tool="vc7">../vc7win64</Export>
 
 
 		<Target name="MeshImportEzm">
-			<Export platform="win32" tool="vc9">../vc9</Export>
-			<Export platform="win32" tool="vc8">../vc8</Export>
-			<Export platform="win32" tool="vc7">../vc7</Export>
+    		<Export platform="win32" tool="vc9">../vc9win32</Export>
+    		<Export platform="win32" tool="vc8">../vc8win32</Export>
+    		<Export platform="win32" tool="vc7">../vc7win32</Export>
+    		<Export platform="win64" tool="vc9">../vc9win64</Export>
+    		<Export platform="win64" tool="vc8">../vc8win64</Export>
+    		<Export platform="win64" tool="vc7">../vc7win64</Export>
 
-			<Configuration name="default" platform="Win32" type="dll">
-				<OutFile>MeshImportEzm.dll</OutFile>
+			<Configuration name="default" type="dll">
 				<Preprocessor type="define">
 					WIN32
 					_WINDOWS
 					UNICODE=1
 					_UNICODE=1
-          MESHIMPORTEZM_EXPORTS
+          		MESHIMPORTEZM_EXPORTS
 				</Preprocessor>
 				<Files name="Source Files" root="../../src/MeshImportEzm" type="source">
 					*.cpp
@@ -50,8 +55,6 @@
           snippets/LegacyFastXml.cpp
           snippets/UserMemAlloc.h
 				</Files>
-				<OutDir>../../bin/win32</OutDir>
-				<ImpDir>../../lib/win32</ImpDir>
 				<SearchPaths type="header">
                 ../../include
                 ../../include/common/snippets
@@ -67,7 +70,10 @@
  				<LFlags tool="vc8">/NODEFAULTLIB:libcp.lib</LFlags>
 			</Configuration>
 
-			<Configuration name="debug">
+			<Configuration name="debug" platform="win32">
+				<OutFile>MeshImportEzm_x86.dll</OutFile>
+				<OutDir>../../bin/win32</OutDir>
+				<ImpDir>../../lib/win32</ImpDir>
 				<CFlags>/WX /W4 /fp:fast /MDd /Zi</CFlags>
 				<LFlags>/DEBUG</LFlags>
 				<Preprocessor type="define">
@@ -77,7 +83,10 @@
 				</Libraries>
 			</Configuration>
 
-			<Configuration name="release">
+			<Configuration name="release" platform="win32">
+				<OutFile>MeshImportEzm_x86.dll</OutFile>
+				<OutDir>../../bin/win32</OutDir>
+				<ImpDir>../../lib/win32</ImpDir>
 				<CFlags>/Zi /WX /W4 /fp:fast /WX /MD /O2</CFlags>
 				<LFlags>/DEBUG</LFlags>
 				<Preprocessor type="define">
@@ -86,6 +95,33 @@
 				<Libraries>
 				</Libraries>
 			</Configuration>
+
+			<Configuration name="debug" platform="win64">
+				<OutFile>MeshImportEzm_x64.dll</OutFile>
+				<OutDir>../../bin/win64</OutDir>
+				<ImpDir>../../lib/win64</ImpDir>
+				<CFlags>/WX /W4 /fp:fast /MDd /Zi</CFlags>
+				<LFlags>/DEBUG</LFlags>
+				<Preprocessor type="define">
+					_DEBUG
+				</Preprocessor>
+				<Libraries>
+				</Libraries>
+			</Configuration>
+
+			<Configuration name="release" platform="win64">
+				<OutFile>MeshImportEzm_x64.dll</OutFile>
+				<OutDir>../../bin/win64</OutDir>
+				<ImpDir>../../lib/win64</ImpDir>
+				<CFlags>/Zi /WX /W4 /fp:fast /WX /MD /O2</CFlags>
+				<LFlags>/DEBUG</LFlags>
+				<Preprocessor type="define">
+					NDEBUG
+				</Preprocessor>
+				<Libraries>
+				</Libraries>
+			</Configuration>
+
 
 		</Target>
 	</Project>

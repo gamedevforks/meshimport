@@ -807,8 +807,8 @@ bool           endsWith(const char *str,const char *ends,bool caseSensitive)
 {
   bool ret = false;
 
-  NxI32 l1 = strlen(str);
-  NxI32 l2 = strlen(ends);
+  NxI32 l1 = (NxI32)strlen(str);
+  NxI32 l2 = (NxI32)strlen(ends);
   if ( l1 >= l2 )
   {
     NxI32 diff = l1-l2;

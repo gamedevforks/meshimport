@@ -115,7 +115,7 @@ public:
   MeshAnimTrack * gather(void)
   {
     mTrack.mName = mName;
-    mTrack.mFrameCount = mKeys.size();
+    mTrack.mFrameCount = (NxI32)mKeys.size();
     mTrack.mDuration = mDuration;
     mTrack.mDtime    = mDtime;
     mTrack.mPose = MEMALLOC_NEW(MeshAnimPose)[mTrack.mFrameCount];
@@ -458,7 +458,7 @@ public:
         {
           MeshSkeleton s;
           s.SetName( mSkeletonName.Get() );
-          s.mBoneCount = mBones.size();
+          s.mBoneCount = (NxI32)mBones.size();
           s.mBones = MEMALLOC_NEW(MeshBone)[s.mBoneCount];
           memcpy(s.mBones,&mBones[0],sizeof(MeshBone)*s.mBoneCount);
           callback->importSkeleton(s);
@@ -501,7 +501,7 @@ public:
   {
     if ( mCallback && mAnimation )
     {
-      mAnimation->mTrackCount = mAnimTracks.size();
+      mAnimation->mTrackCount = (NxI32)mAnimTracks.size();
       if ( !mAnimTracks.empty() )
       {
         mAnimation->mTracks = (MeshAnimTrack **)MEMALLOC_MALLOC(sizeof(MeshAnimTrack *)*mAnimation->mTrackCount);
@@ -603,7 +603,7 @@ public:
         if ( mElement == NE_BONE )
         {
           mCurrentBone = atoi(savalue);
-          NxI32 bsize = mBones.size();
+          NxI32 bsize = (NxI32)mBones.size();
           NxI32 breserve = mCurrentBone+1;
           if ( bsize < breserve )
           {
@@ -882,7 +882,7 @@ public:
           if ( mCurrentBone != -1 )
           {
             StringRef ref = mStrings.Get(savalue);
-            NxI32 bcount = mBones.size();
+            NxI32 bcount = (NxI32)mBones.size();
             MeshBone &bp = mBones[mCurrentBone];
             for (NxI32 i=0; i<bcount; i++)
             {
@@ -900,7 +900,7 @@ public:
         if ( mElement == NE_BONEPARENT )
         {
           StringRef ref = mStrings.Get(savalue);
-          NxI32 bcount = mBones.size();
+          NxI32 bcount = (NxI32)mBones.size();
           mCurrentBone = -1;
           for (NxI32 i=0; i<bcount; i++)
           {
