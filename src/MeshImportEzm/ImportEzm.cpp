@@ -816,12 +816,13 @@ public:
                 if ( mVertexFlags )
                 {
   								MeshVertex vtx[3];
-  								const NxU8 *temp = (const NxU8 *)Asc2Bin(svalue, 3, mCtype, 0 );
+  								const NxU8 *mem = (const NxU8 *)Asc2Bin(svalue, 3, mCtype, 0 );
+								const NxU8 *temp = mem;
                   temp = getVertex(temp,vtx[0],a2,c2);
                   temp = getVertex(temp,vtx[1],a2,c2);
                   temp = getVertex(temp,vtx[2],a2,c2);
                   mCallback->importTriangle(mCurrentMesh.Get(),mCurrentMaterial.Get(),mVertexFlags,vtx[0],vtx[1],vtx[2]);
-                  MEMALLOC_FREE((void *)temp);
+                  MEMALLOC_FREE((void *)mem);
                 }
   					}
   					mCtype = 0;
