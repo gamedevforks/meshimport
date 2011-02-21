@@ -1451,7 +1451,7 @@ public:
 
 // convenience helper functions.
   virtual MeshSkeletonInstance *createMeshSkeletonInstance(const MeshSkeleton &sk) = 0;
-  virtual bool                  sampleAnimationTrack(NxI32 trackIndex,const MeshSystem *msystem,MeshSkeletonInstance *skeleton) = 0;
+  virtual bool                  sampleAnimationTrack(const MeshAnimation* anim, NxI32 trackIndex,const MeshSystem *msystem,MeshSkeletonInstance *skeleton) = 0;
   virtual void                  releaseMeshSkeletonInstance(MeshSkeletonInstance *sk) = 0;
 
   // apply bone weighting transforms to this vertex buffer.
@@ -1475,7 +1475,7 @@ protected:
 };
 
 
-#define MESHIMPORT_VERSION 11  // version 0.01  increase this version number whenever an interface change occurs.
+#define MESHIMPORT_VERSION 12  // version 0.01  increase this version number whenever an interface change occurs.
 
 
 extern MeshImport *gMeshImport; // This is an optional global variable that can be used by the application.  If the application uses it, it should define it somewhere in its codespace.
