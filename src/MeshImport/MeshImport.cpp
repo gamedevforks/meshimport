@@ -2215,12 +2215,13 @@ public:
     }
   }
 
-  virtual bool  sampleAnimationTrack(const MeshAnimation* anim, NxI32 trackIndex,const MeshSystem *msystem,MeshSkeletonInstance *skeleton)
+  virtual bool  sampleAnimationTrack(NxI32 trackIndex,const MeshSystem *msystem,MeshSkeletonInstance *skeleton)
   {
     bool ret = false;
 
-    if ( anim && msystem && skeleton )
+    if ( msystem && skeleton && msystem->mAnimationCount )
     {
+      MeshAnimation *anim = msystem->mAnimations[0]; // got the animation.
       for (NxI32 i=0; i<skeleton->mBoneCount; i++)
       {
         MeshBoneInstance &b = skeleton->mBones[i];
