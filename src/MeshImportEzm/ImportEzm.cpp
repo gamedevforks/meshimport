@@ -693,9 +693,9 @@ public:
                   {
                     MeshAnimTrack *track = MEMALLOC_NEW(MeshAnimTrack);
                     track->mDtime = mAnimation->mDuration;
-                    track->mFrameCount = mAnimation->mFrameCount;
                     track->mDuration = mAnimation->mDuration;
-                    track->mPose = MEMALLOC_NEW(MeshAnimPose)[track->mFrameCount];
+                    //track->mFrameCount = mAnimation->mFrameCount;
+                    //track->mPose = MEMALLOC_NEW(MeshAnimPose)[track->mFrameCount];
                     mAnimation->mTracks[i] = track;
                   }
 						}
@@ -731,6 +731,11 @@ public:
   				{
   					mAnimTrack->SetName(mStrings.Get(mName).Get());
   					NxI32 count = atoi( mCount );
+					if ( mAnimTrack->mFrameCount == 0 && mAnimTrack->mPose == 0 )
+					{
+	                    mAnimTrack->mFrameCount = count;
+	                    mAnimTrack->mPose = MEMALLOC_NEW(MeshAnimPose)[count];
+					}
   					if ( count == mAnimTrack->GetFrameCount() )
   					{
                 if ( mHasScale )
