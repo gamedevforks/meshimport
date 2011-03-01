@@ -146,6 +146,7 @@ public:
 	{
 		mType     = NT_NONE;
 		mBone     = 0;
+		mBoneParents = 0;
 		mFrameCount = 0;
 		mDuration   = 0;
 		mTrackCount = 0;
@@ -233,7 +234,7 @@ public:
 
   virtual ~MeshImportEZM(void)
   {
-
+	  delete [] mBoneParents;
   }
 
   const NxU8 * getVertex(const NxU8 *src,MeshVertex &v,const char **types,NxI32 tcount)
@@ -722,216 +723,216 @@ public:
   }
   void ProcessData(const char *svalue)
   {
-    if ( svalue )
-    {
-  		switch ( mType )
-  		{
-  			case NT_ANIM_TRACK:
-  				if ( mAnimTrack )
-  				{
-  					mAnimTrack->SetName(mStrings.Get(mName).Get());
-  					NxI32 count = atoi( mCount );
-					if ( mAnimTrack->mFrameCount == 0 && mAnimTrack->mPose == 0 )
-					{
-	                    mAnimTrack->mFrameCount = count;
-	                    mAnimTrack->mPose = MEMALLOC_NEW(MeshAnimPose)[count];
-					}
-  					if ( count == mAnimTrack->GetFrameCount() )
-  					{
-                if ( mHasScale )
-                {
-  								NxF32 *buff = (NxF32 *) MEMALLOC_MALLOC(sizeof(NxF32)*10*count);
-  								Asc2Bin(svalue, count, "fff ffff fff", buff );
-  								for (NxI32 i=0; i<count; i++)
-  								{
-  									MeshAnimPose *p = mAnimTrack->GetPose(i);
-  									const NxF32 *src = &buff[i*10];
+	  if ( svalue )
+	  {
+		  switch ( mType )
+		  {
+		  case NT_ANIM_TRACK:
+			  if ( mAnimTrack )
+			  {
+				  mAnimTrack->SetName(mStrings.Get(mName).Get());
+				  NxI32 count = atoi( mCount );
+				  if ( mAnimTrack->mFrameCount == 0 && mAnimTrack->mPose == 0 )
+				  {
+					  mAnimTrack->mFrameCount = count;
+					  mAnimTrack->mPose = MEMALLOC_NEW(MeshAnimPose)[count];
+				  }
+				  if ( count == mAnimTrack->GetFrameCount() )
+				  {
+					  if ( mHasScale )
+					  {
+						  NxF32 *buff = (NxF32 *) MEMALLOC_MALLOC(sizeof(NxF32)*10*count);
+						  Asc2Bin(svalue, count, "fff ffff fff", buff );
+						  for (NxI32 i=0; i<count; i++)
+						  {
+							  MeshAnimPose *p = mAnimTrack->GetPose(i);
+							  const NxF32 *src = &buff[i*10];
 
-  									p->mPos[0]  = src[0];
-  									p->mPos[1]  = src[1];
-  									p->mPos[2]  = src[2];
+							  p->mPos[0]  = src[0];
+							  p->mPos[1]  = src[1];
+							  p->mPos[2]  = src[2];
 
-  									p->mQuat[0] = src[3];
-  									p->mQuat[1] = src[4];
-  									p->mQuat[2] = src[5];
-  									p->mQuat[3] = src[6];
+							  p->mQuat[0] = src[3];
+							  p->mQuat[1] = src[4];
+							  p->mQuat[2] = src[5];
+							  p->mQuat[3] = src[6];
 
-                    p->mScale[0] = src[7];
-                    p->mScale[1] = src[8];
-                    p->mScale[2] = src[9];
-  								}
-                }
-                else
-                {
-  								NxF32 *buff = (NxF32 *) MEMALLOC_MALLOC(sizeof(NxF32)*7*count);
-  								Asc2Bin(svalue, count, "fff ffff", buff );
-  								for (NxI32 i=0; i<count; i++)
-  								{
-  									MeshAnimPose *p = mAnimTrack->GetPose(i);
-  									const NxF32 *src = &buff[i*7];
+							  p->mScale[0] = src[7];
+							  p->mScale[1] = src[8];
+							  p->mScale[2] = src[9];
+						  }
+					  }
+					  else
+					  {
+						  NxF32 *buff = (NxF32 *) MEMALLOC_MALLOC(sizeof(NxF32)*7*count);
+						  Asc2Bin(svalue, count, "fff ffff", buff );
+						  for (NxI32 i=0; i<count; i++)
+						  {
+							  MeshAnimPose *p = mAnimTrack->GetPose(i);
+							  const NxF32 *src = &buff[i*7];
 
-  									p->mPos[0]  = src[0];
-  									p->mPos[1]  = src[1];
-  									p->mPos[2]  = src[2];
+							  p->mPos[0]  = src[0];
+							  p->mPos[1]  = src[1];
+							  p->mPos[2]  = src[2];
 
-  									p->mQuat[0] = src[3];
-  									p->mQuat[1] = src[4];
-  									p->mQuat[2] = src[5];
-  									p->mQuat[3] = src[6];
+							  p->mQuat[0] = src[3];
+							  p->mQuat[1] = src[4];
+							  p->mQuat[2] = src[5];
+							  p->mQuat[3] = src[6];
 
-                    p->mScale[0] = 1;
-                    p->mScale[1] = 1;
-                    p->mScale[2] = 1;
-  								}
-                }
-  					}
-  				}
-  				break;
-  			case NT_NODE_INSTANCE:
-            #if 0 // TODO TODO
-  				if ( mName )
-  				{
-  					NxF32 transform[4*4];
-  					Asc2Bin(svalue, 4, "ffff", transform );
-              MeshBone b;
-              b.SetTransform(transform);
-              NxF32 pos[3];
-              NxF32 quat[3];
-              NxF32 scale[3] = { 1, 1, 1 };
-              b.ExtractOrientation(quat);
-              b.GetPos(pos);
-  					mCallback->importMeshInstance(mName,pos,quat,scale);
-  					mName = 0;
-  				}
-            #endif
-  				break;
-  			case NT_NODE_TRIANGLE:
-  				if ( mCtype && mSemantic )
-  				{
-              NxI32 c1,c2;
-              char scratch1[2048];
-              char scratch2[2048];
-              strcpy(scratch1,mCtype);
-              strcpy(scratch2,mSemantic);
-              const char **a1 = mParser1.GetArglist(scratch1,c1);
-              const char **a2 = mParser2.GetArglist(scratch2,c2);
-              if ( c1 > 0 && c2 > 0 && c1 == c2 )
-              {
-                mVertexFlags = validateSemantics(a1,a2,c1);
-                if ( mVertexFlags )
-                {
-  								MeshVertex vtx[3];
-  								const NxU8 *mem = (const NxU8 *)Asc2Bin(svalue, 3, mCtype, 0 );
-								const NxU8 *temp = mem;
-                  temp = getVertex(temp,vtx[0],a2,c2);
-                  temp = getVertex(temp,vtx[1],a2,c2);
-                  temp = getVertex(temp,vtx[2],a2,c2);
-                  mCallback->importTriangle(mCurrentMesh.Get(),mCurrentMaterial.Get(),mVertexFlags,vtx[0],vtx[1],vtx[2]);
-                  MEMALLOC_FREE((void *)mem);
-                }
-  					}
-  					mCtype = 0;
-  					mSemantic = 0;
-  				}
-  				break;
-  			case NT_VERTEX_BUFFER:
-  	      MEMALLOC_FREE( mVertexBuffer);
-            delete []mVertices;
-            mVertices = 0;
-  				mVertexCount = 0;
-  				mVertexBuffer = 0;
+							  p->mScale[0] = 1;
+							  p->mScale[1] = 1;
+							  p->mScale[2] = 1;
+						  }
+					  }
+				  }
+			  }
+			  break;
+		  case NT_NODE_INSTANCE:
+#if 0 // TODO TODO
+			  if ( mName )
+			  {
+				  NxF32 transform[4*4];
+				  Asc2Bin(svalue, 4, "ffff", transform );
+				  MeshBone b;
+				  b.SetTransform(transform);
+				  NxF32 pos[3];
+				  NxF32 quat[3];
+				  NxF32 scale[3] = { 1, 1, 1 };
+				  b.ExtractOrientation(quat);
+				  b.GetPos(pos);
+				  mCallback->importMeshInstance(mName,pos,quat,scale);
+				  mName = 0;
+			  }
+#endif
+			  break;
+		  case NT_NODE_TRIANGLE:
+			  if ( mCtype && mSemantic )
+			  {
+				  NxI32 c1,c2;
+				  char scratch1[2048];
+				  char scratch2[2048];
+				  strcpy(scratch1,mCtype);
+				  strcpy(scratch2,mSemantic);
+				  const char **a1 = mParser1.GetArglist(scratch1,c1);
+				  const char **a2 = mParser2.GetArglist(scratch2,c2);
+				  if ( c1 > 0 && c2 > 0 && c1 == c2 )
+				  {
+					  mVertexFlags = validateSemantics(a1,a2,c1);
+					  if ( mVertexFlags )
+					  {
+						  MeshVertex vtx[3];
+						  const NxU8 *mem = (const NxU8 *)Asc2Bin(svalue, 3, mCtype, 0 );
+						  const NxU8 *temp = mem;
+						  temp = getVertex(temp,vtx[0],a2,c2);
+						  temp = getVertex(temp,vtx[1],a2,c2);
+						  temp = getVertex(temp,vtx[2],a2,c2);
+						  mCallback->importTriangle(mCurrentMesh.Get(),mCurrentMaterial.Get(),mVertexFlags,vtx[0],vtx[1],vtx[2]);
+						  MEMALLOC_FREE((void *)mem);
+					  }
+				  }
+				  mCtype = 0;
+				  mSemantic = 0;
+			  }
+			  break;
+		  case NT_VERTEX_BUFFER:
+			  MEMALLOC_FREE( mVertexBuffer);
+			  delete []mVertices;
+			  mVertices = 0;
+			  mVertexCount = 0;
+			  mVertexBuffer = 0;
 
-  				if ( mCtype && mCount )
-  				{
-  					mVertexCount  = atoi(mCount);
-  					if ( mVertexCount > 0 )
-  					{
-  						mVertexBuffer = Asc2Bin(svalue, mVertexCount, mCtype, 0 );
+			  if ( mCtype && mCount )
+			  {
+				  mVertexCount  = atoi(mCount);
+				  if ( mVertexCount > 0 )
+				  {
+					  mVertexBuffer = Asc2Bin(svalue, mVertexCount, mCtype, 0 );
 
-                if ( mVertexBuffer )
-                {
+					  if ( mVertexBuffer )
+					  {
 
-                  NxI32 c1,c2;
-                  char scratch1[2048];
-                  char scratch2[2048];
-                  strcpy(scratch1,mCtype);
-                  strcpy(scratch2,mSemantic);
+						  NxI32 c1,c2;
+						  char scratch1[2048];
+						  char scratch2[2048];
+						  strcpy(scratch1,mCtype);
+						  strcpy(scratch2,mSemantic);
 
-                  const char **a1 = mParser1.GetArglist(scratch1,c1);
-                  const char **a2 = mParser2.GetArglist(scratch2,c2);
+						  const char **a1 = mParser1.GetArglist(scratch1,c1);
+						  const char **a2 = mParser2.GetArglist(scratch2,c2);
 
-                  if ( c1 > 0 && c2 > 0 && c1 == c2 )
-                  {
-                    mVertexFlags = validateSemantics(a1,a2,c1);
-                    if ( mVertexFlags )
-                    {
-                      mVertices = MEMALLOC_NEW(MeshVertex)[mVertexCount];
-                      const NxU8 *scan = (const NxU8 *)mVertexBuffer;
-                      for (NxI32 i=0; i<mVertexCount; i++)
-                      {
-                        scan = getVertex(scan,mVertices[i],a2,c2);
-                      }
-                    }
-                  }
-      			      MEMALLOC_FREE( mVertexBuffer);
-                  mVertexBuffer = 0;
-                }
+						  if ( c1 > 0 && c2 > 0 && c1 == c2 )
+						  {
+							  mVertexFlags = validateSemantics(a1,a2,c1);
+							  if ( mVertexFlags )
+							  {
+								  mVertices = MEMALLOC_NEW(MeshVertex)[mVertexCount];
+								  const NxU8 *scan = (const NxU8 *)mVertexBuffer;
+								  for (NxI32 i=0; i<mVertexCount; i++)
+								  {
+									  scan = getVertex(scan,mVertices[i],a2,c2);
+								  }
+							  }
+						  }
+						  MEMALLOC_FREE( mVertexBuffer);
+						  mVertexBuffer = 0;
+					  }
 
-  					}
-  					mCtype = 0;
-  					mCount = 0;
-  				}
-  				break;
-  			case NT_INDEX_BUFFER:
-  				if ( mCount )
-  				{
-  					mIndexCount = atoi(mCount);
-  					if ( mIndexCount > 0 )
-  					{
-  						mIndexBuffer = Asc2Bin(svalue, mIndexCount, "ddd", 0 );
-  					}
-  				}
+				  }
+				  mCtype = 0;
+				  mCount = 0;
+			  }
+			  break;
+		  case NT_INDEX_BUFFER:
+			  if ( mCount )
+			  {
+				  mIndexCount = atoi(mCount);
+				  if ( mIndexCount > 0 )
+				  {
+					  mIndexBuffer = Asc2Bin(svalue, mIndexCount, "ddd", 0 );
+				  }
+			  }
 
-  				if ( mIndexBuffer && mVertices )
-  				{
-              if ( mMeshCollisionConvex )
-              {
-                NxF32 *vertices = (NxF32 *)MEMALLOC_MALLOC(sizeof(NxF32)*mVertexCount*3);
-                NxF32 *dest = vertices;
-                for (NxI32 i=0; i<mVertexCount; i++)
-                {
-                  dest[0] = mVertices[i].mPos[0];
-                  dest[1] = mVertices[i].mPos[1];
-                  dest[2] = mVertices[i].mPos[2];
-                  dest+=3;
-                }
+			  if ( mIndexBuffer && mVertices )
+			  {
+				  if ( mMeshCollisionConvex )
+				  {
+					  NxF32 *vertices = (NxF32 *)MEMALLOC_MALLOC(sizeof(NxF32)*mVertexCount*3);
+					  NxF32 *dest = vertices;
+					  for (NxI32 i=0; i<mVertexCount; i++)
+					  {
+						  dest[0] = mVertices[i].mPos[0];
+						  dest[1] = mVertices[i].mPos[1];
+						  dest[2] = mVertices[i].mPos[2];
+						  dest+=3;
+					  }
 
-                mCallback->importConvexHull(mCollisionRepName.Get(),
-                                            mMeshCollisionConvex->mName,
-                                            mMeshCollisionConvex->mTransform,
-                                            mVertexCount,
-                                            vertices,
-                                            mIndexCount,
-                                            (const NxU32 *)mIndexBuffer);
+					  mCallback->importConvexHull(mCollisionRepName.Get(),
+						  mMeshCollisionConvex->mName,
+						  mMeshCollisionConvex->mTransform,
+						  mVertexCount,
+						  vertices,
+						  mIndexCount,
+						  (const NxU32 *)mIndexBuffer);
 
-                delete []vertices;
-                delete mMeshCollisionConvex;
-                mMeshCollisionConvex = 0;
-              }
-              else
-              {
-                mCallback->importIndexedTriangleList(mCurrentMesh.Get(),mCurrentMaterial.Get(),mVertexFlags,mVertexCount,mVertices,mIndexCount,(const NxU32 *)mIndexBuffer );
-              }
-  					}
+					  delete []vertices;
+					  delete mMeshCollisionConvex;
+					  mMeshCollisionConvex = 0;
+				  }
+				  else
+				  {
+					  mCallback->importIndexedTriangleList(mCurrentMesh.Get(),mCurrentMaterial.Get(),mVertexFlags,mVertexCount,mVertices,mIndexCount,(const NxU32 *)mIndexBuffer );
+				  }
+			  }
 
 
-  				MEMALLOC_FREE( mIndexBuffer);
-  				mIndexBuffer = 0;
-  				mIndexCount = 0;
-  				break;
-  		}
-		}
-	}
+			  MEMALLOC_FREE( mIndexBuffer);
+			  mIndexBuffer = 0;
+			  mIndexCount = 0;
+			  break;
+		  }
+	  }
+  }
 
 	void ProcessAttribute(const char *aname,  // the name of the attribute
 												const char *savalue) // the value of the attribute
@@ -967,10 +968,30 @@ public:
 				mBoneIndex++;
 				if ( mBoneIndex == mSkeleton->GetBoneCount() )
 				{
+					for (NxI32 i=0; i<mSkeleton->GetBoneCount(); i++)
+					{
+						MeshBone* bone = mSkeleton->GetBonePtr(i);
+						const char *parent = mBoneParents[i].Get();
+						if ( *parent )
+						{
+							for (NxI32 j=0; j<mSkeleton->GetBoneCount(); j++)
+							{
+								const MeshBone &b = mSkeleton->GetBone(j);
+								if ( strcmp(parent,b.mName) == 0 )
+								{
+									bone->mParentIndex = j;
+									break;
+								}
+							}
+						}
+					}
+
 					mCallback->importSkeleton(*mSkeleton);
 					delete mSkeleton;
 					mSkeleton = 0;
 					mBoneIndex = 0;
+					delete [] mBoneParents;
+					mBoneParents = 0;
 				}
 			}
 			break;
@@ -1026,36 +1047,36 @@ public:
 
 				switch ( mType )
 				{
-          case NT_MESH_COLLISION:
-            assert( mMeshCollision );
-            if ( mMeshCollision )
-            {
-              mMeshCollision->mName = mStrings.Get(savalue).Get();
-            }
-            break;
-          case NT_MESH_COLLISION_REPRESENTATION:
-            assert(mMeshCollisionRepresentation);
-            if ( mMeshCollisionRepresentation )
-            {
-              mMeshCollisionRepresentation->mName = mStrings.Get(savalue).Get();
-            }
-            break;
-					case NT_MESH:
-            mCurrentMesh = mStrings.Get(savalue);
-            mCallback->importMesh(savalue,0);
-						break;
-					case NT_SKELETON:
-						if ( mSkeleton )
-						{
-							mSkeleton->SetName(mStrings.Get(savalue).Get());
-						}
-						break;
-					case NT_BONE:
-						if ( mBone )
-						{
-							mBone->SetName(mStrings.Get(savalue).Get());
-						}
-						break;
+				case NT_MESH_COLLISION:
+					assert( mMeshCollision );
+					if ( mMeshCollision )
+					{
+						mMeshCollision->mName = mStrings.Get(savalue).Get();
+					}
+					break;
+				case NT_MESH_COLLISION_REPRESENTATION:
+					assert(mMeshCollisionRepresentation);
+					if ( mMeshCollisionRepresentation )
+					{
+						mMeshCollisionRepresentation->mName = mStrings.Get(savalue).Get();
+					}
+					break;
+				case NT_MESH:
+					mCurrentMesh = mStrings.Get(savalue);
+					mCallback->importMesh(savalue,0);
+					break;
+				case NT_SKELETON:
+					if ( mSkeleton )
+					{
+						mSkeleton->SetName(mStrings.Get(savalue).Get());
+					}
+					break;
+				case NT_BONE:
+					if ( mBone )
+					{
+						mBone->SetName(mStrings.Get(savalue).Get());
+					}
+					break;
 				}
 				break;
       case AT_TRIANGLE_COUNT:
@@ -1072,6 +1093,7 @@ public:
 						{
 							MeshBone *bones;
 							bones = MEMALLOC_NEW(MeshBone)[count];
+							mBoneParents = MEMALLOC_NEW(StringRef)[count];
 							mSkeleton->SetBones(count,bones);
 							mBoneIndex = 0;
 						}
@@ -1082,15 +1104,7 @@ public:
 				mParent = savalue;
 				if ( mBone )
 				{
-					for (NxI32 i=0; i<mBoneIndex; i++)
-					{
-						const MeshBone &b = mSkeleton->GetBone(i);
-						if ( strcmp(mParent,b.mName) == 0 )
-						{
-							mBone->mParentIndex = i;
-							break;
-						}
-					}
+					mBoneParents[mBoneIndex] = mStrings.Get(savalue);
 				}
 				break;
 			case AT_MATERIAL:
@@ -1157,6 +1171,7 @@ private:
 	NxI32          mTrackIndex;
 	NxI32          mBoneIndex;
 	MeshBone       * mBone;
+	StringRef		* mBoneParents;
 
 	MeshAnimation  * mAnimation;
 	MeshAnimTrack  * mAnimTrack;
