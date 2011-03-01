@@ -2265,6 +2265,7 @@ public:
         {
           memcpy(transform,b.mLocalTransform,sizeof(NxF32)*16);
         }
+#if 0
         if ( b.mParentIndex != -1 )
         {
           MeshBoneInstance &parent = skeleton->mBones[b.mParentIndex];
@@ -2276,11 +2277,37 @@ public:
 //          fmi_identity(b.mAnimTransform);
         }
         fmi_multiply(b.mInverseTransform,b.mAnimTransform,b.mCompositeAnimTransform);
+#else
+		memcpy(b.mAnimTransform,transform,sizeof(NxF32)*16);
+	  }
+      for (NxI32 i=0; i<skeleton->mBoneCount; i++)
+	  {
+		  if ( skeleton->mBones[i].mParentIndex == -1 )
+			  poseBone( skeleton, i );
+#endif
       }
       ret = true;
     }
 
     return ret;
+  }
+
+  void poseBone(MeshSkeletonInstance *skeleton, NxI32 boneIdx)
+  {
+	  MeshBoneInstance &b = skeleton->mBones[boneIdx];
+	  if ( b.mParentIndex != -1 )
+	  {
+		  MeshBoneInstance &parent = skeleton->mBones[b.mParentIndex];
+		  fmi_multiply(b.mAnimTransform,parent.mAnimTransform,b.mAnimTransform); // multiply times the parent matrix.
+	  }
+	  fmi_multiply(b.mInverseTransform,b.mAnimTransform,b.mCompositeAnimTransform);
+
+	  // recurse to children.
+	  for ( NxI32 i = 0; i < skeleton->mBoneCount; ++i )
+	  {
+          if ( skeleton->mBones[i].mParentIndex == boneIdx )
+			  poseBone( skeleton, i );
+	  }
   }
 
   void transformPoint(const NxF32 v[3],NxF32 t[3],const NxF32 matrix[16])
