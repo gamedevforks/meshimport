@@ -2191,19 +2191,36 @@ public:
         dst.mBoneName = src.mName;
         dst.mParentIndex = src.mParentIndex;
         fmi_composeTransform(src.mPosition,src.mOrientation,src.mScale,dst.mLocalTransform);
-        if ( src.mParentIndex != -1 )
-        {
-          MeshBoneInstance &parent = ret->mBones[src.mParentIndex];
-          fmi_multiply(dst.mLocalTransform,parent.mTransform,dst.mTransform); // multiply times the parent matrix.
-        }
-        else
-        {
-          memcpy(dst.mTransform,dst.mLocalTransform,sizeof(NxF32)*16);
-        }
-        dst.composeInverse(); // compose the inverse transform.
-      }
+	  }
+      for (NxI32 i=0; i<ret->mBoneCount; i++)
+      {
+        const MeshBone &src   = sk.mBones[i];
+		if (src.mParentIndex == -1)
+			composeBoneTransform(ret, i);
+	  }
     }
     return ret;
+  }
+
+  void composeBoneTransform(MeshSkeletonInstance* ret, NxI32 idx)
+  {
+	  MeshBoneInstance &bone = ret->mBones[idx];
+	  if (bone.mParentIndex != -1)
+	  {
+		  MeshBoneInstance &parent = ret->mBones[bone.mParentIndex];
+		  fmi_multiply(bone.mLocalTransform,parent.mTransform,bone.mTransform); // multiply times the parent matrix.
+	  }
+	  else
+	  {
+		  memcpy(bone.mTransform,bone.mLocalTransform,sizeof(NxF32)*16);
+	  }
+	  bone.composeInverse(); // compose the inverse transform.
+
+      for (NxI32 i=0; i<ret->mBoneCount; i++)
+      {
+		  if (ret->mBones[i].mParentIndex == idx)
+			  composeBoneTransform(ret, i);
+	  }
   }
 
   virtual  void  releaseMeshSkeletonInstance(MeshSkeletonInstance *sk)
