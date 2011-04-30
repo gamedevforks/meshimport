@@ -22,6 +22,7 @@
 #include <float.h>
 #include <malloc.h>
 #include <math.h>
+#include <assert.h>
 
 #if 1
 #include "UserMemAlloc.h"
@@ -49,6 +50,23 @@ typedef unsigned char NxU8;
 
 namespace NVSHARE
 {
+
+inline bool fmi_equal(const NxF32 a, const NxF32 b, const NxF32 epsilon)
+{
+	return (fabs(b - a) < epsilon);
+}
+inline bool fmi_equal(const NxF64 a, const NxF64 b, const NxF64 epsilon)
+{
+	return (fabs(b - a) < epsilon);
+}
+inline NxF32 fmi_clamp(const NxF32 a, const NxF32 lo, const NxF32 hi)
+{
+	if (a < lo)
+		return lo;
+	if (a > hi)
+		return hi;
+	return a;
+}
 
 inline NxF32 fmi_computePlane(const NxF32 *A,const NxF32 *B,const NxF32 *C,NxF32 *n) // returns D
 {
@@ -434,7 +452,19 @@ inline NxF32 fmi_dot(const NxF32 *p1,const NxF32 *p2)
   return p1[0]*p2[0]+p1[1]*p2[1]+p1[2]*p2[2];
 }
 
+// [Ax Ay Az]
+// [Bx By Bz]
+// 
+// Cx = Ay*Bz - Az*By
+// Cy = Ax*Bz - Az*Bx
+// Cz = Ax*By - Ay*Bx
 inline void fmi_cross(NxF32 *cross,const NxF32 *a,const NxF32 *b)
+{
+  cross[0] = a[1]*b[2] - a[2]*b[1];
+  cross[1] = a[2]*b[0] - a[0]*b[2];
+  cross[2] = a[0]*b[1] - a[1]*b[0];
+}
+inline void fmi_cross(NxF64 *cross,const NxF64 *a,const NxF64 *b)
 {
   cross[0] = a[1]*b[2] - a[2]*b[1];
   cross[1] = a[2]*b[0] - a[0]*b[2];
@@ -509,6 +539,95 @@ inline void fmi_inverseTransform(const NxF32 matrix[16],NxF32 inverse_matrix[16]
   }
 }
 
+// given the 2D triangle ABC, returns its area.
+inline NxF64 fmi_calcTriArea2D(const NxF32 *A, const NxF32 *B, const NxF32 *C)
+{
+	NxF64 area =
+		(A[0]*B[1] - B[0]*A[1]) +
+		(B[0]*C[1] - C[0]*B[1]) +
+		(C[0]*A[1] - A[0]*C[1]);
+	return (0.5 * area);
+}
+// given the 3D triangle ABC, returns its area.
+inline NxF64 fmi_calcTriArea3D(const NxF32 *A, const NxF32 *B, const NxF32 *C)
+{
+	NxF64 a[3];
+	a[0] = (NxF64)B[0] - (NxF64)A[0];
+	a[1] = (NxF64)B[1] - (NxF64)A[1];
+	a[2] = (NxF64)B[2] - (NxF64)A[2];
+
+	NxF64 b[3];
+	b[0] = (NxF64)C[0] - (NxF64)A[0];
+	b[1] = (NxF64)C[1] - (NxF64)A[1];
+	b[2] = (NxF64)C[2] - (NxF64)A[2];
+
+	NxF64 c[3];
+	fmi_cross(c, a, b);
+
+	NxF64 area = sqrt(c[0]*c[0] + c[1]*c[1] + c[2]*c[2]);
+	return (0.5 * area);
+}
+
+// given the 2D triangle ABC, and location P, outputs the barycentric coordinates (u,v,w).
+// * the return value is the area of the triangle, unless it's degenerate (returns 0)
+// * if the area of ABC is less than 'zeroEpsilon', then the triangle is considered degenerate.
+// * P is assumed to be on the surface of ABC.
+inline NxF64 fmi_barycentric2D(NxF64 *uvw,
+								const NxF32* A, const NxF32* B, const NxF32* C,
+								const NxF32* P,
+								const NxF64 zeroEpsilon = 0.0000125)
+{
+	// the slowest, but clearest algorithm.
+	NxF64 area_ABC = fmi_calcTriArea2D(A, B, C);
+	assert( !fmi_equal(area_ABC, 0.0, zeroEpsilon) );
+	if ( fmi_equal(area_ABC, 0.0, zeroEpsilon) )
+	{
+		uvw[0] = uvw[1] = uvw[2] = 0;
+	}
+	else
+	{
+		NxF64 area_PBC = fmi_calcTriArea2D(P, B, C);
+		NxF64 area_APC = fmi_calcTriArea2D(A, P, C);
+		NxF64 area_ABP = fmi_calcTriArea2D(A, B, P);
+		uvw[0] = area_ABP / area_ABC;
+		uvw[1] = area_PBC / area_ABC;
+		uvw[2] = area_APC / area_ABC;
+	}
+	assert( fmi_equal(uvw[0] + uvw[1] + uvw[2], 1.0, 0.0001) );
+	assert( (uvw[0] >= 0) && (uvw[1] >= 0) && (uvw[2] >= 0) );
+	return area_ABC;
+}
+
+// given the 3D triangle ABC, and location P, outputs the barycentric coordinates (u,v,w).
+// * the return value is the area of the triangle, unless it's degenerate (returns 0)
+// * if the area of ABC is less than 'zeroEpsilon', then the triangle is considered degenerate.
+// * P is assumed to be on the surface of ABC.
+inline NxF64 fmi_barycentric3D(NxF64 *uvw,
+								const NxF32* A, const NxF32* B, const NxF32* C,
+								const NxF32* P,
+								const NxF64 zeroEpsilon = 0.0000125)
+{
+	// the slowest, but clearest algorithm.
+	NxF64 area_ABC = fmi_calcTriArea3D(A, B, C);
+	assert( !fmi_equal(area_ABC, 0.0, zeroEpsilon) );
+	if ( fmi_equal(area_ABC, 0.0, zeroEpsilon) )
+	{
+		uvw[0] = uvw[1] = uvw[2] = 0;
+	}
+	else
+	{
+		NxF64 area_PBC = fmi_calcTriArea3D(P, B, C);
+		NxF64 area_APC = fmi_calcTriArea3D(A, P, C);
+		NxF64 area_ABP = fmi_calcTriArea3D(A, B, P);
+		uvw[0] = area_PBC / area_ABC;
+		uvw[1] = area_APC / area_ABC;
+		uvw[2] = area_ABP / area_ABC;
+	}
+	assert( fmi_equal(uvw[0] + uvw[1] + uvw[2], 1.0, 0.0001) );
+	assert( (uvw[0] >= 0) && (uvw[1] >= 0) && (uvw[2] >= 0) );
+	return area_ABC;
+}
+
 
 
 enum MeshVertexFlag
@@ -532,6 +651,7 @@ enum MeshVertexFlag
   MIVF_INTERP6        = (1<<16),
   MIVF_INTERP7        = (1<<17),
   MIVF_INTERP8        = (1<<18),
+  MIVF_MAX            = (1<<19), // iteration helper.
   MIVF_ALL = (MIVF_POSITION | MIVF_NORMAL | MIVF_COLOR | MIVF_TEXEL1 | MIVF_TEXEL2 | MIVF_TEXEL3 | MIVF_TEXEL4 | MIVF_TANGENT | MIVF_BINORMAL | MIVF_BONE_WEIGHTING )
 };
 
@@ -573,6 +693,108 @@ public:
     return ret;
   }
 
+  // outputs the specified vertex attribute.  Returns the number of components, e.g. MIVF_NORMAL would return 3.
+  // (Note: 'whichAttrib' must specify exactly one vertex flag.)
+  int	get(NxF32 out[4], MeshVertexFlag whichAttribute) const
+  {
+	  // verify that 'whichAttribute' specifies only one attribute.
+	  assert((whichAttribute & (whichAttribute-1)) == 0);
+
+	  switch (whichAttribute)
+	  {
+	  case MIVF_RADIUS:		out[0] = mRadius;		out[1] = 0;				out[2] = 0;				out[3] = 0; return 1;
+	  case MIVF_TEXEL1:		out[0] = mTexel1[0];	out[1] = mTexel1[1];	out[2] = 0;				out[3] = 0; return 2;
+	  case MIVF_TEXEL2:		out[0] = mTexel2[0];	out[1] = mTexel2[1];	out[2] = 0;				out[3] = 0; return 2;
+	  case MIVF_TEXEL3:		out[0] = mTexel3[0];	out[1] = mTexel3[1];	out[2] = 0;				out[3] = 0; return 2;
+	  case MIVF_TEXEL4:		out[0] = mTexel4[0];	out[1] = mTexel4[1];	out[2] = 0;				out[3] = 0; return 2;
+	  case MIVF_POSITION:	out[0] = mPos[0];		out[1] = mPos[1];		out[2] = mPos[2];		out[3] = 0; return 3;
+	  case MIVF_TANGENT:	out[0] = mTangent[0];	out[1] = mTangent[1];	out[2] = mTangent[2];	out[3] = 0; return 3;
+	  case MIVF_BINORMAL:	out[0] = mBiNormal[0];	out[1] = mBiNormal[1];	out[2] = mBiNormal[2];	out[3] = 0; return 3;
+	  case MIVF_NORMAL:		out[0] = mNormal[0];	out[1] = mNormal[1];	out[2] = mNormal[2];	out[3] = 0; return 3;
+	  case MIVF_INTERP1:	out[0] = mInterp1[0];	out[1] = mInterp1[1];	out[2] = mInterp1[2];	out[3] = mInterp1[3]; return 4;
+	  case MIVF_INTERP2:	out[0] = mInterp2[0];	out[1] = mInterp2[1];	out[2] = mInterp2[2];	out[3] = mInterp2[3]; return 4;
+	  case MIVF_INTERP3:	out[0] = mInterp3[0];	out[1] = mInterp3[1];	out[2] = mInterp3[2];	out[3] = mInterp3[3]; return 4;
+	  case MIVF_INTERP4:	out[0] = mInterp4[0];	out[1] = mInterp4[1];	out[2] = mInterp4[2];	out[3] = mInterp4[3]; return 4;
+	  case MIVF_INTERP5:	out[0] = mInterp5[0];	out[1] = mInterp5[1];	out[2] = mInterp5[2];	out[3] = mInterp5[3]; return 4;
+	  case MIVF_INTERP6:	out[0] = mInterp6[0];	out[1] = mInterp6[1];	out[2] = mInterp6[2];	out[3] = mInterp6[3]; return 4;
+	  case MIVF_INTERP7:	out[0] = mInterp7[0];	out[1] = mInterp7[1];	out[2] = mInterp7[2];	out[3] = mInterp7[3]; return 4;
+	  case MIVF_INTERP8:	out[0] = mInterp8[0];	out[1] = mInterp8[1];	out[2] = mInterp8[2];	out[3] = mInterp8[3]; return 4;
+	  case MIVF_BONE_WEIGHTING:	out[0] = mWeight[0];out[1] = mWeight[1];	out[2] = mWeight[2];	out[3] = mWeight[3]; return 4;
+		  // (Note --- not possible to set bone indices via this method.)
+	  case MIVF_COLOR:
+		  {
+			  // decode color components from range [0 .. 255] to range [0.0f .. 1.0f]
+			  NxU32 a = mColor>>24;
+			  NxU32 r = (mColor>>16)&0xFF;
+			  NxU32 g = (mColor>>8)&0xFF;
+			  NxU32 b = (mColor&0xFF);
+			  NxF32 fa = (NxF32)a*(1.0f/255.0f);
+			  NxF32 fr = (NxF32)r*(1.0f/255.0f);
+			  NxF32 fg = (NxF32)g*(1.0f/255.0f);
+			  NxF32 fb = (NxF32)b*(1.0f/255.0f);
+
+			  // return as RGBA.
+			  out[0] = fr;
+			  out[1] = fg;
+			  out[2] = fb;
+			  out[3] = fa;
+		  }
+		  return 4;
+	  }
+	  assert(!"MeshVertex::get(): specified MeshVertex attribute is invalid.");
+	  out[0] = out[1] = out[2] = out[3] = 0;
+	  return 0;
+  };
+
+  // sets the specified attribute.
+  // (Note: 'whichAttribute' must specify exactly one vertex flag.)
+  void	set(MeshVertexFlag whichAttribute, const NxF32 *in)
+  {
+	  // verify that 'whichAttribute' specifies only one attribute.
+	  assert((whichAttribute & (whichAttribute-1)) == 0);
+
+	  switch (whichAttribute)
+	  {
+	  case MIVF_RADIUS:		mRadius = in[0];		break;
+	  case MIVF_TEXEL1:		mTexel1[0] = in[0];		mTexel1[1] = in[1];		break;
+	  case MIVF_TEXEL2:		mTexel2[0] = in[0];		mTexel2[1] = in[1];		break;
+	  case MIVF_TEXEL3:		mTexel3[0] = in[0];		mTexel3[1] = in[1];		break;
+	  case MIVF_TEXEL4:		mTexel4[0] = in[0];		mTexel4[1] = in[1];		break;
+	  case MIVF_POSITION:	mPos[0] = in[0];		mPos[1] = in[1];		mPos[2] = in[2];		break;
+	  case MIVF_TANGENT:	mTangent[0] = in[0];	mTangent[1] = in[1];	mTangent[2] = in[2];	break;
+	  case MIVF_BINORMAL:	mBiNormal[0] = in[0];	mBiNormal[1] = in[1];	mBiNormal[2] = in[2];	break;
+	  case MIVF_NORMAL:		mNormal[0] = in[0];		mNormal[1] = in[1];		mNormal[2] = in[2];		break;
+	  case MIVF_INTERP1:	mInterp1[0] = in[0];	mInterp1[1] = in[1];	mInterp1[2] = in[2];	mInterp1[3] = in[3]; break;
+	  case MIVF_INTERP2:	mInterp2[0] = in[0];	mInterp2[1] = in[1];	mInterp2[2] = in[2];	mInterp2[3] = in[3]; break;
+	  case MIVF_INTERP3:	mInterp3[0] = in[0];	mInterp3[1] = in[1];	mInterp3[2] = in[2];	mInterp3[3] = in[3]; break;
+	  case MIVF_INTERP4:	mInterp4[0] = in[0];	mInterp4[1] = in[1];	mInterp4[2] = in[2];	mInterp4[3] = in[3]; break;
+	  case MIVF_INTERP5:	mInterp5[0] = in[0];	mInterp5[1] = in[1];	mInterp5[2] = in[2];	mInterp5[3] = in[3]; break;
+	  case MIVF_INTERP6:	mInterp6[0] = in[0];	mInterp6[1] = in[1];	mInterp6[2] = in[2];	mInterp6[3] = in[3]; break;
+	  case MIVF_INTERP7:	mInterp7[0] = in[0];	mInterp7[1] = in[1];	mInterp7[2] = in[2];	mInterp7[3] = in[3]; break;
+	  case MIVF_INTERP8:	mInterp8[0] = in[0];	mInterp8[1] = in[1];	mInterp8[2] = in[2];	mInterp8[3] = in[3]; break;
+	  case MIVF_BONE_WEIGHTING:	mWeight[0] = in[0];	mWeight[1] = in[1];		mWeight[2] = in[2];		mWeight[3] = in[3]; break;
+		  // (Note --- not possible to set bone indices via this method.)
+	  case MIVF_COLOR:
+		  {
+			  // encode color components from range [0.0f .. 1.0f] to [0 .. 255]
+			  NxU32 a = (NxU32)(fmi_clamp(in[0],0,1)*255.0f);
+			  NxU32 r = (NxU32)(fmi_clamp(in[1],0,1)*255.0f);
+			  NxU32 g = (NxU32)(fmi_clamp(in[2],0,1)*255.0f);
+			  NxU32 b = (NxU32)(fmi_clamp(in[3],0,1)*255.0f);
+
+			  // encode as ARGB.
+			  mColor =  (a << 24);
+			  mColor |= (r << 16);
+			  mColor |= (g << 8);
+			  mColor |= (b);
+		  }
+		  break;
+
+	  default:
+		  assert(!"MeshVertex::set(): specified MeshVertex component is invalid.");
+	  }
+  };
+
   NxF32          mPos[3];
   NxF32          mNormal[3];
   NxU32   		 mColor;
@@ -594,6 +816,32 @@ public:
   unsigned short mBone[4];
   NxF32          mRadius;
 };
+
+// returns barycentric coordinates for triangle ABC at location P.
+// * assumes P is on the surface of ABC.
+// * 'whichAttribute' must specify exactly one vertex flag.
+inline NxF64 mi_calcBarycentric(NxF64 *uvw,
+							  const MeshVertex& A, const MeshVertex& B, const MeshVertex& C,
+							  const MeshVertex& P,
+							  const MeshVertexFlag whichAttribute = MIVF_POSITION,
+							  const NxF64 zeroEpsilon = 0.0000125)
+{
+	NxF32 Pv[4], Av[4], Bv[4], Cv[4];
+
+	int numComponents = P.get(Pv, whichAttribute);
+	assert(numComponents == 2 || numComponents == 3);
+
+	A.get(Av, whichAttribute);
+	B.get(Bv, whichAttribute);
+	C.get(Cv, whichAttribute);
+
+	if (numComponents == 3)
+		return fmi_barycentric3D(uvw, Av, Bv, Cv, Pv, zeroEpsilon);
+	else if (numComponents == 2)
+		return fmi_barycentric2D(uvw, Av, Bv, Cv, Pv, zeroEpsilon);
+	else
+		return 0;
+}
 
 class MeshBone : public Memalloc
 {
