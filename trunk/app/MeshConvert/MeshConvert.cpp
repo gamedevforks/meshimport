@@ -92,6 +92,49 @@ public:
 };
 
 
+#if 0
+static void testBarycentric()
+{
+		NxF32 A[4] = { 0.0f, 1.0f, 0.0f, 0.0f };
+		NxF32 B[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
+		NxF32 C[4] = { 2.0f, 0.0f, 0.0f, 0.0f };
+		MeshVertex v[3];
+		v[0].set(MIVF_POSITION, A);
+		v[1].set(MIVF_POSITION, B);
+		v[2].set(MIVF_POSITION, C);
+
+		NxF32 P[4] = { 2.0f, 0.0f, 0.0f, 0.0f };
+		MeshVertex p;
+		p.set(MIVF_POSITION, P);
+
+		NxF64 uvw[3];
+		NVSHARE::mi_calcBarycentric(uvw, v[0],v[1],v[2], p);
+		printf("(%f\t%f\t%f)\n\n", uvw[0], uvw[1], uvw[2]);
+
+}
+#elif 0
+static void testBarycentric()
+{
+		NxF32 A[4] = { 0.0f, 1.0f, 0.0f, 0.0f };
+		NxF32 B[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
+		NxF32 C[4] = { 1.0f, 0.0f, 0.0f, 0.0f };
+		MeshVertex v[3];
+		v[0].set(MIVF_TEXEL1, A);
+		v[1].set(MIVF_TEXEL1, B);
+		v[2].set(MIVF_TEXEL1, C);
+
+		NxF32 P[4] = { 0.5001f, 0.5f, 0.0f, 0.0f };
+		MeshVertex p;
+		p.set(MIVF_TEXEL1, P);
+
+		NxF64 uvw[3];
+		NVSHARE::mi_calcBarycentric(uvw, v[0],v[1],v[2], p, MIVF_TEXEL1);
+		printf("(%f\t%f\t%f)\n\n", uvw[0], uvw[1], uvw[2]);
+
+}
+#endif
+
+
 void main(NxI32 argc,const char **argv)
 {
     if ( argc < 2 )
